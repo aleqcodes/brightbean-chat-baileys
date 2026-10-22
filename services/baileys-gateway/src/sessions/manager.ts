@@ -1,4 +1,5 @@
 import makeWASocket, { DisconnectReason, type WASocket } from '@whiskeysockets/baileys';
+import pino from 'pino';
 import { Boom } from '@hapi/boom';
 import { randomUUID } from 'node:crypto';
 import QRCode from 'qrcode';
@@ -7,6 +8,8 @@ import { join } from 'node:path';
 import { AuthStore } from './store.js';
 import { EventOutbox } from '../events/outbox.js';
 import { translateMessage } from '../events/translate.js';
+
+const baileysLogger = pino({ level: 'silent' });
 
 type Status = { state: string; session_generation: number; expires_at?: string; error_code?: string };
 type Command = { command_id: string; jid: string; text: string };
@@ -55,7 +58,7 @@ export class SessionManager {
     const generation = (this.#generation.get(id) ?? 0) + 1;
     this.#generation.set(id, generation); await this.#persist();
     const { state, saveCreds } = await this.#auth.use(id);
-    const socket = makeWASocket({ auth: state, printQRInTerminal: false, logger: { level: 'silent' } as never });
+    const socket = makeWASocket({ auth: state, printQRInTerminal: false, logger: baileysLogger });
     this.#sockets.set(id, socket); this.#status.set(id, { state: 'connecting', session_generation: generation });
     socket.ev.on('creds.update', () => { void saveCreds(); });
     socket.ev.on('messages.upsert', batch => {
@@ -82,14 +85,15 @@ export class SessionManager {
           return;
         }
         const loggedOut = code === DisconnectReason.loggedOut;
+        const errorCode = loggedOut ? 'logged_out' : typeof code === 'number' ? `disconnect_${code}` : 'disconnected';
         this.#sockets.delete(id); this.#qr.delete(id);
-        this.#status.set(id, { state: loggedOut ? 'logged_out' : 'reconnecting', session_generation: generation, error_code: loggedOut ? 'logged_out' : 'disconnected' });
+        this.#status.set(id, { state: loggedOut ? 'logged_out' : 'reconnecting', session_generation: generation, error_code: errorCode });
         if (loggedOut) {
           this.#enabled.delete(id);
           void this.#auth.clear(id);
           void this.#persist();
         }
-        void this.#outbox.enqueue({ schema_version: 1, event_id: randomUUID(), connection_id: id, session_generation: generation, occurred_at: new Date().toISOString(), type: 'connection.update', payload: { state: loggedOut ? 'logged_out' : 'reconnecting', error_code: loggedOut ? 'logged_out' : 'disconnected' } });
+        void this.#outbox.enqueue({ schema_version: 1, event_id: randomUUID(), connection_id: id, session_generation: generation, occurred_at: new Date().toISOString(), type: 'connection.update', payload: { state: loggedOut ? 'logged_out' : 'reconnecting', error_code: errorCode } });
         if (!loggedOut && this.#enabled.has(id) && !this.#stopping) {
           const wait = Math.min(30000, 1000 * (2 ** Math.min(generation, 5))) + Math.floor(Math.random() * 1000);
           setTimeout(() => void this.#start(id), wait).unref();
