@@ -77,6 +77,14 @@ class TestBaileysRegistry:
         assert cloud_policy.outside_window == "needs_template"
         assert cloud_policy.broadcast_allowed is True
 
+    def test_baileys_accepts_phone_and_lid_user_jids_only(self) -> None:
+        from apps.channels.providers.whatsapp_baileys import _is_supported_recipient_jid
+
+        assert _is_supported_recipient_jid("15551234567@s.whatsapp.net")
+        assert _is_supported_recipient_jid("123456789012345@lid")
+        assert not _is_supported_recipient_jid("12345@g.us")
+        assert not _is_supported_recipient_jid("invalid@lid")
+
 
 
 

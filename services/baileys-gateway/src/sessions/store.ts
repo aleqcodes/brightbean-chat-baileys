@@ -41,7 +41,7 @@ export class AuthStore {
         keys: {
           get: async <T extends keyof SignalDataTypeMap>(type: T, ids: string[]) => {
             const values = keysData[type] ?? {};
-            return Object.fromEntries(ids.map(id => [id, values[id] ? (type === 'app-state-sync-key' ? proto.Message.AppStateSyncKeyData.fromObject(values[id] as object) : values[id]) : null])) as { [id: string]: SignalDataTypeMap[T] };
+            return Object.fromEntries(ids.map(id => [id, values[id] ? (type === 'app-state-sync-key' ? proto.Message.AppStateSyncKeyData.create(values[id] as object) : values[id]) : null])) as { [id: string]: SignalDataTypeMap[T] };
           },
           set: async (data) => {
             for (const [type, entries] of Object.entries(data)) {

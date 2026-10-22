@@ -10,13 +10,13 @@ WhatsApp (Baileys) is a separate, unofficial WhatsApp Web channel. It does not r
 - 1:1 text sends go through the existing opt-in, opt-out, 24-hour product window, and message retry pipeline. Outside the product window, messages are blocked. This 24-hour rule is a conservative product choice, not a claim about WhatsApp Web's technical requirements.
 - Cloud API templates, broadcasts, and campaigns are disabled for Baileys.
 
-**Not yet supported:** inbound or outbound media transfer, LID-to-phone alias resolution, delivery/read receipts, group chats, campaigns, multi-part send reconciliation, and real-device E2E verification. Baileys capability flags therefore advertise text only. Unsupported events are ignored; sends are not reported as delivered. An ambiguous gateway send remains retry-protected by the persisted Django message UUID and gateway command journal, but the UI has no separate `unknown` status.
+**Not yet supported:** inbound or outbound media transfer, delivery/read receipts, group chats, campaigns, multi-part send reconciliation, and real-device E2E verification. Text replies support phone-number JIDs and direct LID JIDs; the gateway does not attempt to reverse-resolve an LID to a phone number. Unsupported events are ignored; sends are not reported as delivered. An ambiguous gateway send remains retry-protected by the persisted Django message UUID and gateway command journal, but the UI has no separate `unknown` status.
 
 ## Architecture and trust boundaries
 
 Django remains authoritative for workspace ownership, permissions, opt-in/compliance, identities, messages, and flow/inbox processing. `services/baileys-gateway` is a separate Node 24 + TypeScript process that owns Baileys sockets and AES-256-GCM-encrypted auth state. PostgreSQL stores no QR or Baileys keys. The gateway is private on the Compose network; no gateway port is published. Django-to-gateway commands and gateway-to-Django callbacks use independent 32-byte base64 HMAC keys, timestamps, and replay-resistant nonces. The callback reuses `WebhookEventLog` deduplication and `record_events`.
 
-Baileys is pinned to `@whiskeysockets/baileys` **6.7.22** (MIT; see the gateway lockfile metadata). The BrightBean fork remains AGPL-3.0. Review the exact dependency tree and upstream terms again before distributing an image.
+Baileys is pinned to `@whiskeysockets/baileys` **7.0.0-rc14** (MIT; see the gateway lockfile metadata). The v7 release candidate is required for native LID-addressed sends and updates the bundled WhatsApp Web client revision used during pairing. The gateway's encrypted auth store persists the additional v7 Signal keys. The BrightBean fork remains AGPL-3.0. Review the exact dependency tree and upstream terms again before distributing an image.
 
 ## Development
 

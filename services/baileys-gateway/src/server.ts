@@ -5,13 +5,13 @@ import { readBody, ReplayGuard, verify } from './auth/http-signatures.js';
 import { AuthStore } from './sessions/store.js';
 import { SessionManager } from './sessions/manager.js';
 import { EventOutbox } from './events/outbox.js';
+import { sendSchema } from './sessions/commands.js';
 
 const guard = new ReplayGuard(config.stateDir);
 const outbox = new EventOutbox(config.stateDir, config.callbackUrl, config.outboundKey);
 const sessions = new SessionManager(config.stateDir, new AuthStore(config.stateDir, config.masterKey), outbox);
 const uuid = z.string().uuid();
 const pairSchema = z.object({ request_id: uuid }).strict();
-const sendSchema = z.object({ command_id: uuid, jid: z.string().max(160).regex(/^[0-9]{5,20}@s\.whatsapp\.net$/), text: z.string().min(1).max(65536) }).strict();
 
 function reply(res: ServerResponse, status: number, value: unknown): void {
   const body = JSON.stringify(value);

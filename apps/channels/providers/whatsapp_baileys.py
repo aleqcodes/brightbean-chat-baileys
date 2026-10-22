@@ -10,6 +10,7 @@ import hmac
 import json
 import logging
 import os
+import re
 import time
 import uuid
 from typing import Any
@@ -69,6 +70,10 @@ def gateway_request(method: str, path: str, payload: dict[str, Any] | None = Non
         raise APIError("Baileys gateway is unavailable.", status_code=503, code="gateway_unavailable") from None
 
 
+def _is_supported_recipient_jid(recipient: str) -> bool:
+    return re.fullmatch(r"[0-9]{5,20}@(s\.whatsapp\.net|lid)", recipient) is not None
+
+
 class WhatsAppBaileysAdapter(Adapter):
     platform = Platform.WHATSAPP_BAILEYS.value
     capabilities = _CAPABILITIES
@@ -89,8 +94,8 @@ class WhatsAppBaileysAdapter(Adapter):
         if outbound.template_ref:
             raise APIError("WhatsApp templates are supported only by the Cloud API channel.", status_code=400, code="template_unsupported")
         recipient = str(getattr(identity, "platform_user_id", ""))
-        if not recipient.endswith("@s.whatsapp.net"):
-            raise APIError("This gateway version can send only to verified phone-number JIDs.", status_code=400, code="recipient_unsupported")
+        if not _is_supported_recipient_jid(recipient):
+            raise APIError("This gateway version can send only to verified WhatsApp user JIDs.", status_code=400, code="recipient_unsupported")
         rendered = downgrade(outbound, self.capabilities)
         if len(rendered.messages) != 1:
             raise APIError("This gateway version cannot split one reply into multiple sends.", status_code=400, code="message_unsupported")
