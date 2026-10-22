@@ -292,7 +292,7 @@ class TestPlatformClass:
     which is exactly where the fallback matters.
     """
 
-    @pytest.mark.parametrize("platform", ["telegram", "instagram", "messenger", "whatsapp", "sms", "email"])
+    @pytest.mark.parametrize("platform", ["telegram", "instagram", "messenger", "whatsapp", "whatsapp_baileys", "sms", "email"])
     def test_known_platforms_get_their_own_chip(self, platform):
         from apps.common.templatetags.common_extras import platform_class
 

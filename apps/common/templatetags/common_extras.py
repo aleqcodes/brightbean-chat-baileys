@@ -32,7 +32,7 @@ FILTER_ICONS = frozenset({"status", "channel", "tag", "clock"})
 # is only the render-time question of which glyph and which colour, so the two
 # are allowed to differ (a platform can exist before it has artwork). Keep this
 # in step with the branches in partials/_platform_icon.html.
-PLATFORMS = frozenset({"telegram", "instagram", "messenger", "whatsapp", "sms", "email"})
+PLATFORMS = frozenset({"telegram", "instagram", "messenger", "whatsapp", "whatsapp_baileys", "sms", "email"})
 
 
 @register.filter

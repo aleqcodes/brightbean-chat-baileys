@@ -2355,6 +2355,7 @@ span.flatpickr-weekday {
 .pi-instagram { background: var(--platform-instagram); }
 .pi-messenger { background: var(--platform-messenger); }
 .pi-whatsapp  { background: var(--platform-whatsapp); }
+.pi-whatsapp_baileys { background: var(--platform-whatsapp); }
 .pi-sms       { background: var(--platform-sms); }
 .pi-email     { background: var(--platform-email); }
 /* Unknown platform key — the partial's fallback glyph on a neutral chip. */
@@ -2476,6 +2477,7 @@ span.flatpickr-weekday {
 .pi-ink-instagram { color: var(--platform-instagram); }
 .pi-ink-messenger { color: var(--platform-messenger); }
 .pi-ink-whatsapp  { color: var(--platform-whatsapp); }
+.pi-ink-whatsapp_baileys { color: var(--platform-whatsapp); }
 .pi-ink-sms       { color: var(--platform-sms); }
 .pi-ink-email     { color: var(--platform-email); }
 

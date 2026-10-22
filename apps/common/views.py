@@ -107,7 +107,7 @@ def ui_demo(request: HttpRequest) -> HttpResponse:
         request.workspace = _UI_DEMO_WORKSPACE  # type: ignore[attr-defined]
         request.workspace_membership = None  # type: ignore[attr-defined]
     context = navigation_context(request)
-    context["ui_demo_platforms"] = ["telegram", "instagram", "messenger", "whatsapp", "sms", "email", "carrier-pigeon"]
+    context["ui_demo_platforms"] = ["telegram", "instagram", "messenger", "whatsapp", "whatsapp_baileys", "sms", "email", "carrier-pigeon"]
     context["ui_demo_statuses"] = [("open", "Open"), ("snoozed", "Snoozed"), ("closed", "Closed")]
     context["ui_demo_channels"] = [
         {"value": "tg-main", "label": "Support bot", "icon": "telegram"},

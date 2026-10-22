@@ -847,7 +847,7 @@ class TestStyleGuide:
     def test_it_shows_every_platform_icon_and_the_fallback(self, client):
         body = client.get("/ui/").content.decode()
 
-        for platform in ["telegram", "instagram", "messenger", "whatsapp", "sms", "email"]:
+        for platform in ["telegram", "instagram", "messenger", "whatsapp", "whatsapp_baileys", "sms", "email"]:
             assert f"pi-{platform}" in body
         assert "carrier-pigeon" in body
 

@@ -1,8 +1,9 @@
-<section id="baileys-qr" class="space-y-3" hx-get="{{ qr_url }}" hx-trigger="every 4s" hx-swap="outerHTML">
+<section id="baileys-qr" class="mt-4 flex flex-col items-center rounded-xl border p-4 text-center" hx-get="{{ qr_url }}" hx-trigger="every 4s" hx-swap="outerHTML">
   {% if qr %}
-    <img src="{{ qr }}" alt="WhatsApp linked-device pairing QR code" class="max-w-xs rounded border p-2" referrerpolicy="no-referrer">
-    {% if expires_at %}<p>QR refreshes automatically. Expiry: {{ expires_at }}</p>{% endif %}
+    <img src="{{ qr }}" alt="WhatsApp linked-device pairing QR code" class="h-64 w-64 max-w-full rounded border p-2" referrerpolicy="no-referrer">
+    <p class="section-note mt-3">This QR code refreshes automatically. Scan it before it expires.</p>
+    {% if expires_at %}<time class="section-note mt-1" datetime="{{ expires_at }}">Expires {{ expires_at }}</time>{% endif %}
   {% else %}
-    <p role="status">No current QR code. Start pairing or wait for the gateway.</p>
+    <p class="section-note" role="status">No current QR code. Start pairing or wait for the gateway.</p>
   {% endif %}
 </section>
