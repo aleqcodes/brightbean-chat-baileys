@@ -197,6 +197,7 @@ class TestSpecValues:
             Platform.WHATSAPP: 20.0,
             Platform.SMS: 1.0,
             Platform.EMAIL: 10.0,
+            Platform.WHATSAPP_BAILEYS: 1.0,
         }
 
     def test_email_is_outbound_only(self) -> None:

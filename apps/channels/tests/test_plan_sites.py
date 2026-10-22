@@ -42,6 +42,7 @@ GUARDED_MODULES: dict[str, str] = {
     "views_whatsapp.py": "Phone number connect flow.",
     "views_sms.py": "Twilio credentials connect flow.",
     "views_email.py": "SMTP / Resend / SES connect flow.",
+    "views_whatsapp_baileys.py": "Unofficial WhatsApp Web QR pairing flow.",
 }
 
 #: The guard every one of them has to call.

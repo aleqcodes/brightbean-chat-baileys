@@ -130,6 +130,8 @@ urlpatterns = [
     # already in the wild 404 there, which is the honest answer from a
     # deployment that no longer counts anything.
     *_if_installed("apps.analytics", ("", "apps.analytics.urls_public")),
+    # Authenticated bilateral-HMAC callback from the private Baileys gateway.
+    *_if_installed("apps.channels", ("internal/baileys/events/", "apps.channels.urls_baileys_internal")),
     # Per-user, so no workspace prefix: the bell shows every workspace at once
     # (issue #7).
     path("notifications/", include("apps.notifications.urls")),

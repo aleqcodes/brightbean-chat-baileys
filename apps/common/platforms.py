@@ -20,3 +20,4 @@ class Platform(models.TextChoices):
     WHATSAPP = "whatsapp", "WhatsApp"
     SMS = "sms", "SMS"
     EMAIL = "email", "Email"
+    WHATSAPP_BAILEYS = "whatsapp_baileys", "WhatsApp (Baileys)"

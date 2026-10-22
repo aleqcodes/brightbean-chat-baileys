@@ -107,7 +107,7 @@ def compose_source() -> str:
 
 def test_the_production_compose_parses(compose: dict[str, Any]) -> None:
     """A syntax error here is only discovered by someone trying to deploy."""
-    assert set(APP_SERVICES) | {"postgres", "caddy"} == set(compose["services"])
+    assert set(APP_SERVICES) | {"postgres", "caddy", "baileys-gateway"} == set(compose["services"])
 
 
 @pytest.mark.parametrize("variable", REQUIRED_VARIABLES)

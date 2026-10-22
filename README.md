@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  Build flows once and run them across Telegram, Instagram, Messenger, WhatsApp,
-  SMS, and email, with a visual builder, shared inbox, broadcasts, sequences,
-  analytics, and a public API.
+  Build flows once and run them across Telegram, Instagram, Messenger, WhatsApp
+  Cloud API, WhatsApp (Baileys), SMS, and email, with a visual builder, shared
+  inbox, broadcasts, sequences, analytics, and a public API.
 </p>
 
 <p align="center">
@@ -36,9 +36,9 @@ platform developer apps, and in exchange there is no per-contact pricing, no
 plan that gates the feature you need, and nobody sitting between you and your
 audience.
 
-The application calls each platform's official API with your credentials.
-There is no aggregator in the middle and no payment provider to sign up for.
-Every installation has every feature.
+Official API channels call each platform's supported API with your credentials.
+The separate WhatsApp (Baileys) option uses an unofficial WhatsApp Web client;
+it is not an aggregator and does not replace WhatsApp Cloud API.
 
 If you'd rather not run a server, a hosted version is available at
 [brightbean.xyz/chat](https://brightbean.xyz/chat/).
@@ -102,6 +102,7 @@ checked before every send.
 | <img src=".github/assets/channels/instagram.svg" width="20" height="20" alt=""> **Instagram** | DMs, comments, story mentions, and story replies | Text, media, cards, galleries, buttons, and quick replies | 24-hour messaging window; comment-to-DM supports one private reply per comment within seven days; broadcasts reach only contacts inside that window. |
 | <img src=".github/assets/channels/messenger.svg" width="20" height="20" alt=""> **Facebook Messenger** | DMs, postbacks, referrals, and Page comments | Text, media, cards, galleries, buttons, and quick replies | 24-hour window; approved message tags support permitted outside-window sends and broadcasts. |
 | <img src=".github/assets/channels/whatsapp.svg" width="20" height="20" alt=""> **WhatsApp** | Messages and delivery/read status updates | Text, media, buttons, quick replies, and approved templates | 24-hour window; approved templates are required outside it. Template management is built in. |
+| <img src=".github/assets/channels/whatsapp.svg" width="20" height="20" alt=""> **WhatsApp (Baileys)** | New 1:1 text messages | 1:1 text only | Unofficial client; use at your own risk. Conservative 24-hour product window; media, receipts, templates, broadcasts, and campaigns are unavailable. See [`docs/channels/whatsapp-baileys.md`](docs/channels/whatsapp-baileys.md). |
 | <img src=".github/assets/channels/sms.svg" width="20" height="20" alt=""> **SMS** | Inbound texts and carrier opt-out keywords | SMS and outbound MMS images | Bring your own Twilio account. STOP/HELP/START handling and GSM-7/UCS-2 segment previews are built in. |
 | <img src=".github/assets/channels/email.svg" width="20" height="20" alt=""> **Email** | Provider bounce notifications only (not conversations) | HTML and plain-text email, inline images, unsubscribe links, and tracked links | Bring your own SMTP, Resend, or SES credentials. Unsubscribe and hard-bounce suppression are enforced. |
 
@@ -156,8 +157,9 @@ cp deploy/env.prod.example .env
 make prod-secrets
 ```
 
-Fill in `APP_DOMAIN`, `ACME_EMAIL`, `SECRET_KEY`, `ENCRYPTION_KEY_SALT`, and
-`POSTGRES_PASSWORD`, then start the stack:
+Fill in `APP_DOMAIN`, `ACME_EMAIL`, `SECRET_KEY`, `ENCRYPTION_KEY_SALT`,
+`POSTGRES_PASSWORD`, and the three independent `BAILEYS_*_KEY` values printed
+by `make prod-secrets`, then start the stack:
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d

@@ -1,0 +1,7 @@
+<section id="baileys-status" class="space-y-3" hx-get="{{ status_url }}" hx-trigger="every 2s" hx-swap="outerHTML">
+  <p><strong>Gateway state:</strong> {{ status_data.state|capfirst }}</p>
+  {% if not status_data.gateway_available %}<p role="status">Gateway unavailable; showing last persisted state.</p>{% endif %}
+  <p><strong>Channel:</strong> {{ status_data.connection_status|capfirst }}</p>
+  {% if status_data.last_connected_at %}<p>Last connected: {{ status_data.last_connected_at }}</p>{% endif %}
+  {% if status_data.last_error_code %}<p role="status">Connection issue: {{ status_data.last_error_code }}</p>{% endif %}
+</section>

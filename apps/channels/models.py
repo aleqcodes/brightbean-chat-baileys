@@ -220,6 +220,35 @@ class ChannelConnection(WorkspaceScopedModel):
         return secrets.compare_digest(hmac_digest(presented), self.webhook_secret_digest)
 
 
+class BaileysSession(models.Model):
+    """Django's operational view of a gateway-owned Baileys session.
+
+    Authentication material and QR payloads never enter this database. The
+    gateway owns encrypted session state; this row tracks only status/generation.
+    """
+
+    connection = models.OneToOneField(
+        ChannelConnection,
+        on_delete=models.CASCADE,
+        related_name="baileys_session",
+    )
+    state = models.CharField(max_length=32, default="pending_pairing")
+    session_generation = models.PositiveIntegerField(default=0)
+    pairing_expires_at = models.DateTimeField(null=True, blank=True)
+    last_connected_at = models.DateTimeField(null=True, blank=True)
+    last_disconnected_at = models.DateTimeField(null=True, blank=True)
+    last_error_code = models.CharField(max_length=64, blank=True, default="")
+    risk_accepted_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class BaileysRequestNonce(models.Model):
+    """Short-lived anti-replay ledger for authenticated gateway callbacks."""
+
+    nonce = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(default=timezone.now, db_index=True)
+
+
 class WebhookEventLog(BaseModel):
     """One inbound webhook event, raw, before anything interpreted it (SPEC §5).
 

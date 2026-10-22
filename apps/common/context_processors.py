@@ -241,7 +241,7 @@ SETTINGS_NAV: list[NavGroup] = [
                 label="Channels",
                 icon="channels",
                 url_name="channels:list",
-                # The six guided connect flows are in here too, or the whole
+                # The guided connect flows are in here too, or the whole
                 # settings column sits unlit on the page somebody reached by
                 # clicking "Set up" in it. Spelled out rather than derived from
                 # apps.channels.registry.CONNECT_ROUTES: this module is
@@ -260,6 +260,7 @@ SETTINGS_NAV: list[NavGroup] = [
                         "channels:messenger_connect",
                         "channels:sms_connect",
                         "channels:email_connect",
+                        "channels:whatsapp_baileys_connect",
                     }
                 ),
                 workspace_scoped=True,

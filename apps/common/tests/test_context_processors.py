@@ -303,8 +303,8 @@ class TestNavStructure:
         from apps.common.context_processors import SETTINGS_NAV
 
         row = next(i for g in SETTINGS_NAV for i in g.items if i.key == "ws_channels")
-
         assert set(CONNECT_ROUTES.values()) <= row.url_names
+        assert "channels:whatsapp_baileys_connect" in row.url_names
 
     def test_every_nav_target_resolves_to_a_real_url(self):
         """A nav entry pointing at a name nothing registers renders "#", which
@@ -542,7 +542,7 @@ class TestTheChannelBlock:
         offered = [row["platform"] for row in self._context(tenancy)["channels"]["connectable"]]
 
         assert "whatsapp" not in offered
-        assert offered == ["telegram", "instagram", "messenger", "sms", "email"]
+        assert offered == ["telegram", "instagram", "messenger", "sms", "email", "whatsapp_baileys"]
 
     @pytest.mark.django_db
     @pytest.mark.parametrize("status", ["needs_reauth", "disabled"])

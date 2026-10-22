@@ -17,6 +17,7 @@ from apps.channels import (
     views_sms,
     views_telegram,
     views_whatsapp,
+    views_whatsapp_baileys,
 )
 
 app_name = "channels"
@@ -42,6 +43,32 @@ urlpatterns = [
     # Declared before the ``<uuid:connection_id>`` routes for readability only —
     # the converter would never match "whatsapp".
     path("whatsapp/connect/", views_whatsapp.whatsapp_connect, name="whatsapp_connect"),
+    path("whatsapp-baileys/connect/", views_whatsapp_baileys.whatsapp_baileys_connect, name="whatsapp_baileys_connect"),
+    path(
+        "whatsapp-baileys/<uuid:connection_id>/",
+        views_whatsapp_baileys.whatsapp_baileys_detail,
+        name="whatsapp_baileys_detail",
+    ),
+    path(
+        "whatsapp-baileys/<uuid:connection_id>/pair/",
+        views_whatsapp_baileys.whatsapp_baileys_pair,
+        name="whatsapp_baileys_pair",
+    ),
+    path(
+        "whatsapp-baileys/<uuid:connection_id>/status/",
+        views_whatsapp_baileys.whatsapp_baileys_status,
+        name="whatsapp_baileys_status",
+    ),
+    path(
+        "whatsapp-baileys/<uuid:connection_id>/qr/",
+        views_whatsapp_baileys.whatsapp_baileys_qr,
+        name="whatsapp_baileys_qr",
+    ),
+    path(
+        "whatsapp-baileys/<uuid:connection_id>/logout/",
+        views_whatsapp_baileys.whatsapp_baileys_logout,
+        name="whatsapp_baileys_logout",
+    ),
     path("whatsapp/templates/", views_whatsapp.whatsapp_templates_list, name="whatsapp_templates"),
     path("whatsapp/templates/new/", views_whatsapp.whatsapp_template_new, name="whatsapp_template_new"),
     # No template id: the preview renders what is currently typed into the form,

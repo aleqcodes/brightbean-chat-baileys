@@ -60,6 +60,7 @@ hypothetical.
 """
 
 import logging
+from dataclasses import replace
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -756,7 +757,7 @@ def _dispatch(
     _touch(message.conversation)
 
     try:
-        result = adapter.send(connection, identity, outbound)
+        result = adapter.send(connection, identity, replace(outbound, command_id=str(message.pk)))
     except RateLimitError as exc:
         # Before APIError: it is a subclass, and the two are treated oppositely.
         return _defer(message, error=Failure.RATE_LIMITED.value, delay_seconds=exc.retry_after)

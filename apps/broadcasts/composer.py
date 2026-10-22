@@ -12,9 +12,9 @@ Where each answer comes from:
 
 ===========================  ==================================================
 Which connections may be     ``apps.channels.policy.policy_for(p).broadcast_allowed``
-picked                       — a flag, not a name this module knows. No shipped
-                             platform sets it False; one that does is excluded
-                             the day its row lands.
+picked                       — a flag, not a name this module knows. Baileys
+                             sets it False; any future forbidden platform is
+                             excluded the day its row lands.
 Whether to warn that the     ``policy.outside_window`` being ``"blocked"`` on a
 window is the whole gate     platform that *has* a window — :func:`window_notice`
 Which blocks render          ``apps.channels.capabilities.capabilities_for(p)``
@@ -72,12 +72,11 @@ BLOCK_KINDS: tuple[str, ...] = ("image", "video", "audio", "file", "card")
 def broadcastable_connections(workspace: Any) -> list[ChannelConnection]:
     """The connections a broadcast may be sent on.
 
-    ``PlatformPolicy.broadcast_allowed`` decides it, and every shipped platform
-    sets it True — including Instagram, whose broadcasts are narrowed by its
-    messaging window rather than forbidden outright (SPEC §6.3). The flag stays
-    because contract 4 fixes it and because reading it rather than naming a
-    platform is what excludes a future platform that forbids broadcasts on the
-    day its policy row lands.
+    ``PlatformPolicy.broadcast_allowed`` decides it. Baileys opts out because
+    campaigns and broadcasts are disabled for the unofficial client; Instagram
+    remains allowed, with its messaging window enforced by the audience step
+    (SPEC §6.3). The flag is read rather than naming a platform so future
+    forbidden channels are excluded when their policy row lands.
 
     A platform whose window closes with no way to reopen it is a thin audience,
     not an absent affordance, and :func:`window_notice` is what says so.

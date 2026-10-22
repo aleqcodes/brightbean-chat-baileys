@@ -1,0 +1,28 @@
+{% extends "layouts/settings.html" %}
+{% block title %}{{ connection.display_name }} · BrightBean Chat{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-3xl space-y-6">
+  <header>
+    <h1 class="text-2xl font-semibold">{{ connection.display_name }} · WhatsApp (Baileys)</h1>
+    <p class="mt-2 text-sm text-warning">{{ risk_notice }}</p>
+    <p class="mt-2 text-sm">Only 1:1 chats are supported. Groups, status updates, newsletters, campaigns, Meta templates, and broadcasts are unavailable.</p>
+  </header>
+  {% include "channels/_whatsapp_baileys_status.html" %}
+  <section class="space-y-3">
+    <h2 class="text-lg font-semibold">Pair this device</h2>
+    <p>On your phone, open WhatsApp → Linked devices → Link a device. Scan only the current QR shown here.</p>
+    <form method="post" action="{{ pair_url }}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary">Link / reconnect by QR</button>
+    </form>
+    {% include "channels/_whatsapp_baileys_qr.html" %}
+  </section>
+  {% if connection.status == "active" %}
+  <form method="post" action="{{ logout_url }}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Close linked session</button>
+  </form>
+  {% endif %}
+  <a href="{{ list_url }}">Back to channels</a>
+</section>
+{% endblock %}

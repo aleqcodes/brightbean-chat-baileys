@@ -43,18 +43,15 @@ class TestChannelSelector:
         allowed = {p for p in Platform.values if channel_policy.policy_for(p).broadcast_allowed}
 
         assert offered == allowed
-        # And, concretely: every shipped platform permits broadcasts, Instagram
-        # included. What narrows an Instagram broadcast is its messaging window
-        # (SPEC §6.3), which is the audience step's business and not this list's.
-        assert offered == set(Platform.values)
+        # Cloud API and other currently enabled broadcast channels remain
+        # available; the unofficial Baileys channel is intentionally excluded.
+        assert Platform.WHATSAPP_BAILEYS not in offered
 
     def test_a_platform_that_forbids_broadcasts_is_absent(self, tenancy, monkeypatch):
-        """The exclusion, on a synthetic row, because no shipped row sets it.
+        """A policy exclusion on a platform whose shipped row permits broadcasts.
 
-        SPEC §13.2's selector rule outlived the platform it was written for. It
-        is still the rule, so it is still tested — with a policy row patched to
-        forbid broadcasts, which is exactly the shape a future platform's row
-        would have.
+        Baileys already exercises the shipped forbidden case; patching Instagram
+        proves the registry filter also responds when another row changes.
         """
         self._one_connection_per_platform(tenancy)
         forbidden = replace(channel_policy.POLICIES[Platform.INSTAGRAM], broadcast_allowed=False)
@@ -63,7 +60,7 @@ class TestChannelSelector:
         offered = {connection.platform for connection in composer.broadcastable_connections(tenancy.workspace)}
 
         assert Platform.INSTAGRAM not in offered
-        assert offered == set(Platform.values) - {Platform.INSTAGRAM}
+        assert offered == set(Platform.values) - {Platform.INSTAGRAM, Platform.WHATSAPP_BAILEYS}
 
     @staticmethod
     def _one_connection_per_platform(tenancy):

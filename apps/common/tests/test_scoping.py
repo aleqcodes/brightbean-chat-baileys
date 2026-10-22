@@ -152,6 +152,12 @@ NOT_TENANT_DATA: dict[str, str] = {
         "The org-level half of the credential-resolution chain: one row can serve every workspace "
         "in the organization, which is the point of it."
     ),
+    "channels.BaileysRequestNonce": (
+        "Short-lived anti-replay state for authenticated gateway callbacks; it has no tenant owner."
+    ),
+    "channels.BaileysSession": (
+        "Operational state for the private gateway session, reached only through its workspace-scoped connection."
+    ),
     "channels.WebhookEventLog": (
         "Hangs off the connection. The inbound webhook path has no session and no workspace — the "
         "caller is a platform — so there is nothing to scope it by at write time."

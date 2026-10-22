@@ -100,9 +100,12 @@ cd brightbean-chat
 make prod-secrets
 ```
 
-That prints four values. Two of them — `SECRET_KEY` and `ENCRYPTION_KEY_SALT` —
-are what decrypt your stored platform credentials. Put them somewhere safe now,
-not after the first backup (see [Backups](#backups)).
+That prints seven generated values. `SECRET_KEY` and `ENCRYPTION_KEY_SALT` are
+what decrypt your stored platform credentials. Three independent `BAILEYS_*_KEY`
+values encrypt gateway auth state and authenticate the two service directions.
+Back up the master key separately from PostgreSQL and the state volume; losing it
+makes saved Baileys sessions unrecoverable. Keep all generated values outside
+source control and deployment logs.
 
 If `make` is not installed:
 
@@ -116,10 +119,10 @@ python3 -c "import secrets; print(secrets.token_urlsafe(50))"
 cp deploy/env.prod.example .env
 ```
 
-Then fill in the five required values. `APP_DOMAIN` is the hostname you pointed
+Then fill in the eight required values. `APP_DOMAIN` is the hostname you pointed
 at this host; it configures Caddy's certificate, Django's `ALLOWED_HOSTS` and
 the `APP_URL` that public links are built from, so there is only one place to
-get it right.
+get it right. Paste all three Baileys keys printed by `make prod-secrets`.
 
 ```dotenv
 APP_DOMAIN=chat.example.com
@@ -127,6 +130,9 @@ ACME_EMAIL=ops@example.com
 SECRET_KEY=…
 ENCRYPTION_KEY_SALT=…
 POSTGRES_PASSWORD=…
+BAILEYS_SESSION_MASTER_KEY=…
+BAILEYS_DJANGO_TO_GATEWAY_HMAC_KEY=…
+BAILEYS_GATEWAY_TO_DJANGO_HMAC_KEY=…
 ```
 
 > If you had already run the development stack in this checkout, that `.env` is

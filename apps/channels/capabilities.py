@@ -332,6 +332,14 @@ CAPABILITIES: dict[str, Capabilities] = {
         # Inline images only; the other kinds are False above.
         max_image_bytes=25 * _MB,
     ),
+    # Gateway v1 accepts text only. Keep attachment flags false until protected
+    # byte transfer, MIME validation, and media ACK handling ship.
+    Platform.WHATSAPP_BAILEYS: Capabilities(
+        window_hours=24,
+        proactive_send=False,
+        broadcast_allowed=False,
+        max_text_len=4096,
+    ),
 }
 
 

@@ -21,6 +21,10 @@ x-app-environment: &app-environment
   ENCRYPTION_KEY_SALT: ${ENCRYPTION_KEY_SALT:-}
   ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
   APP_URL: ${APP_URL:-http://localhost:8000}
+  BAILEYS_GATEWAY_URL: http://baileys-gateway:3100
+  BAILEYS_SESSION_MASTER_KEY: ${BAILEYS_SESSION_MASTER_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+  BAILEYS_DJANGO_TO_GATEWAY_HMAC_KEY: ${BAILEYS_DJANGO_TO_GATEWAY_HMAC_KEY:-AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE=}
+  BAILEYS_GATEWAY_TO_DJANGO_HMAC_KEY: ${BAILEYS_GATEWAY_TO_DJANGO_HMAC_KEY:-AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=}
   # A local .env reaches the container through `env_file` below (and through
   # the dev bind-mount). Point the settings loader away from the file so the
   # environment is the single source of truth inside the container.
@@ -104,7 +108,37 @@ services:
     # liveness mechanism (SPEC §15) — abandoned rows come back after 10 minutes
     # whatever killed the process.
     restart: unless-stopped
+  baileys-gateway:
+    build: ./services/baileys-gateway
+    restart: unless-stopped
+    expose:
+      - "3100"
+    environment:
+      NODE_ENV: production
+      PORT: "3100"
+      BAILEYS_STATE_DIR: /var/lib/baileys
+      BAILEYS_SESSION_MASTER_KEY: ${BAILEYS_SESSION_MASTER_KEY:-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+      BAILEYS_DJANGO_TO_GATEWAY_HMAC_KEY: ${BAILEYS_DJANGO_TO_GATEWAY_HMAC_KEY:-AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE=}
+      BAILEYS_GATEWAY_TO_DJANGO_HMAC_KEY: ${BAILEYS_GATEWAY_TO_DJANGO_HMAC_KEY:-AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=}
+      DJANGO_INTERNAL_BASE_URL: http://app:8000
+    volumes:
+      - baileys_state:/var/lib/baileys
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3100/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      app:
+        condition: service_healthy
+    mem_limit: 512m
+
 
 volumes:
   postgres_data:
   media_data:
+  baileys_state:

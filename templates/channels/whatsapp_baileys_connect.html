@@ -1,0 +1,20 @@
+{% extends "layouts/settings.html" %}
+{% block title %}WhatsApp (Baileys) · BrightBean Chat{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-2xl space-y-6">
+  <header><h1 class="text-2xl font-semibold">WhatsApp (Baileys)</h1>
+    <p class="mt-2 text-sm text-warning">{{ risk_notice }}</p>
+  </header>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    <label class="block">Channel name
+      <input name="display_name" maxlength="200" value="WhatsApp (Baileys)" class="mt-1 block w-full" autocomplete="off">
+    </label>
+    <label class="flex gap-2"><input type="checkbox" name="accept_risk" value="yes" required>
+      <span>I understand and accept the risks of using this unofficial channel.</span>
+    </label>
+    <div class="flex gap-3"><button class="btn btn-primary" type="submit">Create pending connection</button>
+      <a class="btn" href="{{ list_url }}">Cancel</a></div>
+  </form>
+</section>
+{% endblock %}

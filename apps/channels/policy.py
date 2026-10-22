@@ -129,6 +129,15 @@ POLICIES: dict[str, PlatformPolicy] = {
         broadcast_allowed=True,
         rate_default=20.0,
     ),
+    # Baileys is a separate, unofficial channel. Product policy conservatively blocks
+    # all sends outside 24 hours and disables broadcasts; this is not a Meta rule.
+    Platform.WHATSAPP_BAILEYS: PlatformPolicy(
+        window_hours=24,
+        outside_window="blocked",
+        human_agent_days=None,
+        broadcast_allowed=False,
+        rate_default=1.0,
+    ),
     # SPEC §6.6 / §8: no window. 1/sec is per number, which is Twilio's
     # long-code throughput.
     Platform.SMS: PlatformPolicy(

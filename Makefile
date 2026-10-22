@@ -125,7 +125,7 @@ docker-logs: ## Tail logs from all Docker services
 # no `python` on PATH at all. This is the first command that guide runs, so it
 # failing with "command not found" is the worst possible first impression.
 prod-secrets: ## Generate the required secrets for a production .env
-	@python3 -c "import secrets; print('SECRET_KEY=' + secrets.token_urlsafe(50)); print('ENCRYPTION_KEY_SALT=' + secrets.token_urlsafe(50)); print('POSTGRES_PASSWORD=' + secrets.token_urlsafe(24)); print('TICK_TOKEN=' + secrets.token_urlsafe(32))"
+	@python3 -c "import base64,secrets; print('SECRET_KEY=' + secrets.token_urlsafe(50)); print('ENCRYPTION_KEY_SALT=' + secrets.token_urlsafe(50)); print('POSTGRES_PASSWORD=' + secrets.token_urlsafe(24)); print('TICK_TOKEN=' + secrets.token_urlsafe(32)); print('BAILEYS_SESSION_MASTER_KEY=' + base64.b64encode(secrets.token_bytes(32)).decode()); print('BAILEYS_DJANGO_TO_GATEWAY_HMAC_KEY=' + base64.b64encode(secrets.token_bytes(32)).decode()); print('BAILEYS_GATEWAY_TO_DJANGO_HMAC_KEY=' + base64.b64encode(secrets.token_bytes(32)).decode())"
 	@echo ""
 	@echo "Paste these into .env (start from deploy/env.prod.example)."
 	@echo "SECRET_KEY and ENCRYPTION_KEY_SALT decrypt your stored platform"

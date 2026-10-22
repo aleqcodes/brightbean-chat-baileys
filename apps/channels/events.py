@@ -347,6 +347,10 @@ class OutboundMessage:
     #: Set it *and* a ``TextBlock`` holding the plain-text equivalent: the blocks
     #: are what the inbox thread renders, and they should not be raw markup.
     html_body: str = ""
+    #: Transient send intent identifier populated by the messaging facade from
+    #: the persisted Message row. It is deliberately excluded from to_body(): the
+    #: row UUID survives retries and must not leak into stored message content.
+    command_id: str = ""
 
     def to_body(self) -> dict[str, Any]:
         """The SPEC §7.2 ``message.body`` json.

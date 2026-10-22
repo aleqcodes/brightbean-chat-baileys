@@ -268,7 +268,7 @@ def _ingest(
         return HttpResponse("Bad request", status=400)
 
     events = _parse_events(adapter, request, connection)
-    _record(connection, events, adapter)
+    record_events(connection, events, adapter)
     return JsonResponse({"status": "ok"})
 
 
@@ -381,7 +381,7 @@ class _LogOutcome(StrEnum):
     REJECTED = "rejected"
 
 
-def _record(connection: ChannelConnection, events: list[NormalizedEvent], adapter: Adapter) -> None:
+def record_events(connection: ChannelConnection, events: list[NormalizedEvent], adapter: Adapter) -> None:
     """Dedup, persist, dispatch, and mark the outcome (SPEC §7.1 steps 2-4).
 
     Events are grouped by the connection they name rather than all being
