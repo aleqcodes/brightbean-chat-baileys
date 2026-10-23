@@ -26,8 +26,7 @@ describe("the error boundary", () => {
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText(/stopped working/i)).toBeInTheDocument();
-    expect(screen.getByText(/the canvas fell over/)).toBeInTheDocument();
+    expect(document.querySelector(".alert-error")).not.toBeNull();
   });
 
   it("leaves a working island alone", () => {
@@ -38,7 +37,7 @@ describe("the error boundary", () => {
     );
 
     expect(screen.getByText("the canvas")).toBeInTheDocument();
-    expect(screen.queryByText(/stopped working/i)).toBeNull();
+    expect(document.querySelector(".alert-error")).toBeNull();
   });
 
   it("still records the failure for whoever opens the console", () => {

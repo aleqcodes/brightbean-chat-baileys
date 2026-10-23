@@ -42,7 +42,7 @@ class TriggerValidationError(ValueError):
     """A trigger was refused. ``issues`` is what to render."""
 
     def __init__(self, issues: list[Issue]) -> None:
-        super().__init__("This trigger's configuration is not valid.")
+        super().__init__("A configuração deste gatilho é inválida.")
         self.issues = issues
 
 
@@ -90,7 +90,7 @@ def create_trigger(
     """
     spec = spec_for(trigger_type)
     if spec is None:
-        raise TriggerValidationError([_issue(f"{trigger_type!r} is not a trigger type.", "type")])
+        raise TriggerValidationError([_issue(f"{trigger_type!r} não é um tipo de gatilho.", "type")])
     payload = config if config is not None else spec.default_config()
     _check(trigger_type, payload, connection)
 
@@ -168,7 +168,7 @@ def move_trigger(trigger: Trigger, *, direction: str) -> Trigger:
     from interleaving into an order neither asked for.
     """
     if direction not in {"up", "down"}:
-        raise TriggerValidationError([_issue(f"{direction!r} is not a direction.", "direction")])
+        raise TriggerValidationError([_issue(f"{direction!r} não é uma direção.", "direction")])
 
     with transaction.atomic():
         ordered = list(workspace_triggers(trigger.workspace_id, lock=True))
@@ -318,11 +318,11 @@ def _check(trigger_type: str, config: Any, connection: Any) -> None:
     spec = spec_for(trigger_type)
     if connection is not None and spec is not None:
         if not spec.bindable:
-            issues = [*issues, _issue(f"A {spec.label.lower()} trigger is not tied to a channel.", "connection")]
+            issues = [*issues, _issue(f"Um gatilho de {spec.label.lower()} não pode estar vinculado a um canal.", "connection")]
         elif connection.platform not in spec.platforms:
             issues = [
                 *issues,
-                _issue(f"{spec.label} triggers do not run on {connection.get_platform_display()}.", "connection"),
+                _issue(f"Gatilhos de {spec.label} não funcionam em {connection.get_platform_display()}.", "connection"),
             ]
     if issues:
         raise TriggerValidationError(list(issues))

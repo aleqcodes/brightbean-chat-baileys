@@ -259,7 +259,7 @@ def call(
     access log (SECURITY-BASELINE §5).
     """
     if not token:
-        raise APIError("This Instagram connection has no access token stored.")
+        raise APIError("Esta conexão do Instagram não tem um token de acesso armazenado.")
     return request_json(
         method,
         f"{API_ROOT}/{API_VERSION}/{path}",
@@ -436,7 +436,7 @@ def _within_bytes(chunk: str, depth: int = 0) -> list[str]:
         # 400 the send pipeline then reports as a bare ``provider_rejected``.
         # Cut on the encoded bytes instead — ``errors="ignore"`` drops the
         # partial character a byte slice can leave behind — and say so.
-        logger.warning("Instagram: text did not split within %s passes and was cut to fit.", MAX_SPLIT_DEPTH)
+        logger.warning("Instagram: o texto não foi dividido em %s tentativas e foi cortado para caber.", MAX_SPLIT_DEPTH)
         return [chunk.encode("utf-8")[:MAX_TEXT_BYTES].decode("utf-8", errors="ignore")]
     budget = max(1, len(chunk) * MAX_TEXT_BYTES // encoded)
     pieces: list[str] = []
@@ -497,8 +497,8 @@ def _attach_quick_replies(parts: list[dict[str, Any]], quick_replies: tuple[Quic
             part["quick_replies"] = chips
             return
     logger.warning(
-        "Instagram: %s quick repl(ies) had no text message to ride on and were left out. "
-        "Give the message a text block or a media caption to carry them.",
+        "Instagram: %s resposta(s) rápida(s) não tinham uma mensagem de texto para acompanhá-las e foram omitidas. "
+        "Adicione um bloco de texto ou uma legenda de mídia à mensagem.",
         len(chips),
     )
 
@@ -546,8 +546,8 @@ def _attach_buttons(parts: list[dict[str, Any]], buttons: tuple[Button, ...], no
     #    Inventing numbers here would show the contact instructions that resolve
     #    to nothing. See ``docs/channels/instagram.md``.
     logger.warning(
-        "Instagram: %s button(s) had no text or card to attach to and were left out. "
-        "Give the message a text block or a media caption to carry them.",
+        "Instagram: %s botão(ões) não tinham texto nem cartão associado e foram omitidos. "
+        "Adicione um bloco de texto ou uma legenda de mídia à mensagem.",
         len(rendered),
     )
 
@@ -756,7 +756,7 @@ class InstagramAdapter(Adapter):
         """
         payload = security.json_payload(request) or {}
         if payload.get("object") != WEBHOOK_OBJECT:
-            logger.info("Instagram delivery on connection %s declared another object; ignored.", connection.pk)
+            logger.info("A entrega do Instagram na conexão %s declarou outro objeto; ignorada.", connection.pk)
             return []
 
         events: list[NormalizedEvent] = []
@@ -769,7 +769,7 @@ class InstagramAdapter(Adapter):
             # mentioned.
             owner = _connection_for_entry(entry)
             if owner is None:
-                logger.info("Instagram delivery named an account with no connection on this deployment.")
+                logger.info("A entrega do Instagram informou uma conta sem conexão nesta implantação.")
                 continue
             events.extend(_entry_events(owner, entry))
         return events
@@ -809,7 +809,7 @@ class InstagramAdapter(Adapter):
             return SendResult(status=SendStatus.FAILED, error="empty_message")
 
         if claimed is not None and len(bodies) > 1:
-            logger.info("Instagram: only the first message of a %s-part reply is a private reply.", len(bodies))
+            logger.info("Somente a primeira mensagem da resposta com %s partes será enviada como resposta privada.", len(bodies))
 
         provider_message_id = ""
         for index, body in enumerate(bodies):
@@ -847,7 +847,7 @@ class InstagramAdapter(Adapter):
             return
         if exc.code not in UNREACHABLE_ERROR_CODES:
             return
-        logger.info("Instagram: connection %s can no longer reach a contact; recording an opt-out.", connection.pk)
+        logger.info("Instagram: a conexão %s não pode mais alcançar um contato; registrando a opção de não receber mensagens.", connection.pk)
         now = timezone.now()
         event = NormalizedEvent(
             type=EventType.OPT_OUT,
@@ -863,7 +863,7 @@ class InstagramAdapter(Adapter):
             channels_ingest.process_events(connection, (event,))
         except Exception:
             # The send failure is what the caller is waiting to hear about.
-            logger.exception("Instagram: could not record an opt-out on connection %s.", connection.pk)
+            logger.exception("Instagram: não foi possível registrar a opção de não receber mensagens na conexão %s.", connection.pk)
 
     def send_typing(self, connection: ChannelConnection, identity: Any) -> None:
         """``typing_on``. Cosmetic, so a failure is logged and swallowed."""
@@ -884,7 +884,7 @@ class InstagramAdapter(Adapter):
                 {"recipient": {"id": recipient_id}, "sender_action": action},
             )
         except APIError:
-            logger.debug("Instagram: %s failed on connection %s.", action, connection.pk)
+            logger.debug("Instagram: falha em %s na conexão %s.", action, connection.pk)
 
 
 # ---------------------------------------------------------------------------
@@ -1240,7 +1240,7 @@ def _comment_event(
         # open a DM thread without an address to open it to. The self-reply
         # filter below also depends on it, so an anonymous comment would slip
         # past that too. Dropping is the only answer that is right on all three.
-        logger.info("Instagram comment on connection %s carried no author; ignored.", connection.pk)
+        logger.info("O comentário do Instagram na conexão %s não informou autor; ignorado.", connection.pk)
         return []
     if account_id and commenter_id == account_id:
         # Our own public reply comes straight back as a comment webhook. Acting
@@ -1302,7 +1302,7 @@ def _mention_event(
     commenter_id = _platform_id(author.get("id")) if isinstance(author, dict) else ""
     if not comment_id or not commenter_id:
         logger.debug(
-            "Instagram mention on connection %s named no comment or no author; ignored.",
+            "Instagram: a menção na conexão %s não informou comentário ou autor; ignorada.",
             connection.pk,
         )
         return []
@@ -1384,7 +1384,7 @@ def _pending_private_reply(connection: ChannelConnection, identity: Any) -> Any:
             return None
         return candidate
     except Exception:
-        logger.warning("Instagram: could not check for a pending private reply on connection %s.", connection.pk)
+        logger.warning("Instagram: não foi possível verificar se há uma resposta privada pendente na conexão %s.", connection.pk)
     return None
 
 
@@ -1438,9 +1438,9 @@ def _spend_private_reply(row: Any, identity: Any, result: dict[str, Any]) -> Non
     except Exception:
         # The message has gone out. Failing the send now would retry it and
         # send a second one, which is the thing the guard exists to prevent.
-        logger.exception("Instagram: could not close the private-reply guard on comment %s.", row.pk)
+        logger.exception("Instagram: não foi possível encerrar a proteção de resposta privada do comentário %s.", row.pk)
     else:
-        logger.info("Instagram: private reply sent for comment row %s (message %s).", row.pk, result.get("message_id"))
+        logger.info("Instagram: resposta privada enviada para o registro de comentário %s (mensagem %s).", row.pk, result.get("message_id"))
 
 
 def reply_to_comment(token: str, comment_id: str, text: str) -> None:
@@ -1507,7 +1507,7 @@ def _respond_to_comment(context: Any, trigger: Any, row: Any) -> None:
             max_attempts=3,
         )
     except Exception:
-        logger.warning("Instagram: could not queue a reply for comment row %s.", row.pk)
+        logger.warning("Instagram: não foi possível adicionar uma resposta à fila para o registro de comentário %s.", row.pk)
 
 
 def _answer_comment(payload: dict[str, Any], action: Any) -> None:
@@ -1540,14 +1540,14 @@ def _answer_comment(payload: dict[str, Any], action: Any) -> None:
         return
     if row.private_reply_sent_at is not None:
         # A redelivery of an action whose private reply already went out.
-        logger.info("Instagram: comment row %s has already been answered.", row.pk)
+        logger.info("O registro de comentário %s já foi respondido.", row.pk)
         return
     if payload.get("open_thread", True) and not guards.may_private_reply(row):
         # Past the seven-day deadline, so there is no thread to open. Checked
         # only on the path that would open one: a commenter we already know has
         # a thread already, and their public reply does not expire with the
         # private-reply window.
-        logger.info("Instagram: comment row %s is past its private-reply deadline.", row.pk)
+        logger.info("O registro de comentário %s está fora do prazo para resposta privada.", row.pk)
         return
 
     config = row.trigger.config_json if isinstance(row.trigger.config_json, dict) else {}
@@ -1581,14 +1581,14 @@ def _send_public_reply(connection: ChannelConnection, row: Any, config: dict[str
         # handler "must be safe to run more than once" — zombie recovery re-runs
         # one that committed without being marked done — and a re-run without
         # this claim puts a second visible comment on the customer's post.
-        logger.info("Instagram: comment row %s already has its public reply.", row.pk)
+        logger.info("O registro de comentário %s já tem uma resposta pública.", row.pk)
         return
     try:
         reply_to_comment(access_token(connection), row.comment_id, text)
     except APIError as exc:
         logger.info("Instagram: public reply to comment row %s was refused (code=%s).", row.pk, exc.code)
     except Exception:
-        logger.exception("Instagram: public reply failed for comment row %s.", row.pk)
+        logger.exception("Instagram: falha na resposta pública do registro de comentário %s.", row.pk)
 
 
 def _open_thread(connection: ChannelConnection, row: Any, payload: dict[str, Any]) -> None:

@@ -17,7 +17,7 @@ class name generated there never reaches the bundle.
 access_token is a PasswordInput(render_value=False), which is what keeps the
 token out of the response on a failed submit. Nothing here re-renders it.
 {% endcomment %}
-{% block title %}Connect WhatsApp · BrightBean Chat{% endblock %}
+{% block title %}Conectar WhatsApp · BrightBean Chat{% endblock %}
 {% block content_wrap %}{% endblock %}
 
 {% block content %}
@@ -27,10 +27,10 @@ token out of the response on a failed submit. Nothing here re-renders it.
     <div class="flex items-start gap-4 mb-7">
         <span class="pi-chip pi-chip-hero {{ platform_key|platform_class }}">{% include "partials/_platform_icon.html" with platform=platform_key size="lg" only %}</span>
         <div class="min-w-0">
-            <h1 class="page-title">Connect a WhatsApp number</h1>
+            <h1 class="page-title">Conectar um número do WhatsApp</h1>
             <p class="page-lede mt-1.5">
-                This is the direct-from-Meta path: you generate a permanent system user token in
-                Business Manager and paste it here. It is stored encrypted and never shown again.
+                Este é o fluxo direto da Meta: gere um token permanente de usuário do sistema no
+                Business Manager e cole-o aqui. Ele será armazenado criptografado e nunca será exibido novamente.
             </p>
         </div>
     </div>
@@ -38,38 +38,38 @@ token out of the response on a failed submit. Nothing here re-renders it.
     {% if error %}<div class="alert-error">{{ error }}</div>{% endif %}
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-4">Before you paste</h2>
+        <h2 class="section-title mb-4">Antes de colar o token</h2>
         <ol class="cn-steps" role="list">
-            <li class="cn-step">In Business Manager, open <em>WhatsApp Accounts</em> and copy the WhatsApp Business Account ID.</li>
-          <li class="cn-step">Open the number under that account and copy its <em>phone number ID</em> (the API ID, not the number).</li>
+            <li class="cn-step">No Business Manager, abra <em>Contas do WhatsApp</em> e copie o ID da conta do WhatsApp Business.</li>
+            <li class="cn-step">Abra o número nessa conta e copie o <em>ID do número de telefone</em> (o ID da API, não o número).</li>
             <li class="cn-step">
-                Create a system user with <code>whatsapp_business_messaging</code> and
-                <code>whatsapp_business_management</code>, then generate a permanent token for it.
+                Crie um usuário do sistema com <code>whatsapp_business_messaging</code> e
+                <code>whatsapp_business_management</code> e gere um token permanente para ele.
             </li>
         </ol>
     </section>
 
     <form class="card p-6 mb-5 cn-form" method="post">
         {% csrf_token %}
-        <h2 class="section-title mb-4">Paste the three values</h2>
+        <h2 class="section-title mb-4">Cole os três valores</h2>
         {% include "partials/_auth_form_fields.html" with form=form %}
         <div class="form-actions">
-            <button type="submit" class="btn-pill-primary">Connect</button>
+            <button type="submit" class="btn-pill-primary">Conectar</button>
         </div>
     </form>
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-3">What happens next</h2>
+        <h2 class="section-title mb-3">O que acontece depois</h2>
         <p class="section-note mb-4">
-            We prove the token against Meta before anything is written, then subscribe the account
-            to this deployment.
+            Validamos o token com a Meta antes de salvar qualquer dado e, em seguida, inscrevemos a conta
+            nesta instalação.
         </p>
-        {% include "partials/_copy_field.html" with label="Deliveries arrive at" value=webhook_url hint="Paste this into the app's WhatsApp webhook configuration, with the verify token shown there. Full setup notes are in docs/channels/whatsapp.md." only %}
+        {% include "partials/_copy_field.html" with label="Endereço de recebimento" value=webhook_url hint="Cole este endereço na configuração do webhook do WhatsApp no app, junto com o token de verificação exibido ali. As instruções completas estão em docs/channels/whatsapp.md." only %}
     </section>
 
     <a class="cn-back" href="{{ list_url }}">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-        Back to channels
+        Voltar aos canais
     </a>
 </div>
 {% endwith %}

@@ -1,6 +1,6 @@
 {% extends "layouts/workspace_settings.html" %}
 {% block title %}Webhook · BrightBean Chat{% endblock %}
-{% block page_header %}<h1 class="page-title mb-4">Webhook endpoint</h1>{% endblock %}
+{% block page_header %}<h1 class="page-title mb-4">Endpoint do webhook</h1>{% endblock %}
 
 {% block content %}
   <p><code>{{ webhook.url }}</code></p>
@@ -13,20 +13,20 @@
     {% endcomment %}
     <div class="alert-error">
       <p>
-        <strong>Switched off after {{ failure_limit }} consecutive failed deliveries.</strong>
-        Fix the endpoint, then tick <em>Enabled</em> below to start delivering again.
+        <strong>Desativado após {{ failure_limit }} entregas consecutivas com falha.</strong>
+        Corrija o endpoint e marque <em>Ativado</em> abaixo para retomar as entregas.
       </p>
     </div>
   {% endif %}
 
-  <h2>Settings</h2>
+  <h2>Configurações</h2>
   <form method="post" action="{% url 'api_webhooks:update' workspace_id=request.workspace.id webhook_id=webhook.id %}">
     {% csrf_token %}
     <label for="webhook-url">URL</label>
     <input id="webhook-url" type="url" name="url" maxlength="500" required value="{{ webhook.url }}" />
 
     <fieldset>
-      <legend>Events</legend>
+      <legend>Eventos</legend>
       {% for choice in event_choices %}
         <label>
           <input type="checkbox" name="events" value="{{ choice.value }}"
@@ -37,39 +37,36 @@
     </fieldset>
 
     <label>
-      <input type="checkbox" name="enabled" {% if webhook.enabled %}checked{% endif %} /> Enabled
+      <input type="checkbox" name="enabled" {% if webhook.enabled %}checked{% endif %} /> Ativado
     </label>
 
-    <button type="submit" class="btn-pill-primary btn-pill-sm">Save</button>
+    <button type="submit" class="btn-pill-primary btn-pill-sm">Salvar</button>
   </form>
 
-  <h2>Signing secret</h2>
+  <h2>Segredo de assinatura</h2>
   <p class="muted">
-    Every delivery carries an HMAC of the body over this secret. Rotating it
-    invalidates signatures immediately. Update your receiver first, or
-    deliveries will start failing verification the moment you rotate.
-  </p>
+    Cada entrega inclui um HMAC do corpo calculado com este segredo. A rotação o invalida imediatamente.
+    Atualize primeiro o seu receptor; caso contrário, as entregas deixarão de passar na verificação assim que você fizer a rotação.
   <form method="post" x-data
-        @submit="if (!window.confirm('Rotate the signing secret? Signatures made with the old one stop verifying straight away.')) $event.preventDefault()"
+        @submit="if (!window.confirm('Rotacionar o segredo de assinatura? As assinaturas feitas com o segredo antigo deixarão de ser válidas imediatamente.')) $event.preventDefault()"
         action="{% url 'api_webhooks:rotate_secret' workspace_id=request.workspace.id webhook_id=webhook.id %}">
     {% csrf_token %}
-    <button type="submit" class="btn-pill-secondary btn-pill-sm">Rotate secret</button>
+    <button type="submit" class="btn-pill-secondary btn-pill-sm">Rotacionar segredo</button>
   </form>
 
-  <h2>Test</h2>
+  <h2>Teste</h2>
   <p class="muted">
-    Sends a <code>webhook.test</code> event to this endpoint right now. Test
-    deliveries are not retried and never count towards the auto-disable limit.
+    Envia agora um evento <code>webhook.test</code> para este endpoint. As entregas de teste não são repetidas e nunca contam para o limite de desativação automática.
   </p>
   <form method="post" action="{% url 'api_webhooks:test' workspace_id=request.workspace.id webhook_id=webhook.id %}">
     {% csrf_token %}
-    <button type="submit" class="btn-pill-secondary btn-pill-sm">Send test event</button>
+    <button type="submit" class="btn-pill-secondary btn-pill-sm">Enviar evento de teste</button>
   </form>
 
-  <h2>Recent deliveries</h2>
+  <h2>Entregas recentes</h2>
   {% if deliveries %}
     <table>
-      <thead><tr><th>When</th><th>Event</th><th>Result</th><th>Code</th><th>Duration</th><th>Attempt</th></tr></thead>
+      <thead><tr><th>Quando</th><th>Evento</th><th>Resultado</th><th>Código</th><th>Duração</th><th>Tentativa</th></tr></thead>
       <tbody>
         {% for delivery in deliveries %}
           <tr>
@@ -87,7 +84,7 @@
       </tbody>
     </table>
   {% else %}
-    <p class="muted">Nothing delivered yet.</p>
+    <p class="muted">Nenhuma entrega ainda.</p>
   {% endif %}
 
   {% comment %}
@@ -95,11 +92,11 @@
   {% endcomment %}
   <hr>
   <form method="post" x-data
-        @submit="if (!window.confirm('Delete this endpoint? It stops receiving events and its delivery history goes with it.')) $event.preventDefault()"
+        @submit="if (!window.confirm('Excluir este endpoint? Ele deixará de receber eventos e o histórico de entregas será removido.')) $event.preventDefault()"
         action="{% url 'api_webhooks:delete' workspace_id=request.workspace.id webhook_id=webhook.id %}">
     {% csrf_token %}
-    <button type="submit" class="btn-danger-link">Delete endpoint</button>
+    <button type="submit" class="btn-danger-link">Excluir endpoint</button>
   </form>
 
-  <p><a href="{% url 'api_webhooks:list' workspace_id=request.workspace.id %}">Back to webhooks</a></p>
+  <p><a href="{% url 'api_webhooks:list' workspace_id=request.workspace.id %}">Voltar aos webhooks</a></p>
 {% endblock %}

@@ -114,11 +114,11 @@ honestly live (SECURITY-BASELINE §7).
         var template = this.selectedTemplate;
         if (!hint || !template) return '';
         if (!hint.configured) {
-          return 'No per-message price is set for this workspace yet.';
+          return 'Ainda não há um preço por mensagem definido para este espaço de trabalho.';
         }
         // The composer multiplies; apps/channels/segments.py and the cost-hint
         // table both deliberately stop short of a price times a count.
-        return 'About ' + hint[template.category] + ' ' + hint.currency + ' per message.';
+        return 'Cerca de ' + hint[template.category] + ' ' + hint.currency + ' por mensagem.';
       },
 
       // SPEC §6.6's segment-count preview is NOT computed here. The arithmetic

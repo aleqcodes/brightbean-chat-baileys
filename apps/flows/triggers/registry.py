@@ -114,8 +114,8 @@ def _spec(
 register_trigger_type(
     _spec(
         TriggerType.KEYWORD,
-        "Keyword",
-        "Runs when an incoming message matches one of these words.",
+        "Palavra-chave",
+        "É acionado quando uma mensagem recebida corresponde a uma destas palavras.",
         trigger_schema.KEYWORD,
         default_config=lambda: {"keywords": []},
     )
@@ -123,8 +123,8 @@ register_trigger_type(
 register_trigger_type(
     _spec(
         TriggerType.COMMENT,
-        "Comment",
-        "Runs when someone comments on a post, and replies to them privately.",
+        "Comentário",
+        "É acionado quando alguém comenta em uma publicação e responde em particular.",
         trigger_schema.COMMENT,
         default_config=lambda: {
             "post_scope": "all",
@@ -141,16 +141,16 @@ register_trigger_type(
 register_trigger_type(
     _spec(
         TriggerType.STORY_MENTION,
-        "Story mention",
-        "Runs when someone mentions this account in their story.",
+        "Menção em story",
+        "É acionado quando alguém menciona esta conta no story.",
         trigger_schema.STORY_MENTION,
     )
 )
 register_trigger_type(
     _spec(
         TriggerType.STORY_REPLY,
-        "Story reply",
-        "Runs when someone replies to one of this account's stories.",
+        "Resposta ao story",
+        "É acionado quando alguém responde a um dos stories desta conta.",
         trigger_schema.STORY_REPLY,
         default_config=lambda: {"keywords": []},
     )
@@ -158,21 +158,21 @@ register_trigger_type(
 register_trigger_type(
     _spec(
         TriggerType.FOLLOW,
-        "New follower",
-        "Runs when someone follows this account.",
+        "Novo seguidor",
+        "É acionado quando alguém começa a seguir esta conta.",
         trigger_schema.FOLLOW,
         unavailable=(
-            "Instagram does not tell apps about new followers yet, so this trigger "
-            "will not run. It is here so it starts working on its own if Instagram "
-            "opens that up."
+            "O Instagram ainda não informa os aplicativos sobre novos seguidores, "
+            "por isso este gatilho não será executado. Ele começará a funcionar "
+            "automaticamente se o Instagram disponibilizar esse recurso."
         ),
     )
 )
 register_trigger_type(
     _spec(
         TriggerType.REF_URL,
-        "Link or QR code",
-        "Runs when someone arrives through a link or QR code carrying this reference.",
+        "Link ou código QR",
+        "É acionado quando alguém acessa um link ou escaneia um código QR com esta referência.",
         trigger_schema.REF_URL,
         default_config=lambda: {"ref": ""},
     )
@@ -180,8 +180,8 @@ register_trigger_type(
 register_trigger_type(
     _spec(
         TriggerType.DEFAULT_REPLY,
-        "Nothing else matched",
-        "Runs when nothing else matched. At most once per contact per day.",
+        "Nenhuma outra correspondência",
+        "É acionado quando nada mais corresponde. No máximo uma vez por contato por dia.",
         trigger_schema.DEFAULT_REPLY,
         stage_only=True,
     )
@@ -189,16 +189,16 @@ register_trigger_type(
 register_trigger_type(
     _spec(
         TriggerType.WELCOME,
-        "Welcome",
-        "Runs the first time someone opens a conversation.",
+        "Boas-vindas",
+        "É acionado na primeira vez que alguém abre uma conversa.",
         trigger_schema.WELCOME,
     )
 )
 register_trigger_type(
     _spec(
         TriggerType.RULE,
-        "Something happens here",
-        "Runs when a contact gets a tag or a field changes.",
+        "Evento",
+        "É acionado quando um contato recebe uma etiqueta ou um campo é alterado.",
         trigger_schema.RULE,
         bindable=False,
     )
@@ -206,8 +206,8 @@ register_trigger_type(
 register_trigger_type(
     _spec(
         TriggerType.API,
-        "Another system",
-        "Runs only when the API asks for it.",
+        "Outro sistema",
+        "É acionado somente quando solicitado pela API.",
         trigger_schema.API,
         bindable=False,
         entrypoint_only=True,

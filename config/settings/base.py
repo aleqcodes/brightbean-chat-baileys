@@ -161,6 +161,8 @@ LOCAL_APPS = [
     "apps.notifications",
     "apps.queueing",
     "apps.api",
+    # Persistência de agentes; execução depende das flags global e do workspace.
+    "apps.ai_agents",
     # Counters and stats views (SPEC §2, issue #26). Last of the domain apps
     # because it only ever reads the others: it registers nothing at boot and
     # is itself reached through the late-resolving seams in
@@ -174,6 +176,7 @@ LOCAL_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+AI_AGENTS_ENABLED = env.bool("AI_AGENTS_ENABLED", default=False)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -182,6 +185,7 @@ MIDDLEWARE = [
     # CSRF token should still burn its budget rather than getting a free 403.
     "apps.accounts.middleware.AuthRateLimitMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -549,7 +553,8 @@ def _platform_credentials_from_env() -> dict[str, dict[str, str]]:
 PLATFORM_CREDENTIALS_FROM_ENV = _platform_credentials_from_env()
 
 # Internationalization
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "pt-br"
+LANGUAGES = [("pt-br", "Português (Brasil)")]
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True

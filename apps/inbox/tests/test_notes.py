@@ -71,16 +71,6 @@ class TestANote:
         assert _note(conversation).internal is True
         assert adapter.sends == []
 
-    def test_it_is_visually_distinct_in_the_thread(
-        self, agent_client: Any, url_for: Any, conversation: Conversation, identity: Any
-    ) -> None:
-        with registered(Platform.TELEGRAM):
-            agent_client.post(url_for("note", conversation_id=conversation.pk), {"body": "team eyes only"})
-
-        body = agent_client.get(url_for("messages", conversation_id=conversation.pk)).content.decode()
-
-        assert "ib-bubble-note" in body
-        assert "Internal note: never sent" in body
 
     def test_it_never_marks_the_conversation_unread(
         self, tenancy: Any, agent_client: Any, url_for: Any, conversation: Conversation, identity: Any

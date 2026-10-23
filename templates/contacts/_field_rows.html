@@ -34,35 +34,35 @@ even with one item in it, so these rows do not disagree with the tag rows.
           <span class="list-row-title truncate">{{ field.name }}</span>
           <span class="status-pill">{{ field.get_type_display }}</span>
         </div>
-        <div class="list-row-meta">{{ field.value_count }} value{{ field.value_count|pluralize }} stored</div>
+        <div class="list-row-meta">{{ field.value_count }} {% if field.value_count == 1 %}valor armazenado{% else %}valores armazenados{% endif %}</div>
       </div>
 
-      <button type="button" class="btn-pill-secondary btn-pill-sm flex-shrink-0" @click="renaming = true; $nextTick(() => $refs.name.focus())">Rename</button>
+      <button type="button" class="btn-pill-secondary btn-pill-sm flex-shrink-0" @click="renaming = true; $nextTick(() => $refs.name.focus())">Renomear</button>
 
-      <button type="button" class="btn-icon-round flex-shrink-0" @click="openMenu($event)" aria-haspopup="menu" :aria-expanded="menuOpen ? 'true' : 'false'" aria-label="More actions for {{ field.name }}">
+      <button type="button" class="btn-icon-round flex-shrink-0" @click="openMenu($event)" aria-haspopup="menu" :aria-expanded="menuOpen ? 'true' : 'false'" aria-label="Mais ações para {{ field.name }}">
         <svg width="17" height="17" fill="currentColor" stroke="none" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
       </button>
 
       <div x-show="menuOpen" x-cloak @click.away="menuOpen = false" :style="`top:${menuTop}px; left:${menuLeft}px;`" class="row-menu-panel fixed z-50 w-[200px]" role="menu">
-        <button type="button" class="row-menu-item row-menu-item-danger" role="menuitem" hx-post="{% url 'contacts:field_delete' workspace_id=request.workspace.id field_id=field.id %}" hx-confirm="Delete “{{ field.name }}”? {{ field.value_count }} stored value{{ field.value_count|pluralize }} will go with it." @click="menuOpen = false">Delete</button>
+        <button type="button" class="row-menu-item row-menu-item-danger" role="menuitem" hx-post="{% url 'contacts:field_delete' workspace_id=request.workspace.id field_id=field.id %}" hx-confirm="Excluir “{{ field.name }}”? {{ field.value_count }} {% if field.value_count == 1 %}valor armazenado também será removido{% else %}valores armazenados também serão removidos{% endif %}." @click="menuOpen = false">Excluir</button>
       </div>
 
       <form x-show="renaming" x-cloak class="w-full order-last flex flex-wrap items-center gap-2 pt-3" hx-post="{% url 'contacts:field_rename' workspace_id=request.workspace.id field_id=field.id %}" @htmx:after-request="if (bbChanged($event, 'fieldsChanged')) renaming = false">
-        <label class="sr-only" for="field-name-{{ field.id }}">Name</label>
+        <label class="sr-only" for="field-name-{{ field.id }}">Nome</label>
         <input class="form-input-styled" id="field-name-{{ field.id }}" x-ref="name" type="text" name="name" value="{{ field.name }}" maxlength="100" required style="width: 16rem;">
-        <button type="submit" class="btn-pill-secondary btn-pill-sm">Save</button>
-        <button type="button" class="btn-pill-secondary btn-pill-sm" @click="renaming = false">Cancel</button>
+        <button type="submit" class="btn-pill-secondary btn-pill-sm">Salvar</button>
+        <button type="button" class="btn-pill-secondary btn-pill-sm" @click="renaming = false">Cancelar</button>
       </form>
     </div>
     {% endfor %}
   </div>
   {% else %}
   <div class="empty-state">
-    <p class="empty-state-title">No custom fields yet</p>
+    <p class="empty-state-title">Nenhum campo personalizado ainda</p>
     <p class="empty-state-body">
-      Save answers from flows, then use them to filter contacts.
+      Salve respostas de fluxos e use-as para filtrar contatos.
     </p>
-    <button type="button" class="btn-pill-secondary mt-4" @click="$modal('new-field')">New field</button>
+    <button type="button" class="btn-pill-secondary mt-4" @click="$modal('new-field')">Novo campo</button>
   </div>
   {% endif %}
 </div>

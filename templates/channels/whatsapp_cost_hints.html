@@ -1,25 +1,25 @@
 {% extends "layouts/workspace_settings.html" %}
-{% block title %}WhatsApp cost estimates · BrightBean Chat{% endblock %}
-{% block page_header %}<h1 class="page-title mb-4">WhatsApp cost estimates</h1>{% endblock %}
+{% block title %}Estimativas de custo do WhatsApp · BrightBean Chat{% endblock %}
+{% block page_header %}<h1 class="page-title mb-4">Estimativas de custo do WhatsApp</h1>{% endblock %}
 
 {% block content %}
   <p class="muted">
-    Meta bills you directly, per conversation, at a rate that depends on the
-    template's category and the recipient's country. BrightBean Chat never meters
-    and never charges. It only shows the numbers you enter here beside a
-    template and in the broadcast composer, so a send of ten thousand messages
-    does not come as a surprise.
+    A Meta cobra diretamente por conversa, com tarifas que variam conforme a
+    categoria do modelo e o país do destinatário. O BrightBean Chat não mede o uso
+    nem cobra. Ele apenas mostra os valores informados aqui ao lado dos modelos e no
+    compositor de envios em massa, para que o custo de um envio de dez mil mensagens
+    não seja uma surpresa.
   </p>
   <p class="muted">
-    Copy the rates for the countries you actually message from Meta's own
-    pricing page. Leaving them at zero simply hides the estimate.
+    Copie da página de preços da Meta as tarifas dos países para os quais você envia
+    mensagens. Valores zero apenas ocultam a estimativa.
   </p>
 
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn-pill-primary btn-pill-sm">Save</button>
+    <button type="submit" class="btn-pill-primary btn-pill-sm">Salvar</button>
   </form>
 
-  <p><a href="{{ list_url }}">Back to templates</a></p>
+  <p><a href="{{ list_url }}">Voltar aos modelos</a></p>
 {% endblock %}

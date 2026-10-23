@@ -88,11 +88,11 @@ Args:
             hx-target="#notification-panel-body"
             hx-swap="innerHTML"
             class="sidebar-nav-item{% if item.active %} active{% endif %}"
-            title="{{ item.label|default:'Notifications' }}"
+            title="{{ item.label|default:'Notificações' }}"
             aria-haspopup="true"
             :aria-expanded="bellOpen ? 'true' : 'false'">
         {% include "partials/_nav_icon.html" with name="bell" %}
-        <span class="sidebar-nav-label">{{ item.label|default:"Notifications" }}</span>
+        <span class="sidebar-nav-label">{{ item.label|default:"Notificações" }}</span>
         {% comment %}The nav's own badge partial, keyed to match the id
         notifications/partials/_badge.html swaps out of band. The two ends have
         to name the same id or the 60s poll lands nowhere, silently.{% endcomment %}
@@ -136,7 +136,7 @@ Args:
              hx-get="{% url 'notifications:bell' %}"
              hx-trigger="notificationsChanged from:body"
              hx-swap="innerHTML">
-            <div class="px-4 py-6 text-center text-xs" style="color: var(--text-tertiary);">Loading…</div>
+            <div class="px-4 py-6 text-center text-xs" style="color: var(--text-tertiary);">Carregando…</div>
         </div>
     </div>
     </template>

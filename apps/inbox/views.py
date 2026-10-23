@@ -864,7 +864,7 @@ def _deliver(request: WorkspaceRequest, conversation_id: Any, *, internal: bool)
         # what happens to an attachment the platform cannot carry.
         body = _outbound_body(request, conversation, allow_media=not internal, dropped=dropped)
     except _ComposeError as exc:
-        return toast_response(tone="error", title="Nothing to send", body=str(exc))
+        return toast_response(tone="error", title="Nada para enviar", body=str(exc))
 
     message = messaging.send_as_agent(
         workspace=request.workspace,
@@ -879,8 +879,8 @@ def _deliver(request: WorkspaceRequest, conversation_id: Any, *, internal: bool)
         # Not a 400: the refusal is the answer, and the thread now holds a
         # failed row explaining it. describe() rather than message.error,
         # which is a machine code that can carry a provider suffix.
-        return toast_response(tone="error", title="Not sent", body=describe(message.error), events=events)
-    title = "Note added" if internal else "Reply sent"
+        return toast_response(tone="error", title="Não enviada", body=describe(message.error), events=events)
+    title = "Anotação adicionada" if internal else "Resposta enviada"
     if dropped:
         # Sent, but not with everything the agent attached. Saying so beats a
         # success toast under a message that refers to a document the contact
@@ -888,7 +888,7 @@ def _deliver(request: WorkspaceRequest, conversation_id: Any, *, internal: bool)
         return toast_response(
             tone="warn",
             title=title,
-            body=f"{_platform_name(conversation)} cannot carry {_listed(dropped)}, so that was left off.",
+            body=f"{_platform_name(conversation)} não aceita anexos do tipo {_listed(dropped)}; eles foram omitidos.",
             events=events,
         )
     return toast_response(tone="success", title=title, events=events)
@@ -900,8 +900,15 @@ def _platform_name(conversation: Conversation) -> str:
 
 def _listed(kinds: set[str]) -> str:
     """ "an image", or "an image or a video" — for a sentence, not a log line."""
-    words = sorted(f"{'an' if kind[0] in 'aeiou' else 'a'} {kind}" for kind in kinds)
-    return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " or " + words[-1]
+    labels = {
+        "audio": "áudio",
+        "document": "documento",
+        "image": "imagem",
+        "location": "localização",
+        "video": "vídeo",
+    }
+    words = sorted(labels.get(kind, kind) for kind in kinds)
+    return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " ou " + words[-1]
 
 
 def _idempotency_key(request: WorkspaceRequest, *, prefix: str) -> str:
@@ -951,7 +958,7 @@ def retry(request: WorkspaceRequest, workspace_id: str, conversation_id: str, me
         # send compliance already refused into one it would permit.
         or original.source != MessageSource.AGENT
     ):
-        raise Http404("Only an agent's own failed send can be retried.")
+        raise Http404("Somente o próprio agente pode tentar enviar novamente uma mensagem com falha.")
 
     message = messaging.send_as_agent(
         workspace=request.workspace,
@@ -962,8 +969,8 @@ def retry(request: WorkspaceRequest, workspace_id: str, conversation_id: str, me
     )
     events = _refresh(inboxSent=True)
     if message.status == MessageStatus.FAILED:
-        return toast_response(tone="error", title="Still not sent", body=describe(message.error), events=events)
-    return toast_response(tone="success", title="Sent", events=events)
+        return toast_response(tone="error", title="Ainda não enviada", body=describe(message.error), events=events)
+    return toast_response(tone="success", title="Enviada", events=events)
 
 
 @login_required
@@ -1076,7 +1083,7 @@ def assign(request: WorkspaceRequest, workspace_id: str, conversation_id: str) -
     raw = (request.POST.get("assignee") or "").strip()
     if not raw:
         messaging.assign_conversation(conversation, None)
-        return toast_response(tone="success", title="Unassigned", events=_refresh())
+        return toast_response(tone="success", title="Sem responsável", events=_refresh())
 
     membership = _membership(request, raw)
     if membership is None:
@@ -1084,10 +1091,10 @@ def assign(request: WorkspaceRequest, workspace_id: str, conversation_id: str) -
         # without it, any user id in the system could be written onto a tenant's
         # conversation by anyone holding reply_in_inbox in any workspace.
         return toast_response(
-            tone="error", title="Cannot assign", body="That person is not a member of this workspace."
+            tone="error", title="Não foi possível atribuir", body="Essa pessoa não é membro deste espaço de trabalho."
         )
     messaging.assign_conversation(conversation, membership.user)
-    return toast_response(tone="success", title=f"Assigned to {membership.user.display_name}", events=_refresh())
+    return toast_response(tone="success", title=f"Conversa atribuída a {membership.user.display_name}", events=_refresh())
 
 
 @login_required
@@ -1099,7 +1106,7 @@ def set_state(request: WorkspaceRequest, workspace_id: str, conversation_id: str
     wanted = (request.POST.get("state") or "").strip()
     if wanted == ConversationState.DONE:
         messaging.close_conversation(conversation)
-        return toast_response(tone="success", title="Marked done", events=_refresh())
+        return toast_response(tone="success", title="Conversa concluída", events=_refresh())
     if wanted == ConversationState.OPEN:
         # open_conversation() is get-or-reopen, so for a thread that already
         # exists this is precisely "reopen" — and it is the facade's function
@@ -1109,8 +1116,8 @@ def set_state(request: WorkspaceRequest, workspace_id: str, conversation_id: str
             contact=conversation.contact,
             connection=conversation.channel_connection,
         )
-        return toast_response(tone="success", title="Reopened", events=_refresh())
-    return toast_response(tone="error", title="Unknown state", body="A conversation is either open or done.")
+        return toast_response(tone="success", title="Conversa reaberta", events=_refresh())
+    return toast_response(tone="error", title="Status desconhecido", body="Uma conversa pode estar aberta ou concluída.")
 
 
 @login_required
@@ -1126,9 +1133,9 @@ def pause(request: WorkspaceRequest, workspace_id: str, conversation_id: str) ->
     conversation = _conversation(request, conversation_id)
     if (request.POST.get("action") or "").strip() == "resume":
         messaging.pause_automation(conversation, None)
-        return toast_response(tone="success", title="Automation resumed", events=_refresh())
+        return toast_response(tone="success", title="Automação retomada", events=_refresh())
     messaging.pause_automation(conversation, timezone.now() + messaging.AGENT_AUTOMATION_PAUSE)
-    return toast_response(tone="success", title="Automation paused", events=_refresh())
+    return toast_response(tone="success", title="Automação pausada", events=_refresh())
 
 
 @login_required
@@ -1150,8 +1157,8 @@ def stop_automation(request: WorkspaceRequest, workspace_id: str, conversation_i
     conversation = _conversation(request, conversation_id)
     stopped = stop_automation(conversation.contact)
     if not stopped:
-        return toast_response(tone="info", title="Nothing running", events=_refresh())
-    return toast_response(tone="success", title="Automation stopped", events=_refresh())
+        return toast_response(tone="info", title="Nenhuma automação em andamento", events=_refresh())
+    return toast_response(tone="success", title="Automação interrompida", events=_refresh())
 
 
 @login_required
@@ -1172,13 +1179,13 @@ def tags(request: WorkspaceRequest, workspace_id: str, conversation_id: str) -> 
     if not wanted:
         # The picker's own placeholder option. Nothing to do, and answering 404
         # for it would turn "changed my mind" into an error.
-        return toast_response(tone="info", title="No tag selected")
+        return toast_response(tone="info", title="Nenhuma etiqueta selecionada")
     tag = get_scoped_object_or_404(Tag, request.workspace, pk=wanted)
     if (request.POST.get("action") or "").strip() == "remove":
         contact_services.remove_tag(conversation.contact, tag)
-        return toast_response(tone="success", title="Tag removed", events={"inboxContactChanged": True})
+        return toast_response(tone="success", title="Etiqueta removida", events={"inboxContactChanged": True})
     contact_services.add_tag(conversation.contact, tag)
-    return toast_response(tone="success", title="Tag added", events={"inboxContactChanged": True})
+    return toast_response(tone="success", title="Etiqueta adicionada", events={"inboxContactChanged": True})
 
 
 # ---------------------------------------------------------------------------
@@ -1202,8 +1209,8 @@ def add_label(request: WorkspaceRequest, workspace_id: str, conversation_id: str
     try:
         services.apply_label(conversation, label, by=request.user)
     except services.InboxError as exc:
-        return toast_response(tone="error", title="Not labelled", body=str(exc), events=_refresh())
-    return toast_response(tone="success", title="Labelled", events=_refresh())
+        return toast_response(tone="error", title="Não foi possível definir a etiqueta", body=str(exc), events=_refresh())
+    return toast_response(tone="success", title="Etiqueta aplicada", events=_refresh())
 
 
 @login_required
@@ -1463,7 +1470,7 @@ def _outbound_body(
     """
     text = (request.POST.get("body") or "").strip()
     if len(text) > MAX_REPLY_CHARS:
-        raise _ComposeError("That message is too long.")
+        raise _ComposeError("Esta mensagem é muito longa.")
     dropped = dropped if dropped is not None else set()
     blocks: list[Any] = []
     if text:
@@ -1472,9 +1479,9 @@ def _outbound_body(
         blocks.extend(_attachments(request, conversation, dropped))
     if not blocks:
         raise _ComposeError(
-            f"{conversation.channel_connection.get_platform_display()} cannot carry that attachment."
+            f"{conversation.channel_connection.get_platform_display()} não aceita esse anexo."
             if dropped
-            else "Write something first."
+            else "Escreva uma mensagem primeiro."
         )
     return OutboundMessage(blocks=tuple(blocks)).to_body()
 
@@ -1503,7 +1510,7 @@ def _attachments(request: WorkspaceRequest, conversation: Conversation, dropped:
         try:
             asset = resolve(media_id, workspace=request.workspace)
         except MediaNotFoundError:
-            raise _ComposeError("One of those attachments is no longer in the library.") from None
+            raise _ComposeError("Um destes anexos não está mais na biblioteca.") from None
         kind = str(asset["kind"])
         if capabilities is not None and not capabilities.supports_block(kind):
             dropped.add(kind)

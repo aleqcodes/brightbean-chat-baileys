@@ -136,7 +136,7 @@ def credentials_of(connection: Any) -> dict[str, Any]:
     try:
         credentials: Any = connection.credentials or {}
     except ValueError:
-        logger.error("Connection %s: credentials could not be decrypted.", connection.pk)
+        logger.error("Conexão %s: não foi possível descriptografar as credenciais.", connection.pk)
         return {}
     return credentials if isinstance(credentials, dict) else {}
 
@@ -276,10 +276,10 @@ def resolved_destination(host: str, port: int) -> str:
     nothing.
     """
     if not MIN_PORT <= port <= MAX_PORT:
-        raise APIError(f"{port} is not a port number.", status_code=400, code="bad_port")
+        raise APIError(f"{port} não é um número de porta.", status_code=400, code="bad_port")
     if getattr(settings, "EMAIL_SMTP_ALLOW_INTERNAL", False):
         return ""
-    return _checked_address(host, subject="That mail server")
+    return _checked_address(host, subject="Esse servidor de e-mail")
 
 
 def _checked_address(host: str, *, subject: str) -> str:
@@ -296,7 +296,7 @@ def _checked_address(host: str, *, subject: str) -> str:
     """
     addresses = resolve_host(host)
     if not addresses:
-        raise APIError(f"{subject}'s hostname does not resolve.", status_code=400, code="dns")
+        raise APIError(f"O nome do host de {subject} não pôde ser resolvido.", status_code=400, code="dns")
     for address in addresses:
         refusal = refusal_for(address)
         if refusal:
@@ -304,7 +304,7 @@ def _checked_address(host: str, *, subject: str) -> str:
             # workspace admin, and confirming which internal addresses exist is
             # the reconnaissance the check exists to prevent.
             raise APIError(
-                f"{subject} resolves to {refusal}, which this deployment will not connect to.",
+                f"{subject} resolve para {refusal}, e esta implantação não se conectará a esse endereço.",
                 status_code=400,
                 code="blocked_host",
             )
@@ -325,7 +325,7 @@ def smtp_connection(connection: Any) -> Any:
     # local of that name would shadow it for anything added below.
     config = _smtp_settings(connection)
     if not config["host"]:
-        raise APIError("This email connection has no SMTP host stored.")
+        raise APIError("Esta conexão de e-mail não tem um host SMTP armazenado.")
     address = resolved_destination(config["host"], config["port"])
     backend = get_connection(
         backend="django.core.mail.backends.smtp.EmailBackend",
@@ -462,7 +462,7 @@ def _close_pooled() -> None:
     try:
         cached[1].close()
     except Exception:  # noqa: BLE001 - a connection being closed is already going away
-        logger.debug("Closing a pooled SMTP connection raised; dropping it anyway.")
+        logger.debug("Falha ao fechar a conexão SMTP reutilizada; descartando-a mesmo assim.")
 
 
 def _deliver_smtp(connection: Any, envelope: Envelope) -> str:
@@ -527,7 +527,7 @@ def _send_smtp_once(connection: Any, envelope: Envelope, *, reuse: bool) -> str:
         message.attach_alternative(envelope.html, "text/html")
     sent = message.send()
     if not sent:
-        raise APIError("The mail server accepted no recipients.", status_code=400, code="no_recipients")
+        raise APIError("O servidor de e-mail não aceitou nenhum destinatário.", status_code=400, code="no_recipients")
     return envelope.message_id
 
 
@@ -565,12 +565,12 @@ def _verify_smtp(connection: Any) -> None:
     try:
         backend.open()
     except (smtplib.SMTPException, ssl.SSLError, OSError) as exc:
-        raise APIError(f"Could not sign in to the mail server: {type(exc).__name__}") from exc
+        raise APIError(f"Não foi possível autenticar no servidor de e-mail: {type(exc).__name__}") from exc
     finally:
         try:
             backend.close()
         except Exception:  # noqa: BLE001 - closing a failed connection is best effort
-            logger.debug("Closing the SMTP probe connection raised; ignoring.")
+            logger.debug("Falha ao fechar a conexão de teste SMTP; ignorando.")
 
 
 # ---------------------------------------------------------------------------
@@ -581,7 +581,7 @@ def _verify_smtp(connection: Any) -> None:
 def _resend_key(connection: Any) -> str:
     key = credentials_of(connection).get("api_key")
     if not isinstance(key, str) or not key:
-        raise APIError("This email connection has no Resend API key stored.")
+        raise APIError("Esta conexão de e-mail não tem uma chave de API do Resend armazenada.")
     return key
 
 
@@ -644,7 +644,7 @@ def ses_client(connection: Any, service: str = "sesv2") -> Any:
     secret = str(credentials.get("secret_access_key") or "")
     region = str(credentials.get("region") or "")
     if not key_id or not secret or not region:
-        raise APIError("This email connection has no complete set of SES credentials stored.")
+        raise APIError("Esta conexão de e-mail não tem todas as credenciais do SES armazenadas.")
     client = boto3.client(
         service,
         region_name=region,
@@ -681,8 +681,8 @@ def guard_boto_client(client: Any) -> Any:
     def _check_endpoint(request: Any = None, **_kwargs: Any) -> None:
         host = urlsplit(getattr(request, "url", "") or "").hostname or ""
         if not host:
-            raise APIError("That AWS endpoint has no host.", status_code=400, code="blocked_host")
-        _checked_address(host, subject="That AWS endpoint")
+            raise APIError("O endpoint da AWS não tem um host.", status_code=400, code="blocked_host")
+        _checked_address(host, subject="Esse endpoint da AWS")
         return None
 
     client.meta.events.register("before-send.*", _check_endpoint)

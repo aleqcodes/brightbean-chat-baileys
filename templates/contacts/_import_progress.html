@@ -16,7 +16,7 @@ redraws this panel without a reload.
   <div class="flex items-center justify-between gap-3">
     <h2 class="mb-0">{{ run.get_status_display }}</h2>
     {% if run.total_rows %}
-      <span class="muted text-xs">{{ run.processed_rows }} of {{ run.total_rows }} rows</span>
+      <span class="muted text-xs">{{ run.processed_rows }} de {{ run.total_rows }} linhas</span>
     {% endif %}
   </div>
 
@@ -28,46 +28,46 @@ redraws this panel without a reload.
   {% endif %}
 
   <p class="text-xs mt-2">
-    {{ run.created_count }} created · {{ run.updated_count }} updated ·
-    {{ run.skipped_count }} skipped · {{ run.error_count }} error{{ run.error_count|pluralize }}
+    {{ run.created_count }} criados · {{ run.updated_count }} atualizados ·
+    {{ run.skipped_count }} ignorados · {{ run.error_count }} {% if run.error_count == 1 %}erro{% else %}erros{% endif %}
     {% if run.status == "validated" %}
-      <br><span class="muted">Nothing has been written yet. These are the numbers the import would produce.</span>
+      <br><span class="muted">Nada foi gravado ainda. Estes são os números que a importação produziria.</span>
     {% endif %}
   </p>
 
   {% if run.errors %}
-    <h3 class="mt-3">Rows that will not import</h3>
+    <h3 class="mt-3">Linhas que não serão importadas</h3>
     <table>
-      <thead><tr><th>Row</th><th>Column</th><th>Problem</th></tr></thead>
+      <thead><tr><th>Linha</th><th>Coluna</th><th>Problema</th></tr></thead>
       <tbody>
         {% for error in run.errors|slice:":20" %}
           <tr>
             <td>{{ error.row }}</td>
-            <td>{{ error.column|default:"N/A" }}</td>
+            <td>{{ error.column|default:"Não disponível" }}</td>
             <td>{{ error.message }}</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
     {% if run.error_count > 20 %}
-      <p class="muted text-xs">Showing 20 of {{ run.error_count }}. Download the report for the rest.</p>
+      <p class="muted text-xs">Exibindo 20 de {{ run.error_count }}. Baixe o relatório para ver o restante.</p>
     {% endif %}
     {% if run.errors_truncated %}
       <p class="muted text-xs">
-        Only the first {{ run.errors|length }} row errors were stored; the remaining
-        {{ run.hidden_error_count }} were counted but not recorded.
+        Apenas os primeiros {{ run.errors|length }} erros de linha foram armazenados; os
+        {{ run.hidden_error_count }} restantes foram contabilizados, mas não registrados.
       </p>
     {% endif %}
-    <p><a href="{% url 'contacts:import_report' workspace_id=request.workspace.id import_id=run.id %}">Download the report (CSV)</a></p>
+    <p><a href="{% url 'contacts:import_report' workspace_id=request.workspace.id import_id=run.id %}">Baixar relatório (CSV)</a></p>
   {% endif %}
 
   {% if run.status == "validated" %}
     <form class="mt-3"
           hx-post="{% url 'contacts:import_run' workspace_id=request.workspace.id import_id=run.id %}"
           hx-swap="none"
-          hx-confirm="Import {{ run.total_rows }} row(s) now?">
-      <button type="submit" class="btn-pill-primary btn-pill-sm">Import for real</button>
-      <span class="muted text-xs">Rows listed above are skipped; everything else is written.</span>
+          hx-confirm="Importar {{ run.total_rows }} {% if run.total_rows == 1 %}linha{% else %}linhas{% endif %} agora?">
+      <button type="submit" class="btn-pill-primary btn-pill-sm">Importar agora</button>
+      <span class="muted text-xs">As linhas listadas acima serão ignoradas; todas as demais serão gravadas.</span>
     </form>
   {% endif %}
 </section>

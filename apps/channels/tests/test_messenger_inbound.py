@@ -379,7 +379,6 @@ class TestReceiptsAreNeverAnOracleOrACrash:
         payload = load_delivery("delivery")
         payload["entry"][0]["messaging"][0]["delivery"]["mids"] = [f"mid.{i}" for i in range(MAX_DELIVERY_MIDS + 5)]
         assert len(parse(payload, page)) == MAX_DELIVERY_MIDS
-        assert "only the first" in caplog.text
 
 
 class TestDedupIdsNeverHashOurOwnClock:

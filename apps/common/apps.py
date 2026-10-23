@@ -4,7 +4,7 @@ from django.apps import AppConfig
 class CommonConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "apps.common"
-    verbose_name = "Common"
+    verbose_name = "Comum"
 
     def ready(self) -> None:
         # Install the global log scrubber as early as any app code can run, so

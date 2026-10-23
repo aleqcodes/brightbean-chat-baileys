@@ -37,6 +37,7 @@ from apps.flows.schema import ValidationResult, empty_graph, validate_graph
 from apps.flows.schema.sanitize import sanitize_graph
 
 __all__ = [
+    "FlowInUseError",
     "FlowNotLiveError",
     "FlowValidationError",
     "PublishResult",
@@ -66,7 +67,11 @@ class FlowPlanLimitError(ValueError):
 
 
 class FlowNotLiveError(ValueError):
-    """This flow cannot be taken offline: it is not live, or it is a broadcast's own."""
+    """This flow is not live and cannot be taken offline."""
+
+
+class FlowInUseError(FlowNotLiveError):
+    """This flow belongs to a broadcast and cannot be taken offline."""
 
 
 class FlowValidationError(Exception):
@@ -263,9 +268,9 @@ def take_offline(flow: Flow) -> int:
     with transaction.atomic():
         locked = Flow.objects.for_workspace(flow.workspace_id).select_for_update().get(pk=flow.pk)
         if locked.status != FlowStatus.ACTIVE:
-            raise FlowNotLiveError("Only a live flow can be set offline.")
+            raise FlowNotLiveError("Somente um fluxo ativo pode ser desativado.")
         if Flow.objects.for_workspace(flow.workspace_id).filter(pk=locked.pk, broadcasts__isnull=False).exists():
-            raise FlowNotLiveError("This flow belongs to a broadcast. Cancel the broadcast to stop it.")
+            raise FlowInUseError("Este fluxo pertence a um disparo. Cancele o disparo para interrompê-lo.")
 
         _versions(locked).filter(published=True).update(published=False)
         locked.status = FlowStatus.OFFLINE

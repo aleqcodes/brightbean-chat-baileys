@@ -85,7 +85,7 @@ from apps.common.htmx import toast_response
 from apps.common.shortcuts import get_scoped_object_or_404
 from apps.contacts import activity, erasure, export, filters, imports, services, subject_export
 from apps.contacts.builder import builder_config
-from apps.contacts.conditions import ConditionError
+from apps.contacts.conditions import ConditionError, SYSTEM_FIELDS
 from apps.contacts.errors import ContactsError
 from apps.contacts.filters import (
     DEFAULT_SORT,
@@ -585,16 +585,16 @@ def contact_edit(request: WorkspaceRequest, workspace_id: str, contact_id: str) 
     contact = _contact_or_404(request, contact_id)
     submitted = {name: request.POST[name] for name in services.EDITABLE_FIELDS if name in request.POST}
     if not submitted:
-        return toast_response(tone="info", title="Nothing to save")
+        return toast_response(tone="info", title="Nada para salvar")
     try:
         changed = services.update_contact(contact, **submitted)
     except ContactsError as exc:
-        return _failed(exc, "Could not save the contact")
+        return _failed(exc, "Não foi possível salvar o contato")
     if not changed:
-        return toast_response(tone="info", title="No change")
+        return toast_response(tone="info", title="Nenhuma alteração")
     return toast_response(
         tone="success",
-        title="Contact saved",
+        title="Contato salvo",
         body=contact.display_name,
         events={"contactChanged": True},
     )
@@ -636,8 +636,8 @@ def contact_field_value(request: WorkspaceRequest, workspace_id: str, contact_id
         else:
             services.set_field_value(contact, field, raw)
     except ContactsError as exc:
-        return _failed(exc, f"Could not save {field.name}")
-    return toast_response(tone="success", title=f"{field.name} saved", events={"contactChanged": True})
+        return _failed(exc, f"Não foi possível salvar {field.name}")
+    return toast_response(tone="success", title=f"Campo {field.name} salvo", events={"contactChanged": True})
 
 
 def _aware_datetime(raw: str, field: CustomField) -> Any:
@@ -686,23 +686,23 @@ def contact_tag_add(request: WorkspaceRequest, workspace_id: str, contact_id: st
         if existing is None and not _can(request, "manage_crm"):
             return toast_response(
                 tone="error",
-                title="That tag does not exist",
-                body="Creating tags needs the manage_crm permission. Ask an editor to add it first.",
+                title="Essa etiqueta não existe",
+                body="Para criar etiquetas, é necessária a permissão de gerenciamento do CRM. Peça a uma pessoa editora para adicioná-la primeiro.",
             )
         try:
             tag, _created = services.get_or_create_tag(request.workspace, name)
         except ContactsError as exc:
-            return _failed(exc, "Could not add the tag")
+            return _failed(exc, "Não foi possível adicionar a etiqueta")
     else:
-        return toast_response(tone="info", title="Pick a tag first")
+        return toast_response(tone="info", title="Selecione uma etiqueta primeiro")
 
     try:
         added = services.add_tag(contact, tag)
     except ContactsError as exc:
-        return _failed(exc, "Could not add the tag")
+        return _failed(exc, "Não foi possível adicionar a etiqueta")
     if not added:
-        return toast_response(tone="info", title="Already tagged", body=tag.name)
-    return toast_response(tone="success", title="Tag added", body=tag.name, events={"contactTagsChanged": True})
+        return toast_response(tone="info", title="Essa etiqueta já está aplicada", body=tag.name)
+    return toast_response(tone="success", title="Etiqueta adicionada", body=tag.name, events={"contactTagsChanged": True})
 
 
 @login_required
@@ -713,8 +713,8 @@ def contact_tag_remove(request: WorkspaceRequest, workspace_id: str, contact_id:
     tag = get_scoped_object_or_404(Tag, request.workspace, pk=tag_id)
     removed = services.remove_tag(contact, tag)
     if not removed:
-        return toast_response(tone="info", title="That tag was not on this contact")
-    return toast_response(tone="success", title="Tag removed", body=tag.name, events={"contactTagsChanged": True})
+        return toast_response(tone="info", title="Essa etiqueta não está aplicada a este contato")
+    return toast_response(tone="success", title="Etiqueta removida", body=tag.name, events={"contactTagsChanged": True})
 
 
 @login_required
@@ -770,10 +770,10 @@ def identity_opt_out(request: WorkspaceRequest, workspace_id: str, contact_id: s
 
     changed = activity.opt_out(identity, source="manual")
     if not changed:
-        return toast_response(tone="info", title="Already opted out")
+        return toast_response(tone="info", title="O contato já não recebe mensagens")
     return toast_response(
         tone="success",
-        title="Opted out",
+        title="Contato deixou de receber mensagens",
         body=f"{identity.platform} · {identity.platform_user_id}",
         events={"contactChannelsChanged": True},
     )
@@ -794,16 +794,16 @@ def contact_start_flow(request: WorkspaceRequest, workspace_id: str, contact_id:
     if flow is None:
         return toast_response(
             tone="error",
-            title="Could not start that flow",
-            body="It has no published version, or it is archived.",
+            title="Não foi possível iniciar esse fluxo",
+            body="Ele não tem uma versão publicada ou está arquivado.",
         )
     try:
         execution = activity.start_flow_for(contact, flow, actor=request.user)
     except (FlowNotRunnableError, ContactsError) as exc:
-        return _failed(exc, "Could not start that flow")
+        return _failed(exc, "Não foi possível iniciar esse fluxo")
     return toast_response(
         tone="success",
-        title="Flow started",
+        title="Fluxo iniciado",
         body=flow.name,
         events={"contactAutomationChanged": True, "executionId": str(execution.pk)},
     )
@@ -823,11 +823,11 @@ def contact_stop_automation(request: WorkspaceRequest, workspace_id: str, contac
     contact = _contact_or_404(request, contact_id)
     stopped = activity.stop_automation(contact)
     if not stopped:
-        return toast_response(tone="info", title="Nothing was running")
+        return toast_response(tone="info", title="Nenhuma automação estava em execução")
     return toast_response(
         tone="success",
-        title="Automation stopped",
-        body=f"{stopped} run{'' if stopped == 1 else 's'} expired.",
+        title="Automação interrompida",
+        body=f"{stopped} execução{'' if stopped == 1 else 'ões'} encerrada{'' if stopped == 1 else 's'}.",
         events={"contactAutomationChanged": True},
     )
 
@@ -848,7 +848,7 @@ def contact_delete(request: WorkspaceRequest, workspace_id: str, contact_id: str
     services.delete_contact(contact)
     return toast_response(
         tone="success",
-        title="Contact deleted",
+        title="Contato excluído",
         body=contact.display_name,
         events={"contactsChanged": True},
     )
@@ -910,19 +910,19 @@ def bulk_tag(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
     removing = request.POST.get("mode") == "remove"
     contacts = list(_selected(request))
     if not contacts:
-        return toast_response(tone="info", title="Nothing selected")
+        return toast_response(tone="info", title="Nenhum contato selecionado")
 
     touched = 0
     for contact in contacts:
         try:
             changed = services.remove_tag(contact, tag) if removing else services.add_tag(contact, tag)
         except ContactsError as exc:
-            return _failed(exc, "Could not update the tags")
+            return _failed(exc, "Não foi possível atualizar as etiquetas")
         touched += int(changed)
-    verb = "removed from" if removing else "added to"
+    verb = "removida de" if removing else "adicionada a"
     return _bulk_result(
-        f"Tag {verb} {touched} contact{'' if touched == 1 else 's'}",
-        f"{tag.name}: {len(contacts)} selected.",
+        f"Etiqueta {verb} {touched} contato{'' if touched == 1 else 's'}",
+        f"{tag.name}: {len(contacts)} contatos selecionados.",
     )
 
 
@@ -939,14 +939,15 @@ def bulk_delete(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
     """
     contacts = list(_selected(request))
     if not contacts:
-        return toast_response(tone="info", title="Nothing selected")
+        return toast_response(tone="info", title="Nenhum contato selecionado")
     deleted = 0
     for contact in contacts:
         activity.stand_down(contact)
         deleted += int(services.delete_contact(contact))
+    title = f"{deleted} contato excluído" if deleted == 1 else f"{deleted} contatos excluídos"
     return _bulk_result(
-        f"{deleted} contact{'' if deleted == 1 else 's'} deleted",
-        "They are hidden everywhere and excluded from every segment.",
+        title,
+        "Os contatos estão ocultos em todas as áreas e não aparecem em nenhum segmento.",
     )
 
 
@@ -980,7 +981,7 @@ def bulk_sequence(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
     removing = request.POST.get("mode") == "unsubscribe"
     contacts = list(_selected(request))
     if not contacts:
-        return toast_response(tone="info", title="Nothing selected")
+        return toast_response(tone="info", title="Nenhum contato selecionado")
 
     # A refusal for one contact does not abandon the rest, and does not discard
     # the ones already done. Each `subscribe` commits its own transaction, so
@@ -1003,18 +1004,19 @@ def bulk_sequence(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
     if not touched and refusals:
         # Nothing happened at all, so there is no partial state to report and
         # the reason is the whole story.
-        return toast_response(tone="error", title="Could not update the sequence", body=refusals[0])
+        return toast_response(tone="error", title="Não foi possível atualizar a sequência", body=refusals[0])
 
-    verb = "unsubscribed from" if removing else "subscribed to"
+    verb = ("removido" if touched == 1 else "removidos") if removing else ("inscrito" if touched == 1 else "inscritos")
+    preposition = "da" if removing else "na"
     detail = (
-        "Unsubscribing stops future steps; anything already running finishes."
+        "A remoção da inscrição interrompe as próximas etapas; qualquer etapa já iniciada será concluída."
         if removing
-        else "Everyone starts again at step 1."
+        else "Todos começam novamente na etapa 1."
     )
     if refusals:
-        detail = f"{len(refusals)} skipped: {refusals[0]}"
+        detail = f"{len(refusals)} ignorados: {refusals[0]}"
     return _bulk_result(
-        f"{touched} contact{'' if touched == 1 else 's'} {verb} {sequence.name}",
+        f"{touched} contato{'s' if touched != 1 else ''} {verb} {preposition} sequência {sequence.name}",
         detail,
         events={"contactsChanged": True, "sequenceSubscribersChanged": True, "sequenceStepsChanged": True},
     )
@@ -1048,10 +1050,10 @@ def segment_create(request: WorkspaceRequest, workspace_id: str) -> HttpResponse
             filter_json=_posted_filter(request),
         )
     except (ContactsError, ConditionError) as exc:
-        return _failed(exc, "Could not save the segment")
+        return _failed(exc, "Não foi possível salvar o segmento")
     return toast_response(
         tone="success",
-        title="Segment saved",
+        title="Segmento salvo",
         body=segment.name,
         events={"segmentsChanged": True, "segmentSaved": str(segment.pk)},
     )
@@ -1073,8 +1075,8 @@ def segment_update(request: WorkspaceRequest, workspace_id: str, segment_id: str
     try:
         services.update_segment(segment, name=name, filter_json=document)
     except (ContactsError, ConditionError) as exc:
-        return _failed(exc, "Could not update the segment")
-    return toast_response(tone="success", title="Segment updated", body=segment.name, events={"segmentsChanged": True})
+        return _failed(exc, "Não foi possível atualizar o segmento")
+    return toast_response(tone="success", title="Segmento atualizado", body=segment.name, events={"segmentsChanged": True})
 
 
 @login_required
@@ -1090,7 +1092,7 @@ def segment_delete(request: WorkspaceRequest, workspace_id: str, segment_id: str
     segment = get_scoped_object_or_404(Segment, request.workspace, pk=segment_id)
     name = segment.name
     segment.delete()
-    return toast_response(tone="success", title="Segment deleted", body=name, events={"segmentsChanged": True})
+    return toast_response(tone="success", title="Segmento excluído", body=name, events={"segmentsChanged": True})
 
 
 # ---------------------------------------------------------------------------
@@ -1162,7 +1164,7 @@ def _import_context(request: WorkspaceRequest, run: ContactImport) -> dict[str, 
             # One read for both — see `imports.header_and_preview`.
             header, rows = imports.header_and_preview(run)
         except (imports.UnusableImportError, OSError, ValueError) as exc:
-            problem = str(exc) or "That file could not be read."
+            problem = str(exc) or "Não foi possível ler esse arquivo."
     return {
         "run": run,
         # One row per column, carrying its own samples and its current target.
@@ -1174,11 +1176,11 @@ def _import_context(request: WorkspaceRequest, run: ContactImport) -> dict[str, 
         "preview_rows": rows,
         "file_problem": problem,
         "system_targets": [
-            {"value": f"system:{name}", "label": name.replace("_", " ").capitalize()}
+            {"value": f"system:{name}", "label": SYSTEM_FIELDS[name].label}
             for name in imports.IMPORTABLE_SYSTEM_FIELDS
         ],
         "field_targets": [
-            {"value": f"field:{row.pk}", "label": row.name, "type": row.type}
+            {"value": f"field:{row.pk}", "label": row.name, "type": row.get_type_display()}
             for row in CustomField.objects.for_workspace(request.workspace).order_by("name")
         ],
         "tags_target": imports.TAGS_TARGET,
@@ -1243,16 +1245,16 @@ def import_upload(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
     """
     upload = request.FILES.get("file")
     if upload is None:
-        return toast_response(tone="error", title="Pick a CSV file first")
+        return toast_response(tone="error", title="Selecione um arquivo CSV primeiro")
     if not request.POST.get("consent_ack"):
         return toast_response(
             tone="error",
-            title="Confirm the note about reachability",
-            body="Imported contacts cannot be messaged until they write to you first.",
+            title="Confirme o aviso sobre o recebimento de mensagens",
+            body="Os contatos importados só poderão receber mensagens depois de enviarem uma mensagem primeiro.",
         )
     if upload.size > settings.CONTACT_IMPORT_MAX_BYTES:
         megabytes = settings.CONTACT_IMPORT_MAX_BYTES // (1024 * 1024)
-        return toast_response(tone="error", title="That file is too large", body=f"The limit is {megabytes} MB.")
+        return toast_response(tone="error", title="Esse arquivo é grande demais", body=f"O limite é {megabytes} MB.")
 
     run = ContactImport(
         workspace=request.workspace,
@@ -1278,11 +1280,11 @@ def import_upload(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
         # find again.
         run.file.delete(save=False)
         run.delete()
-        return _failed(exc, "That file could not be read")
+        return _failed(exc, "Não foi possível ler o arquivo")
     return toast_response(
         tone="success",
-        title="File uploaded",
-        body="Map its columns to finish.",
+        title="Arquivo enviado",
+        body="Mapeie as colunas para concluir.",
         events={"importCreated": str(run.pk)},
     )
 
@@ -1330,12 +1332,12 @@ def import_mapping(request: WorkspaceRequest, workspace_id: str, import_id: str)
         # `is_writing`, not `is_running`: re-mapping during a *dry run* is safe
         # and is exactly what an operator who spotted a mistake wants. See the
         # property.
-        return toast_response(tone="info", title="That import is already running")
+        return toast_response(tone="info", title="Esta importação já está em andamento")
 
     try:
         header = imports.read_header(run)
     except (imports.UnusableImportError, OSError, ValueError) as exc:
-        return _failed(exc, "That file could not be read")
+        return _failed(exc, "Não foi possível ler o arquivo")
     mapping = {
         str(index): request.POST.get(f"column-{index}", "")
         for index in range(len(header))
@@ -1348,7 +1350,7 @@ def import_mapping(request: WorkspaceRequest, workspace_id: str, import_id: str)
     try:
         imports.resolve_mapping(request.workspace, mapping, header)
     except ContactsError as exc:
-        return _failed(exc, "That mapping cannot be used")
+        return _failed(exc, "Esse mapeamento não pode ser usado")
 
     run.mapping = mapping
     run.dedupe = dedupe
@@ -1363,8 +1365,8 @@ def import_mapping(request: WorkspaceRequest, workspace_id: str, import_id: str)
     imports.enqueue(run, mode=imports.MODE_DRY_RUN)
     return toast_response(
         tone="success",
-        title="Checking the file",
-        body="Nothing is written until you confirm.",
+        title="Verificando o arquivo",
+        body="Nada será gravado até você confirmar.",
         events={"importChanged": True},
     )
 
@@ -1384,8 +1386,8 @@ def import_run(request: WorkspaceRequest, workspace_id: str, import_id: str) -> 
     if run.status != ImportStatus.VALIDATED:
         return toast_response(
             tone="error",
-            title="Check the file first",
-            body="The preview has to finish before anything is imported.",
+            title="Verifique o arquivo primeiro",
+            body="A prévia precisa terminar antes de iniciar a importação.",
         )
     run.next_offset = 0
     # See `import_mapping`: the panel polls on `is_running`, so the status has to
@@ -1394,7 +1396,7 @@ def import_run(request: WorkspaceRequest, workspace_id: str, import_id: str) -> 
     run.save(update_fields=["next_offset", "status", "updated_at"])
     imports.enqueue(run, mode=imports.MODE_IMPORT)
     return toast_response(
-        tone="success", title="Import started", body="You can leave this page.", events={"importChanged": True}
+        tone="success", title="Importação iniciada", body="Você pode sair desta página.", events={"importChanged": True}
     )
 
 
@@ -1476,10 +1478,10 @@ def tag_create(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
     try:
         tag, created = services.get_or_create_tag(request.workspace, request.POST.get("name", ""))
     except ContactsError as exc:
-        return _failed(exc, "Could not create the tag")
+        return _failed(exc, "Não foi possível criar a etiqueta")
     if not created:
-        return toast_response(tone="info", title="That tag already exists", body=tag.name)
-    return toast_response(tone="success", title="Tag created", body=tag.name, events={"tagsChanged": True})
+        return toast_response(tone="info", title="Essa etiqueta já existe", body=tag.name)
+    return toast_response(tone="success", title="Etiqueta criada", body=tag.name, events={"tagsChanged": True})
 
 
 @login_required
@@ -1490,8 +1492,8 @@ def tag_rename(request: WorkspaceRequest, workspace_id: str, tag_id: str) -> Htt
     try:
         services.rename_tag(tag, request.POST.get("name", ""))
     except ContactsError as exc:
-        return _failed(exc, "Could not rename the tag")
-    return toast_response(tone="success", title="Tag renamed", body=tag.name, events={"tagsChanged": True})
+        return _failed(exc, "Não foi possível renomear a etiqueta")
+    return toast_response(tone="success", title="Etiqueta renomeada", body=tag.name, events={"tagsChanged": True})
 
 
 @login_required
@@ -1503,8 +1505,8 @@ def tag_delete(request: WorkspaceRequest, workspace_id: str, tag_id: str) -> Htt
     removed = services.delete_tag(tag)
     return toast_response(
         tone="success",
-        title="Tag deleted",
-        body=f"{name} removed from {removed} contact{'' if removed == 1 else 's'}.",
+        title="Etiqueta excluída",
+        body=f"{name} removida de {removed} contato{'' if removed == 1 else 's'}.",
         events={"tagsChanged": True},
     )
 
@@ -1525,11 +1527,11 @@ def tag_merge(request: WorkspaceRequest, workspace_id: str, tag_id: str) -> Http
     try:
         moved = services.merge_tags(source, target)
     except ContactsError as exc:
-        return _failed(exc, "Could not merge the tags")
+        return _failed(exc, "Não foi possível mesclar as etiquetas")
     return toast_response(
         tone="success",
-        title="Tags merged",
-        body=f"{moved} contact{'' if moved == 1 else 's'} moved to {target.name}.",
+        title="Etiquetas mescladas",
+        body=f"{moved} contato{'' if moved == 1 else 's'} movido{'' if moved == 1 else 's'} para {target.name}.",
         events={"tagsChanged": True},
     )
 
@@ -1562,8 +1564,8 @@ def field_create(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
             field_type=request.POST.get("field_type", ""),
         )
     except ContactsError as exc:
-        return _failed(exc, "Could not create the field")
-    return toast_response(tone="success", title="Field created", body=field.name, events={"fieldsChanged": True})
+        return _failed(exc, "Não foi possível criar o campo")
+    return toast_response(tone="success", title="Campo criado", body=field.name, events={"fieldsChanged": True})
 
 
 @login_required
@@ -1575,8 +1577,8 @@ def field_rename(request: WorkspaceRequest, workspace_id: str, field_id: str) ->
     try:
         services.rename_custom_field(field, request.POST.get("name", ""))
     except ContactsError as exc:
-        return _failed(exc, "Could not rename the field")
-    return toast_response(tone="success", title="Field renamed", body=field.name, events={"fieldsChanged": True})
+        return _failed(exc, "Não foi possível renomear o campo")
+    return toast_response(tone="success", title="Campo renomeado", body=field.name, events={"fieldsChanged": True})
 
 
 @login_required
@@ -1588,8 +1590,8 @@ def field_delete(request: WorkspaceRequest, workspace_id: str, field_id: str) ->
     removed = services.delete_custom_field(field)
     return toast_response(
         tone="success",
-        title="Field deleted",
-        body=f"{name}: {removed} stored value{'' if removed == 1 else 's'} removed.",
+        title="Campo excluído",
+        body=f"{name}: {removed} valor{'' if removed == 1 else 'es'} armazenado{'' if removed == 1 else 's'} removido{'' if removed == 1 else 's'}.",
         events={"fieldsChanged": True},
     )
 
@@ -1674,16 +1676,16 @@ def contact_erase(request: WorkspaceRequest, workspace_id: str, contact_id: str)
     try:
         record = erasure.begin(contact, source=ErasureSource.UI, requested_by=request.user)
     except ContactsError as exc:
-        return _failed(exc, "Could not erase this contact")
+        return _failed(exc, "Não foi possível apagar este contato")
 
     queued = record.status != ErasureStatus.DONE
     return toast_response(
         tone="success",
-        title="Contact erased" if not queued else "Erasure started",
+        title="Contato apagado" if not queued else "Exclusão iniciada",
         body=(
-            f"{label} and everything held about them are gone."
+            f"{label} e todos os dados associados foram apagados."
             if not queued
-            else f"{label} is hidden everywhere already; the rest is being removed in the background."
+            else f"Os dados de {label} já estão ocultos em todas as áreas; o restante será apagado em segundo plano."
         ),
         events={"contactsChanged": True},
     )
@@ -1714,13 +1716,13 @@ def bulk_erase(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
     if (request.POST.get("confirm") or "").strip() != erasure.CONFIRMATION:
         return toast_response(
             tone="error",
-            title="Erasure not confirmed",
-            body=f"Type {erasure.CONFIRMATION} to confirm. Nothing was changed.",
+            title="Exclusão não confirmada",
+            body=f"Digite {erasure.CONFIRMATION} para confirmar. Nenhuma alteração foi feita.",
         )
 
     contacts = list(_selected(request))
     if not contacts:
-        return toast_response(tone="info", title="Nothing selected")
+        return toast_response(tone="info", title="Nenhum contato selecionado")
 
     started = 0
     for contact in contacts:
@@ -1745,14 +1747,14 @@ def bulk_erase(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
     named = len({raw for raw in request.POST.getlist("ids")[:MAX_BULK_IDS]})
     untouched = max(0, named - started)
 
-    body = "They are hidden everywhere already. Their messages, identities and consent records are being removed."
+    body = "Os contatos já estão ocultos em todas as áreas. Mensagens, identidades e registros de consentimento estão sendo removidos."
     if untouched:
         body += (
-            f" {untouched} of the {named} selected {'was' if untouched == 1 else 'were'} not touched. "
-            f"They were already deleted, being erased, or outside this workspace."
+            f" {untouched} dos {named} contatos selecionados não foram processados. "
+            "Eles já foram excluídos, estão sendo apagados ou não pertencem a este espaço de trabalho."
         )
     return _bulk_result(
-        f"Erasing {started} contact{'' if started == 1 else 's'}",
+        f"Exclusão de {started} contato{'s' if started != 1 else ''} iniciada",
         body,
     )
 
@@ -1762,13 +1764,13 @@ def _confirmation_refusal(request: WorkspaceRequest, contact: Contact) -> HttpRe
     if (request.POST.get("confirm") or "").strip() != erasure.CONFIRMATION:
         return toast_response(
             tone="error",
-            title="Erasure not confirmed",
-            body=f"Type {erasure.CONFIRMATION} to confirm. Nothing was changed.",
+            title="Exclusão não confirmada",
+            body=f"Digite {erasure.CONFIRMATION} para confirmar. Nenhuma alteração foi feita.",
         )
     if (request.POST.get("contact_id") or "") != str(contact.pk):
         return toast_response(
             tone="error",
-            title="That form was for a different contact",
-            body="Reload the page and try again. Nothing was changed.",
+            title="Esse formulário corresponde a outro contato",
+            body="Atualize a página e tente novamente. Nenhuma alteração foi feita.",
         )
     return None

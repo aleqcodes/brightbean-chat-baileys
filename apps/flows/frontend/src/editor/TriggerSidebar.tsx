@@ -16,20 +16,20 @@ export function TriggerSidebar() {
   const stepCount = useBuilder((state) => state.nodeOrder.length);
 
   return (
-    <aside className="fb-trigger-sidebar" aria-label="Outline">
+    <aside className="fb-trigger-sidebar" aria-label="Fluxo">
       <TriggerSection />
       {triggerCount === 0 && stepCount === 0 ? (
         <section className="fb-editor-start">
-          <p className="fb-editor-start-title">Two things make a flow</p>
+          <p className="fb-editor-start-title">Um fluxo tem duas partes</p>
           <p className="fb-editor-start-body">
-            Something that starts it, and something it does. Choose what starts it here, then add
-            your first step on the canvas.
+            Algo que o inicia e algo que ele faz. Escolha aqui o que inicia o fluxo e adicione
+            a primeira etapa na tela.
           </p>
         </section>
       ) : null}
       {stepCount > 0 ? (
         <section className="fb-outline-steps">
-          <h2 className="fb-trigger-heading">Steps</h2>
+          <h2 className="fb-trigger-heading">Etapas</h2>
           <StepList />
         </section>
       ) : null}

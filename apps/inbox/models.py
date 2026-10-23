@@ -82,15 +82,15 @@ class DeferredStatus(models.TextChoices):
     is what an operator's cancel writes here *as well as* on the queue row.
     """
 
-    PENDING = "pending", "Pending"
-    SENT = "sent", "Sent"
-    FAILED = "failed", "Failed"
-    CANCELLED = "cancelled", "Cancelled"
+    PENDING = "pending", "Pendente"
+    SENT = "sent", "Enviada"
+    FAILED = "failed", "Falhou"
+    CANCELLED = "cancelled", "Cancelada"
     #: A failure an operator has read and taken off the thread. Distinct from
     #: ``CANCELLED`` because "it never went out because I called it off" and "it
     #: never went out because the platform refused it, and I have seen that" are
     #: different facts, and the second one is the one an audit wants back.
-    DISMISSED = "dismissed", "Dismissed"
+    DISMISSED = "dismissed", "Dispensada"
 
 
 class ConversationScopedModel(WorkspaceScopedModel):
@@ -146,7 +146,7 @@ class ConversationScopedModel(WorkspaceScopedModel):
             peer = getattr(self, self.peer_field)
             if peer is not None and peer.workspace_id != self.conversation.workspace_id:
                 raise WorkspaceMismatchError(
-                    f"That {peer._meta.verbose_name} belongs to a different workspace than the conversation."
+                    f"Esse {peer._meta.verbose_name} pertence a outro espaço de trabalho da conversa."
                 )
         update_fields = kwargs.get("update_fields")
         if update_fields is not None:
@@ -284,7 +284,7 @@ class ConversationLabelLink(ConversationScopedModel):
         does the derivation in a constructor instead of forbidding the bulk path.
         """
         if label.workspace_id != conversation.workspace_id:
-            raise WorkspaceMismatchError("That label belongs to a different workspace than the conversation.")
+            raise WorkspaceMismatchError("Essa etiqueta pertence a outro espaço de trabalho da conversa.")
         return cls(
             workspace_id=conversation.workspace_id,
             conversation=conversation,

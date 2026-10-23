@@ -36,18 +36,18 @@ class OrgRole(models.TextChoices):
     """Authority over the organization itself: billing-free, but it owns
     workspaces, membership and the org-level credential store."""
 
-    OWNER = "owner", "Owner"
-    ADMIN = "admin", "Admin"
-    MEMBER = "member", "Member"
+    OWNER = "owner", "Proprietário"
+    ADMIN = "admin", "Administrador"
+    MEMBER = "member", "Membro"
 
 
 class WorkspaceRole(models.TextChoices):
     """SPEC §4's four roles. Ordered admin > editor > agent > viewer."""
 
-    ADMIN = "admin", "Admin"
+    ADMIN = "admin", "Administrador"
     EDITOR = "editor", "Editor"
-    AGENT = "agent", "Agent"
-    VIEWER = "viewer", "Viewer"
+    AGENT = "agent", "Atendente"
+    VIEWER = "viewer", "Visualizador"
 
 
 ORG_ROLE_LEVEL: dict[str, int] = {
@@ -74,6 +74,7 @@ PERMISSION_KEYS: list[str] = [
     "manage_channels",
     "manage_members",
     "manage_workspace_settings",
+    "manage_ai_agents",
     "manage_api_keys",
     "view_analytics",
     "erase_contacts",
@@ -86,6 +87,7 @@ _ADMIN_ONLY_KEYS = frozenset(
         "manage_channels",
         "manage_members",
         "manage_workspace_settings",
+        "manage_ai_agents",
         "manage_api_keys",
         # GDPR erasure (SPEC §19, issue #29). Admin-only because it is the one
         # destructive act in the product with no undo: ``manage_crm``'s delete

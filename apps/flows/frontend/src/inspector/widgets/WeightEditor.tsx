@@ -26,7 +26,7 @@ export function WeightEditor(props: FieldProps) {
   return (
     <div className="fb-field">
       <span className="fb-field-label">
-        Paths <span className="fb-empty">{paths.length}{max !== undefined ? `/${max}` : ""}</span>
+        Caminhos <span className="fb-empty">{paths.length}{max !== undefined ? `/${max}` : ""}</span>
       </span>
 
       {paths.map((entry, index) => (
@@ -35,7 +35,7 @@ export function WeightEditor(props: FieldProps) {
           <input
             type="number"
             className="form-input-styled w-24"
-            aria-label={`Weight for path ${index + 1}`}
+            aria-label={`Peso do caminho ${index + 1}`}
             value={typeof entry["weight"] === "number" ? entry["weight"] : ""}
             min={deref(weight)?.minimum ?? 0}
             max={deref(weight)?.maximum ?? 100}
@@ -49,18 +49,18 @@ export function WeightEditor(props: FieldProps) {
             <button
               type="button"
               className="btn-link text-xs ml-auto"
-              aria-label={`Remove path ${index + 1}`}
+              aria-label={`Remover caminho ${index + 1}`}
               disabled={paths.length <= min}
               onClick={() => write(paths.filter((_unused, at) => at !== index))}
             >
-              Remove
+              Remover
             </button>
           )}
         </div>
       ))}
 
       <p className={total === 100 ? "fb-field-help" : "fb-empty"}>
-        Total {total}%{total === 100 ? "" : ". Weights are shares, so they do not have to add up to 100."}
+        Total {total}%{total === 100 ? "" : ". Os pesos são proporções e não precisam somar 100."}
       </p>
 
       {readOnly || (max !== undefined && paths.length >= max) ? null : (
@@ -69,9 +69,10 @@ export function WeightEditor(props: FieldProps) {
           className="btn-outline-sm mt-1"
           onClick={() => write([...paths, { id: newItemId(), weight: 50 }])}
         >
-          Add a path
+          Adicionar caminho
         </button>
       )}
+
     </div>
   );
 }

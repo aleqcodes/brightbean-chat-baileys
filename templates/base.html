@@ -1,5 +1,5 @@
 {% load static %}<!DOCTYPE html>
-<html lang="en" {% block html_style %}{% endblock %}>
+<html lang="pt-BR" {% block html_style %}{% endblock %}>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -174,7 +174,7 @@
         {% endcomment %}
         <div class="mobile-topbar">
             <button type="button" class="sidebar-toggle" @click="mobileMenuOpen = !mobileMenuOpen"
-                    title="Toggle menu" aria-label="Toggle menu"
+                    title="Alternar menu" aria-label="Alternar menu"
                     :aria-expanded="mobileMenuOpen ? 'true' : 'false'">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -219,7 +219,8 @@
         </main>
     </div>
 </div>
-{% else %}
+{% endif %}
+{% if not show_app_shell %}
 <main class="auth-bg min-h-screen flex items-center justify-center py-12 px-4" style="font-family: var(--font-body);">
     {% comment %}
       Issue #31 owns the auth templates. They extend this file and fill this
@@ -249,5 +250,6 @@
 {% block alpine_components %}{% endblock %}
 <script src="{% static 'js/vendor/alpine.min.js' %}" defer></script>
 {% block extra_js %}{% endblock %}
+<script src="{% static 'js/flatpickr-pt-br.js' %}"></script>
 </body>
 </html>

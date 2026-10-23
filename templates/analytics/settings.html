@@ -17,14 +17,14 @@ change; a toggle sitting above a Save button would lie about when it takes
 effect. This page's h1 was also the one that never got .page-title, so it has
 been rendering at the @layer base 18px while every sibling used 28px.
 {% endcomment %}
-{% block title %}Email tracking · BrightBean Chat{% endblock %}
+{% block title %}Rastreamento de e-mails · BrightBean Chat{% endblock %}
 {% block content_wrap %}{% endblock %}
 
 {% block content %}
 <div class="max-w-[1060px] w-full">
-    <h1 class="page-title">Email tracking</h1>
+    <h1 class="page-title">Rastreamento de e-mails</h1>
     <p class="page-lede mt-1.5 mb-6">
-        Click and open tracking for email. Both are off until you turn them on.
+        Rastreamento de cliques e aberturas de e-mails. Ambos ficam desativados até você ativá-los.
     </p>
 
     <form method="post" action="{% url 'analytics:update_tracking_settings' workspace_id=request.workspace.id %}">
@@ -33,11 +33,11 @@ been rendering at the @layer base 18px while every sibling used 28px.
             <label class="field-check" for="wrap-email-links">
                 <input class="bb-checkbox" id="wrap-email-links" type="checkbox" name="wrap_email_links" {% if wrap_email_links %}checked{% endif %}>
                 <span class="field-check-body">
-                    <span class="field-label">Rewrite links in email bodies</span>
+                    <span class="field-label">Reescrever links no corpo dos e-mails</span>
                     <span class="field-hint">
-                        Every link in an email you send is replaced with one that records the click
-                        and forwards to the original address. Recipients see the forwarding link in
-                        their status bar rather than the destination.
+                        Cada link de um e-mail enviado é substituído por um link que registra o clique
+                        e redireciona ao endereço original. Os destinatários veem o link de redirecionamento
+                        na barra de status, em vez do destino.
                     </span>
                 </span>
             </label>
@@ -45,22 +45,22 @@ been rendering at the @layer base 18px while every sibling used 28px.
             <label class="field-check" for="open-pixel">
                 <input class="bb-checkbox" id="open-pixel" type="checkbox" name="open_pixel" {% if open_pixel %}checked{% endif %}>
                 <span class="field-check-body">
-                    <span class="field-label">Add an open-tracking pixel</span>
+                    <span class="field-label">Adicionar pixel de rastreamento de abertura</span>
                     <span class="field-hint">
-                        A one-pixel image is added to each email and marks the message as read when
-                        it loads. Many mail clients block or pre-fetch images, so this is an
-                        indication rather than a count.
+                        Uma imagem de um pixel é adicionada a cada e-mail e marca a mensagem como lida quando
+                        é carregada. Muitos clientes de e-mail bloqueiam ou pré-carregam imagens, então isso é
+                        apenas uma indicação, não uma contagem.
                     </span>
                 </span>
             </label>
 
             <p class="section-note">
-                Neither affects the click counters on flow buttons, which are always recorded. A
-                button is a link somebody added on purpose.
+                Nenhuma dessas opções afeta os contadores de cliques nos botões dos fluxos, que são sempre registrados. Um
+                botão é um link adicionado intencionalmente por alguém.
             </p>
 
             <div class="form-actions">
-                <button type="submit" class="btn-pill-primary">Save changes</button>
+                <button type="submit" class="btn-pill-primary">Salvar alterações</button>
             </div>
         </section>
     </form>

@@ -76,19 +76,19 @@ def not_included() -> list[dict[str, str]]:
     """
     return [
         {
-            "category": "Raw webhook payloads",
+            "category": "Conteúdos brutos de webhook",
             "detail": (
-                "Inbound deliveries are logged verbatim for replay protection and debugging. The log is keyed "
-                "on the channel connection and the platform's event id, with no reference to a contact, so it "
-                "cannot be searched by person. It is pruned automatically 30 days after receipt."
+                "As entregas recebidas são registradas sem alterações para proteção contra repetição e depuração. O log é "
+                "associado à conexão do canal e ao identificador do evento na plataforma, sem referência a um contato, "
+                "portanto não pode ser pesquisado por pessoa. Os registros são removidos automaticamente 30 dias após o recebimento."
             ),
         },
         {
-            "category": "CSV import files",
+            "category": "Arquivos de importação CSV",
             "detail": (
-                "A spreadsheet uploaded to the importer is stored with the import run and quotes whatever cells "
-                "it contained. Nothing links a row of it back to the contact it created. Files are pruned "
-                "automatically after the workspace's import retention window."
+                "Uma planilha enviada ao importador é armazenada junto com a execução da importação e contém as células "
+                "originais. Nenhuma linha é associada ao contato criado. Os arquivos são removidos automaticamente "
+                "após o período de retenção de importações do espaço de trabalho."
             ),
         },
     ]

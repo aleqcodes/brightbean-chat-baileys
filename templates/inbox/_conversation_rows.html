@@ -8,7 +8,7 @@ renders under Django's default autoescaping and none of it is marked safe.
 {% endcomment %}
 {% load common_extras %}
 {% if not conversations %}
-  <p class="p-4 text-xs" style="color: var(--text-tertiary);">No conversations match these filters.</p>
+  <p class="p-4 text-xs" style="color: var(--text-tertiary);">Nenhuma conversa corresponde a esses filtros.</p>
 {% else %}
   {% for row in conversations %}
     <div class="ib-row-wrap">
@@ -37,7 +37,7 @@ renders under Django's default autoescaping and none of it is marked safe.
       column of empty boxes was the first thing the list said.
     {% endcomment %}
     <input type="checkbox" class="ib-row-select"
-           aria-label="Select {{ row.conversation.contact.display_name }}"
+           aria-label="Selecionar {{ row.conversation.contact.display_name }}"
            x-bind:checked="isSelected('{{ row.conversation.id }}')"
            x-on:change="toggle('{{ row.conversation.id }}', $event.target.checked)">
     <a href="{% url 'inbox:thread' workspace_id=request.workspace.id conversation_id=row.conversation.id %}"
@@ -60,9 +60,9 @@ renders under Django's default autoescaping and none of it is marked safe.
       <span class="ib-row-top">
         <span class="ib-row-name">{{ row.conversation.contact.display_name }}</span>
         {% if row.age %}<span class="ib-row-time">{{ row.age }}</span>{% endif %}
-        {% if row.unread %}<span class="ib-dot" role="img" aria-label="Unread"></span>{% endif %}
+        {% if row.unread %}<span class="ib-dot" role="img" aria-label="Não lida"></span>{% endif %}
       </span>
-      <span class="ib-row-preview">{% if row.last_internal %}<span class="ib-chip">Note</span> {% endif %}{{ row.preview }}</span>
+      <span class="ib-row-preview">{% if row.last_internal %}<span class="ib-chip">Nota</span> {% endif %}{{ row.preview }}</span>
       {% if row.labels or row.conversation.assignee or row.has_pending or row.conversation.state == "done" %}
       <span class="ib-row-meta ib-row-labels">
         {% comment %}
@@ -73,14 +73,14 @@ renders under Django's default autoescaping and none of it is marked safe.
         {% endcomment %}
         {% for chip in row.labels %}<span class="ib-label-chip" style="--chip-ink: {{ chip.color }};">{{ chip.name }}</span>{% endfor %}
         {% if row.extra_labels %}<span class="ib-row-tag">+{{ row.extra_labels }}</span>{% endif %}
-        {% if row.conversation.state == "done" %}<span class="ib-row-tag">Done</span>{% endif %}
+        {% if row.conversation.state == "done" %}<span class="ib-row-tag">Concluída</span>{% endif %}
         {% comment %}
           A word, not a countdown. selectors.list_version hashes what this row
           prints, and a due time here would re-derive from the clock and churn
           every row in the inbox once a minute for every open tab. The thread is
           where the countdown belongs.
         {% endcomment %}
-        {% if row.has_pending %}<span class="ib-row-tag" title="Something is scheduled on this conversation">Scheduled</span>{% endif %}
+        {% if row.has_pending %}<span class="ib-row-tag" title="Há algo agendado nesta conversa">Agendada</span>{% endif %}
         {% if row.conversation.assignee %}<span class="ib-row-assignee">{{ row.conversation.assignee.display_name }}</span>{% endif %}
       </span>
       {% endif %}

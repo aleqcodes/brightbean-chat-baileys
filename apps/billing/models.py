@@ -63,10 +63,10 @@ MAX_RAW_BYTES = 16_384
 class EventStatus(models.TextChoices):
     """What happened to one webhook event after it was verified and recorded."""
 
-    RECEIVED = "received", "Received"
-    PROCESSED = "processed", "Processed"
-    IGNORED = "ignored", "Ignored"
-    FAILED = "failed", "Failed"
+    RECEIVED = "received", "Recebido"
+    PROCESSED = "processed", "Processado"
+    IGNORED = "ignored", "Ignorado"
+    FAILED = "failed", "Falhou"
 
 
 class BillingCustomer(BaseModel):

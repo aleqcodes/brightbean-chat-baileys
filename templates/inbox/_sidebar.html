@@ -16,36 +16,36 @@ thing. The panel only says so while a pause is on, with the way back out.
     Only shown where the panel opens over the thread (below `lg`), because there
     it covers the header button that opened it.
   {% endcomment %}
-  <button type="button" class="ib-side-close" @click="toggleInfo()" aria-label="Close contact details">×</button>
-  <h2 class="ib-side-label" id="side-contact-{{ conversation.id }}">Contact</h2>
+  <button type="button" class="ib-side-close" @click="toggleInfo()" aria-label="Fechar detalhes do contato">×</button>
+  <h2 class="ib-side-label" id="side-contact-{{ conversation.id }}">Contato</h2>
   <dl class="ib-side-grid">
-    <dt>Name</dt><dd>{{ contact.display_name }}</dd>
+    <dt>Nome</dt><dd>{{ contact.display_name }}</dd>
     {% for row in identities %}
       <dt>{{ row.get_platform_display }}</dt>
       <dd class="truncate" title="{{ row.platform_user_id }}">{{ row.platform_user_id }}</dd>
     {% endfor %}
-    {% if contact.email %}<dt>Email</dt><dd>{{ contact.email }}</dd>{% endif %}
-    {% if contact.phone %}<dt>Phone</dt><dd>{{ contact.phone }}</dd>{% endif %}
-    <dt>First seen</dt><dd>{{ contact.created_at|date:"j M Y" }}</dd>
-    <dt>Opt-in</dt>
+    {% if contact.email %}<dt>E-mail</dt><dd>{{ contact.email }}</dd>{% endif %}
+    {% if contact.phone %}<dt>Telefone</dt><dd>{{ contact.phone }}</dd>{% endif %}
+    <dt>Visto pela primeira vez</dt><dd>{{ contact.created_at|date:"j M Y" }}</dd>
+    <dt>Consentimento</dt>
     {% comment %}
       The address this conversation is on, because it is the one a reply here
       goes to. A word and a colour, never the colour alone.
     {% endcomment %}
     {% if identity.opted_out_at %}
-      <dd class="ib-side-bad">Opted out {{ identity.opted_out_at|date:"j M" }}</dd>
+      <dd class="ib-side-bad">Sem consentimento desde {{ identity.opted_out_at|date:"j M" }}</dd>
     {% elif identity.opt_in %}
-      <dd class="ib-side-good" {% if identity.opt_in_source %}title="Via {{ identity.get_opt_in_source_display|lower }}"{% endif %}>Subscribed</dd>
+      <dd class="ib-side-good" {% if identity.opt_in_source %}title="Via {{ identity.get_opt_in_source_display|lower }}"{% endif %}>Inscrito</dd>
     {% else %}
-      <dd class="ib-side-muted">Not recorded</dd>
+      <dd class="ib-side-muted">Não registrado</dd>
     {% endif %}
   </dl>
-  <a class="ib-side-link" href="{{ contact_url }}">Open contact</a>
+  <a class="ib-side-link" href="{{ contact_url }}">Abrir contato</a>
 </section>
 
 {% if thread_labels or can_reply and thread_label_options %}
 <section class="ib-side-section" aria-labelledby="side-labels-{{ conversation.id }}">
-  <h2 class="ib-side-label" id="side-labels-{{ conversation.id }}">Labels</h2>
+  <h2 class="ib-side-label" id="side-labels-{{ conversation.id }}">Marcadores</h2>
   <div class="ib-side-chips">
     {% comment %}
       `chip.color` is the vetted value from apps.inbox.rendering; the stored
@@ -58,7 +58,7 @@ thing. The panel only says so while a pause is on, with the way back out.
           <form hx-post="{% url 'inbox:remove_label' workspace_id=request.workspace.id conversation_id=conversation.id label_id=chip.id %}"
                 hx-swap="none">
             {% csrf_token %}
-            <button type="submit" class="ib-chip-x" aria-label="Remove label {{ chip.name }}">×</button>
+            <button type="submit" class="ib-chip-x" aria-label="Remover marcador {{ chip.name }}">×</button>
           </form>
         {% endif %}
       </span>
@@ -66,8 +66,8 @@ thing. The panel only says so while a pause is on, with the way back out.
     {% if can_reply and thread_label_options %}
       <div class="ib-add" x-data="{ open: false }" @click.outside="open = false" @keydown.escape="open = false">
         <button type="button" class="ib-add-chip" @click="open = !open" aria-haspopup="true"
-                :aria-expanded="open ? 'true' : 'false'">+ Add</button>
-        <form class="ib-add-menu" x-show="open" x-cloak aria-label="Add a label"
+                :aria-expanded="open ? 'true' : 'false'">+ Adicionar</button>
+        <form class="ib-add-menu" x-show="open" x-cloak aria-label="Adicionar marcador"
               hx-post="{% url 'inbox:add_label' workspace_id=request.workspace.id conversation_id=conversation.id %}"
               hx-swap="none">
           {% csrf_token %}
@@ -92,12 +92,12 @@ thing. The panel only says so while a pause is on, with the way back out.
             {% csrf_token %}
             <input type="hidden" name="tag" value="{{ tag.id }}">
             <input type="hidden" name="action" value="remove">
-            <button type="submit" class="ib-chip-x" aria-label="Remove tag {{ tag.name }}">×</button>
+            <button type="submit" class="ib-chip-x" aria-label="Remover tag {{ tag.name }}">×</button>
           </form>
         {% endif %}
       </span>
     {% empty %}
-      {% if not can_edit_contact or not available_tags %}<span class="ib-side-muted">None yet.</span>{% endif %}
+      {% if not can_edit_contact or not available_tags %}<span class="ib-side-muted">Nenhuma ainda.</span>{% endif %}
     {% endfor %}
     {% if can_edit_contact and available_tags %}
       {% comment %}
@@ -108,8 +108,8 @@ thing. The panel only says so while a pause is on, with the way back out.
       {% endcomment %}
       <div class="ib-add" x-data="{ open: false }" @click.outside="open = false" @keydown.escape="open = false">
         <button type="button" class="ib-add-chip" @click="open = !open" aria-haspopup="true"
-                :aria-expanded="open ? 'true' : 'false'">+ Add</button>
-        <form class="ib-add-menu" x-show="open" x-cloak aria-label="Add a tag"
+                :aria-expanded="open ? 'true' : 'false'">+ Adicionar</button>
+        <form class="ib-add-menu" x-show="open" x-cloak aria-label="Adicionar tag"
               hx-post="{% url 'inbox:tags' workspace_id=request.workspace.id conversation_id=conversation.id %}"
               hx-swap="none">
           {% csrf_token %}
@@ -123,16 +123,16 @@ thing. The panel only says so while a pause is on, with the way back out.
 </section>
 
 <section class="ib-side-section" aria-labelledby="side-automation-{{ conversation.id }}">
-  <h2 class="ib-side-label" id="side-automation-{{ conversation.id }}">Automation</h2>
+  <h2 class="ib-side-label" id="side-automation-{{ conversation.id }}">Automação</h2>
   {% if is_paused %}
     <div class="ib-side-card ib-side-card-paused">
-      <b>Paused until {{ conversation.automation_paused_until|time:"H:i" }}</b>
-      <span>Flows will not reply to this contact until then.</span>
+      <b>Pausada até {{ conversation.automation_paused_until|time:"H:i" }}</b>
+      <span>Os fluxos não responderão a este contato até lá.</span>
       {% if can_reply %}
         <form hx-post="{% url 'inbox:pause' workspace_id=request.workspace.id conversation_id=conversation.id %}" hx-swap="none">
           {% csrf_token %}
           <input type="hidden" name="action" value="resume">
-          <button type="submit" class="ib-side-action">Resume automation</button>
+          <button type="submit" class="ib-side-action">Retomar automação</button>
         </form>
       {% endif %}
     </div>
@@ -141,24 +141,24 @@ thing. The panel only says so while a pause is on, with the way back out.
     <div class="ib-side-card">
       <b>{{ last_run.execution.flow.name }}</b>
       <span>
-        {% if last_run.is_live %}{{ last_run.execution.get_status_display }} · started {{ last_run.execution.created_at|timesince }} ago{% else %}Last ran {{ last_run.execution.updated_at|timesince }} ago{% endif %}
-        · {{ last_run.sent }} message{{ last_run.sent|pluralize }} sent
+        {% if last_run.is_live %}{{ last_run.execution.get_status_display }} · iniciada há {{ last_run.execution.created_at|timesince }}{% else %}Última execução há {{ last_run.execution.updated_at|timesince }}{% endif %}
+        · {{ last_run.sent }} {% if last_run.sent == 1 %}mensagem enviada{% else %}mensagens enviadas{% endif %}
       </span>
       {% if last_run.is_live and can_reply %}
         <form hx-post="{% url 'inbox:stop' workspace_id=request.workspace.id conversation_id=conversation.id %}" hx-swap="none">
           {% csrf_token %}
-          <button type="submit" class="ib-side-action ib-side-action-danger">Stop automation</button>
+          <button type="submit" class="ib-side-action ib-side-action-danger">Parar automação</button>
         </form>
       {% endif %}
     </div>
   {% elif not is_paused %}
-    <p class="ib-side-muted">Nothing has run for this contact yet.</p>
+    <p class="ib-side-muted">Nenhuma automação foi executada para este contato ainda.</p>
   {% endif %}
 </section>
 
 {% if custom_fields %}
 <section class="ib-side-section" aria-labelledby="side-fields-{{ conversation.id }}">
-  <h2 class="ib-side-label" id="side-fields-{{ conversation.id }}">Fields</h2>
+  <h2 class="ib-side-label" id="side-fields-{{ conversation.id }}">Campos personalizados</h2>
   <dl class="ib-side-grid">
     {% for field in custom_fields %}<dt>{{ field.name }}</dt><dd>{{ field.value }}</dd>{% endfor %}
   </dl>

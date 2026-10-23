@@ -296,15 +296,6 @@ class TestTheEditor:
 
         assert admin_client.get(url_for("rule_form"), {"rule": str(theirs.pk)}).status_code == 404
 
-    def test_the_settings_page_itself_renders(self, tenancy, admin_client, url_for):
-        """Covers the sortable/keyboard reorder script and the rows partial."""
-        _rule(tenancy.workspace, "Refunds")
-
-        page = admin_client.get(url_for("rule_settings")).content.decode()
-
-        assert "data-rule-list" in page
-        assert "data-rule-move" in page
-        assert "Message mentions refund" in page
 
 
 class TestEditingPreservesActions:

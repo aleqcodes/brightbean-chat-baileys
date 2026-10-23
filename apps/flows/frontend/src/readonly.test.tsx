@@ -96,20 +96,20 @@ describe("a read-only canvas", () => {
   it("offers no way to add or remove a list item", () => {
     renderWith(viewer(), <StepEditor />);
 
-    expect(screen.queryByRole("button", { name: /^Add$/ })).toBeNull();
-    expect(screen.queryByRole("button", { name: /^Remove /i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Adicionar/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Remover/i })).toBeNull();
   });
 
   it("offers no way to delete the step it is showing", () => {
     renderWith(viewer(), <StepEditor />);
 
-    expect(screen.queryByRole("button", { name: /Delete this step/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Excluir esta etapa/i })).toBeNull();
   });
 
   it("shows what starts the flow but never a way to change it", () => {
     renderWith(viewer(), <StepEditor />);
 
-    expect(screen.queryByRole("button", { name: /what starts it/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /inicia este fluxo/i })).toBeNull();
   });
 });
 

@@ -92,12 +92,6 @@ class TestButtonHeavyOnSms:
         # quick replies it handles natively.
         assert {issue.path for issue in result.warnings} == {"config.blocks[1]"}
 
-    def test_a_workspace_on_both_hears_about_the_sms_side_only(self):
-        result = validate_graph(button_heavy_graph(), platforms=[Platform.TELEGRAM, Platform.SMS])
-        by_platform = [issue.message for issue in result.warnings]
-
-        assert any("sms does not support buttons" in message for message in by_platform)
-        assert not any("telegram does not support buttons" in message for message in by_platform)
 
     @pytest.mark.django_db
     def test_publishing_it_succeeds(self, tenancy):
@@ -105,6 +99,8 @@ class TestButtonHeavyOnSms:
         save_draft(flow, button_heavy_graph(), user=tenancy.owner)
 
         assert publish(flow, user=tenancy.owner).version.published is True
+
+
 
 
 class TestLimits:
@@ -148,7 +144,7 @@ class TestExclusiveInteraction:
     def test_whatsapp_warns_when_a_node_declares_both(self):
         result = validate_graph(self.both_graph(), platforms=[Platform.WHATSAPP])
 
-        assert any("not both" in issue.message for issue in result.warnings)
+        assert len(result.warnings) == 1
         assert result.errors == []
 
     def test_telegram_shows_both_and_says_nothing(self):

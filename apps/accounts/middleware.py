@@ -63,7 +63,7 @@ class AuthRateLimitMiddleware:
     def __call__(self, request: HttpRequest) -> HttpResponse:
         limited = request.method == "POST" and request.path.startswith(AUTH_RATE_LIMITED_PATHS)
         if limited and self._over_limit(request):
-            response = HttpResponse("Too many requests. Please try again later.", status=429)
+            response = HttpResponse("Muitas tentativas. Tente novamente mais tarde.", status=429)
             # Without this a client has to guess when to come back, and every
             # well-behaved one guesses "immediately".
             response["Retry-After"] = str(AUTH_RATE_WINDOW)

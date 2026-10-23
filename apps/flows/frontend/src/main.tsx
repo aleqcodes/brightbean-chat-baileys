@@ -37,7 +37,7 @@ if (mount) {
     // readEnv throws when the mount div is missing an attribute — a template
     // change, not something the reader can fix, but they still need to be told
     // rather than left watching a placeholder.
-    console.error("The flow builder could not start.", error);
+    console.error("O construtor de fluxos não pôde ser iniciado.", error);
     root.render(<BuilderFailure error={error instanceof Error ? error : new Error(String(error))} />);
   }
 }

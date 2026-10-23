@@ -42,18 +42,18 @@ thread above keeps its height.
       believing it will be sent — or the other way round.
     {% endcomment %}
     <div class="ib-compose-head">
-      <div class="ib-seg" role="tablist" aria-label="Message type">
+      <div class="ib-seg" role="tablist" aria-label="Tipo de mensagem">
         <button type="button" role="tab" class="ib-seg-btn" :aria-selected="mode === 'reply' ? 'true' : 'false'"
-                aria-controls="reply-{{ conversation.id }}" @click="mode = 'reply'">Reply</button>
+                aria-controls="reply-{{ conversation.id }}" @click="mode = 'reply'">Responder</button>
         <button type="button" role="tab" class="ib-seg-btn" :aria-selected="mode === 'note' ? 'true' : 'false'"
-                aria-controls="reply-{{ conversation.id }}" @click="mode = 'note'; sheet = ''">Internal note</button>
+                aria-controls="reply-{{ conversation.id }}" @click="mode = 'note'; sheet = ''">Nota interna</button>
       </div>
-      <span class="ib-compose-hint" x-show="mode === 'reply'">Sending pauses automation for {{ pause_minutes }} minutes.</span>
-      <span class="ib-compose-hint" x-show="mode === 'note'" x-cloak>Only your team sees notes.</span>
+      <span class="ib-compose-hint" x-show="mode === 'reply'">O envio pausa a automação por {{ pause_minutes }} minutos.</span>
+      <span class="ib-compose-hint" x-show="mode === 'note'" x-cloak>Só sua equipe vê as notas.</span>
     </div>
 
     <div class="ib-compose-box" :class="mode === 'note' && 'is-note'">
-      <label class="sr-only" for="reply-{{ conversation.id }}" x-text="mode === 'note' ? 'Internal note' : 'Reply'">Reply</label>
+      <label class="sr-only" for="reply-{{ conversation.id }}" x-text="mode === 'note' ? 'Nota interna' : 'Responder'">Responder</label>
       {% comment %}
         No `required`: with the attachment button beside it a picture on its own
         is a legitimate reply, and a browser-side `required` would refuse to
@@ -64,8 +64,8 @@ thread above keeps its height.
                 maxlength="{{ max_chars }}"
                 data-shortcut="reply"
                 class="ib-compose-input"
-                :placeholder="mode === 'note' ? 'Write a note for your team…' : 'Write a reply… press r to focus'"
-                placeholder="Write a reply…"></textarea>
+                :placeholder="mode === 'note' ? 'Escreva uma nota para sua equipe…' : 'Escreva uma resposta… pressione r para focar'"
+                placeholder="Escreva uma resposta…"></textarea>
       {% comment %}
         Attachments picked from the library (#16). Ids only — the picker's
         contract says "Store `id`. Never store `url` — it is minted per request" —
@@ -78,7 +78,7 @@ thread above keeps its height.
             <span x-text="item.name"></span>
             <input type="hidden" name="media" :value="item.id">
             <button type="button" class="btn-icon-hover" @click="drop(item.id)"
-                    :aria-label="'Remove attachment ' + item.name">×</button>
+                    :aria-label="'Remover anexo ' + item.name">×</button>
           </span>
         </template>
       </div>
@@ -91,27 +91,27 @@ thread above keeps its height.
         {% if media_kinds %}
           <button type="button" class="ib-tool" x-show="mode === 'reply'"
                   @click="sheet = ''; togglePicker()"
-                  :aria-expanded="picker.open ? 'true' : 'false'">Attach</button>
+                  :aria-expanded="picker.open ? 'true' : 'false'">Anexar</button>
         {% endif %}
         <button type="button" class="ib-tool" x-show="mode === 'reply'"
                 @click="closePicker(); sheet = sheet === 'later' ? '' : 'later'"
                 aria-haspopup="dialog" :aria-expanded="sheet === 'later' ? 'true' : 'false'"
-                aria-controls="inbox-schedule-{{ conversation.id }}">Send later</button>
+                aria-controls="inbox-schedule-{{ conversation.id }}">Enviar mais tarde</button>
         <button type="button" class="ib-tool"
                 @click="closePicker(); sheet = sheet === 'remind' ? '' : 'remind'"
                 aria-haspopup="dialog" :aria-expanded="sheet === 'remind' ? 'true' : 'false'"
-                aria-controls="inbox-reminder-{{ conversation.id }}">Reminder</button>
+                aria-controls="inbox-reminder-{{ conversation.id }}">Lembrete</button>
         {% comment %}
           Send is the one orange control in the inbox (HANDOFF §3). In the note
           tab it gives way to "Add note", which posts the same fields to the
           note endpoint — hx-post on the button overrides the form's. Same
           token: whichever is pressed, pressing it twice is still one message.
         {% endcomment %}
-        <button type="submit" class="btn-pill-primary ib-send-btn ml-auto" x-show="mode === 'reply'">Send</button>
+        <button type="submit" class="btn-pill-primary ib-send-btn ml-auto" x-show="mode === 'reply'">Enviar</button>
         <button type="submit" class="btn-pill-secondary ib-send-btn ml-auto" x-show="mode === 'note'" x-cloak
                 hx-post="{% url 'inbox:note' workspace_id=request.workspace.id conversation_id=conversation.id %}"
                 hx-include="closest form"
-                hx-swap="none">Add note</button>
+                hx-swap="none">Adicionar nota</button>
       </div>
     </div>
 
@@ -122,15 +122,15 @@ thread above keeps its height.
       by filtering what already arrived.
     {% endcomment %}
     <div class="ib-popover ib-picker" x-show="picker.open" x-cloak @keydown.escape.window="closePicker()"
-         role="dialog" aria-label="Attach from the media library">
+         role="dialog" aria-label="Anexar da biblioteca de mídia">
       <div class="ib-picker-head">
-        <label class="sr-only" :for="'media-search-' + conversationId">Search the library</label>
+        <label class="sr-only" :for="'media-search-' + conversationId">Buscar na biblioteca</label>
         <input type="search" :id="'media-search-' + conversationId" class="form-input-styled"
-               placeholder="Search the media library…"
+               placeholder="Buscar na biblioteca de mídia…"
                x-model="picker.term" @input.debounce.300ms="loadPicker()">
-        <button type="button" class="btn-icon-hover" @click="closePicker()" aria-label="Close the picker">×</button>
+        <button type="button" class="btn-icon-hover" @click="closePicker()" aria-label="Fechar seletor">×</button>
       </div>
-      <p class="muted text-xs" x-show="picker.loading">Loading…</p>
+      <p class="muted text-xs" x-show="picker.loading">Carregando…</p>
       <p class="alert-error text-xs" x-show="picker.error" x-text="picker.error"></p>
       <ul class="ib-picker-list" x-show="!picker.loading && !picker.error">
         <template x-for="asset in picker.results" :key="asset.id">
@@ -146,7 +146,7 @@ thread above keeps its height.
         </template>
       </ul>
       <p class="muted text-xs" x-show="!picker.loading && !picker.error && !picker.results.length">
-        Nothing in the library this channel can carry.
+        Nada na biblioteca pode ser enviado por este canal.
       </p>
     </div>
 
@@ -156,20 +156,20 @@ thread above keeps its height.
       scheduled body is built by exactly the code that builds a live one.
     {% endcomment %}
     <div id="inbox-schedule-{{ conversation.id }}" class="ib-popover" x-show="sheet === 'later'" x-cloak
-         role="dialog" aria-label="Send later"
+         role="dialog" aria-label="Enviar mais tarde"
          x-effect="if (sheet === 'later') $nextTick(() => $el.querySelector('input:not([type=hidden])')?.focus())">
-      <p class="ib-popover-title">Send later</p>
-      <p class="ib-popover-text">The reply in the box goes out at this time, in your time zone.</p>
-      <label class="ib-field-label" for="send-at-{{ conversation.id }}">Send at</label>
+      <p class="ib-popover-title">Enviar mais tarde</p>
+      <p class="ib-popover-text">A resposta escrita será enviada neste horário, no seu fuso horário.</p>
+      <label class="ib-field-label" for="send-at-{{ conversation.id }}">Enviar em</label>
       <input id="send-at-{{ conversation.id }}" class="form-datetime" type="datetime-local" name="send_at">
       <div class="ib-popover-actions">
-        <button type="button" class="ib-plain-btn" @click="sheet = ''">Cancel</button>
+        <button type="button" class="ib-plain-btn" @click="sheet = ''">Cancelar</button>
         <button type="submit" class="ib-ink-btn"
                 hx-post="{% url 'inbox:create_scheduled_reply' workspace_id=request.workspace.id conversation_id=conversation.id %}"
                 hx-include="closest form"
                 hx-disabled-elt="this"
                 hx-swap="none"
-                x-on:htmx:after-request.camel="if ($event.detail.successful) sheet = ''">Schedule reply</button>
+                x-on:htmx:after-request.camel="if ($event.detail.successful) sheet = ''">Agendar resposta</button>
       </div>
     </div>
   </form>
@@ -181,23 +181,23 @@ thread above keeps its height.
     button, through the `sheet` both forms share.
   {% endcomment %}
   <form id="inbox-reminder-{{ conversation.id }}" class="ib-popover ib-remind"
-        x-show="sheet === 'remind'" x-cloak role="dialog" aria-label="Set a reminder"
+        x-show="sheet === 'remind'" x-cloak role="dialog" aria-label="Criar um lembrete"
         x-effect="if (sheet === 'remind') $nextTick(() => $el.querySelector('input:not([type=hidden])')?.focus())"
         x-on:htmx:after-request.camel="if ($event.detail.successful) { sheet = ''; $el.reset(); }"
         hx-post="{% url 'inbox:create_reminder' workspace_id=request.workspace.id conversation_id=conversation.id %}"
         hx-swap="none">
     {% csrf_token %}
-    <p class="ib-popover-title">Set a reminder</p>
-    <p class="ib-popover-text">You or a teammate get a notification to come back to this conversation.</p>
+    <p class="ib-popover-title">Criar um lembrete</p>
+    <p class="ib-popover-text">Você ou alguém da equipe receberá uma notificação para voltar a esta conversa.</p>
     <div class="ib-remind-grid">
       <div class="ib-remind-field">
-        <label class="ib-field-label" for="remind-at-{{ conversation.id }}">When</label>
+        <label class="ib-field-label" for="remind-at-{{ conversation.id }}">Quando</label>
         <input id="remind-at-{{ conversation.id }}" class="form-datetime" type="datetime-local" name="remind_at">
       </div>
       <div class="ib-remind-field">
-        <label class="ib-field-label" for="remind-who-{{ conversation.id }}">For</label>
+        <label class="ib-field-label" for="remind-who-{{ conversation.id }}">Para</label>
         <select id="remind-who-{{ conversation.id }}" class="bb-select" name="recipient">
-          <option value="">Me</option>
+          <option value="">Eu</option>
           {% for membership in members %}
             <option value="{{ membership.user_id }}">{{ membership.user.display_name }}</option>
           {% endfor %}
@@ -205,21 +205,17 @@ thread above keeps its height.
       </div>
     </div>
     <div class="ib-remind-field">
-      <label class="ib-field-label" for="remind-note-{{ conversation.id }}">Note <span>(optional)</span></label>
-      <input id="remind-note-{{ conversation.id }}" class="form-input-styled" type="text" name="note" maxlength="500" placeholder="What should you follow up on?">
+      <label class="ib-field-label" for="remind-note-{{ conversation.id }}">Nota <span>(opcional)</span></label>
+      <input id="remind-note-{{ conversation.id }}" class="form-input-styled" type="text" name="note" maxlength="500" placeholder="O que você precisa acompanhar?">
     </div>
     <div class="ib-popover-actions">
-      <button type="button" class="ib-plain-btn" @click="sheet = ''">Cancel</button>
+      <button type="button" class="ib-plain-btn" @click="sheet = ''">Cancelar</button>
       {% comment %}
         This endpoint does not refetch the composer, so it needs its own
         double-submit guard rather than the reply's rotating token.
       {% endcomment %}
-      <button type="submit" class="ib-ink-btn" hx-disabled-elt="this">Set reminder</button>
+      <button type="submit" class="ib-ink-btn" hx-disabled-elt="this">Criar lembrete</button>
     </div>
   </form>
-</div>
-{% else %}
-  <div class="ib-composer ib-composer-readonly">
-    You can read this inbox but not reply to it.
-  </div>
+
 {% endif %}

@@ -341,7 +341,7 @@ def check_can_add_channel(organization: Any) -> None:
     if limit is None or count_channels(organization) < limit:
         return
     _refuse(
-        f"Your plan connects {limit} channels. Upgrade to connect more, or disable one you are not using.",
+        f"Seu plano conecta {limit} canais. Faça upgrade para conectar mais ou desative um que não esteja usando.",
         "plan_channels",
     )
 
@@ -352,7 +352,7 @@ def check_can_activate_automation(organization: Any) -> None:
     if limit is None or count_active_automations(organization) < limit:
         return
     _refuse(
-        f"Your plan runs {limit} automations at once. Upgrade, or switch one off to free up a slot.",
+        f"Seu plano permite executar {limit} automações ao mesmo tempo. Faça upgrade ou desative uma para liberar espaço.",
         "plan_automations",
     )
 
@@ -363,7 +363,7 @@ def check_can_add_seat(organization: Any, *, excluding_invitation: Any = None) -
     if limit is None or count_seats(organization, excluding_invitation=excluding_invitation) < limit:
         return
     _refuse(
-        f"Your plan includes {limit} user{'' if limit == 1 else 's'}. Upgrade to add more.",
+        f"Seu plano inclui {limit} usuário{'' if limit == 1 else 's'}. Faça upgrade para adicionar mais pessoas.",
         "plan_seats",
     )
 
@@ -374,7 +374,7 @@ def check_can_add_workspace(organization: Any) -> None:
     if limit is None or count_workspaces(organization) < limit:
         return
     _refuse(
-        f"Your plan includes {limit} workspace{'' if limit == 1 else 's'}. Upgrade to add more.",
+        f"Seu plano inclui {limit} espaço{'' if limit == 1 else 's'} de trabalho. Faça upgrade para adicionar mais.",
         "plan_workspaces",
     )
 
@@ -390,7 +390,7 @@ def check_api_access(organization: Any) -> None:
     """
     if limits_for(organization).api_access:
         return
-    _refuse("The public API is available on the paid plan.", "plan_api")
+    _refuse("A API pública está disponível no plano pago.", "plan_api")
 
 
 # --- The read model the billing page renders ----------------------------------

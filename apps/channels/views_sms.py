@@ -154,12 +154,12 @@ def _connect(
 ) -> str:
     """Do the connect. Returns "" on success, or the message to show."""
     if not account_sid or not token:
-        return "Paste both the Account SID and the Auth Token from your Twilio console."
+        return "Cole o Account SID e o Auth Token do console do Twilio."
     if bool(from_number) == bool(messaging_service_sid):
         # Exactly one. Twilio's Messages API accepts ``From`` or
         # ``MessagingServiceSid`` and refuses both, so a row holding both would
         # be a connection whose every send is rejected.
-        return "Give either a from-number or a messaging service SID, but not both."
+        return "Informe um número de origem ou um SID de serviço de mensagens, mas não ambos."
 
     # Shape-checked before any of these reaches a URL. Both SIDs are
     # interpolated into request paths — by ``sms._account_url`` and
@@ -167,11 +167,11 @@ def _connect(
     # string, so this is the boundary where an operator typo stops being a
     # confusing 404 and a hostile string stops being a re-pointed request.
     if not ACCOUNT_SID_PATTERN.match(account_sid):
-        return "That does not look like an Account SID. It starts with AC and is 34 characters long."
+        return "Esse não parece ser um Account SID. Ele começa com AC e tem 34 caracteres."
     if messaging_service_sid and not MESSAGING_SERVICE_PATTERN.match(messaging_service_sid):
-        return "That does not look like a Messaging Service SID. It starts with MG and is 34 characters long."
+        return "Esse não parece ser um SID de serviço de mensagens. Ele começa com MG e tem 34 caracteres."
     if from_number and not E164_PATTERN.match(from_number):
-        return "Give the number in E.164 form, with the country code and no spaces: +15551234567."
+        return "Informe o número no formato E.164, com código do país e sem espaços: +15551234567."
 
     try:
         sms.fetch_account(account_sid, token)
@@ -234,7 +234,7 @@ def _connect(
 
     messages.success(
         request,
-        f"Connected {connection.display_name}. Paste the webhook URL below into Twilio to start receiving messages.",
+        f"Conectado {connection.display_name}. Cole a URL do webhook abaixo no Twilio para começar a receber mensagens.",
     )
     return ""
 
@@ -273,12 +273,12 @@ def sms_settings_update(request: WorkspaceRequest, workspace_id: str) -> HttpRes
 
     _save_settings(row)
     if cost_ok:
-        messages.success(request, "SMS settings saved.")
+        messages.success(request, "Configurações de SMS salvas.")
     else:
         messages.warning(
             request,
-            "SMS settings saved, but the price per segment was not a number "
-            f"between 0 and {MAX_SEGMENT_COST} and was left unchanged.",
+            "Configurações de SMS salvas, mas o preço por segmento não era um número "
+            f"entre 0 e {MAX_SEGMENT_COST} e não foi alterado.",
         )
     return redirect(reverse("channels:sms_settings", kwargs={"workspace_id": workspace_id}))
 

@@ -65,10 +65,10 @@ def validate_config(trigger_type: str, config: Any, *, known_size: int | None = 
     """
     spec = spec_for(trigger_type)
     if spec is None:
-        return [_issue(f"{trigger_type!r} is not a trigger type.", path="type")]
+        return [_issue(f"{trigger_type!r} não é um tipo de gatilho.", path="type")]
 
     if not isinstance(config, dict):
-        return [_issue("A trigger's configuration has to be an object.", path="config")]
+        return [_issue("A configuração do gatilho deve ser um objeto.", path="config")]
 
     if known_size is None or known_size > MAX_TRIGGER_CONFIG_BYTES:
         size = config_byte_size(config)
@@ -78,17 +78,17 @@ def validate_config(trigger_type: str, config: Any, *, known_size: int | None = 
             # refuse at any length.
             return [
                 _issue(
-                    "The configuration holds a value that cannot be stored as JSON.",
+                    "A configuração contém um valor que não pode ser armazenado como JSON.",
                     path="config",
                 )
             ]
         if size > MAX_TRIGGER_CONFIG_BYTES:
             return [
-                _issue(f"The configuration is {size} bytes; the limit is {MAX_TRIGGER_CONFIG_BYTES}.", path="config")
+                _issue(f"A configuração tem {size} bytes; o limite é {MAX_TRIGGER_CONFIG_BYTES}.", path="config")
             ]
 
     if json_depth(config, limit=MAX_TRIGGER_CONFIG_DEPTH) > MAX_TRIGGER_CONFIG_DEPTH:
-        return [_issue(f"The configuration nests deeper than {MAX_TRIGGER_CONFIG_DEPTH} levels.", path="config")]
+        return [_issue(f"A configuração ultrapassa {MAX_TRIGGER_CONFIG_DEPTH} níveis de aninhamento.", path="config")]
 
     return validate_instance(spec.config, config, path="config", defs=all_defs())
 

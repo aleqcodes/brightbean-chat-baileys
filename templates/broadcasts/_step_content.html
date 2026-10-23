@@ -39,20 +39,20 @@ script tag out of its own comment for its extractor.
     <input type="hidden" name="template_id" :value="templateId">
     <input type="hidden" name="message_tag" :value="tag">
 
-    <h2 class="wizard-title">Write the message</h2>
-    <p class="wizard-lede">What everyone in the audience receives. The preview shows it as it lands in the chat.</p>
+    <h2 class="wizard-title">Escreva a mensagem</h2>
+    <p class="wizard-lede">O conteúdo que todos no público receberão. A prévia mostra como a mensagem aparecerá no chat.</p>
 
     {% if composer.templates %}
     <div class="bc-panel">
       <div class="bc-panel-head">
-        <span class="bc-panel-title">What kind of message?</span>
+        <span class="bc-panel-title">Que tipo de mensagem?</span>
       </div>
       <div class="bc-row">
-        <label><input type="radio" value="message" x-model="mode"> Compose a message</label>
-        <label><input type="radio" value="template" x-model="mode"> Use an approved template</label>
+        <label><input type="radio" value="message" x-model="mode"> Escrever uma mensagem</label>
+        <label><input type="radio" value="template" x-model="mode"> Usar um modelo aprovado</label>
       </div>
       <p class="bc-hint mt-1">
-        Outside the {{ composer.window_hours }}-hour messaging window this channel accepts approved templates only.
+        Fora da janela de {{ composer.window_hours }} horas, este canal aceita somente modelos aprovados.
       </p>
     </div>
     {% endif %}
@@ -60,7 +60,7 @@ script tag out of its own comment for its extractor.
     {# ── Composed message ─────────────────────────────────────── #}
     <div class="bc-panel" x-show="mode === 'message'">
       <div class="bc-panel-head">
-        <span class="bc-panel-title">Message</span>
+        <span class="bc-panel-title">Mensagem</span>
         {% if composer.counts_segments %}
         {% comment %}
           SPEC §6.6's segment-count preview, served by L5-D's own endpoint —
@@ -82,9 +82,9 @@ script tag out of its own comment for its extractor.
       <template x-for="(block, index) in blocks" :key="index">
         <div class="bc-block">
           <div class="bc-block-head">
-            <span class="bc-block-kind" x-text="block.type"></span>
+            <span class="bc-block-kind" x-text="({text: 'Texto', image: 'Imagem', audio: 'Áudio', video: 'Vídeo', file: 'Arquivo', card: 'Cartão'})[block.type] || block.type"></span>
             <button type="button" class="bc-remove" @click="blocks.splice(index, 1)"
-                    :aria-label="`Remove block ${index + 1}`">&times;</button>
+                    :aria-label="`Remover bloco ${index + 1}`">&times;</button>
           </div>
 
           <template x-if="block.type === 'text'">
@@ -92,7 +92,7 @@ script tag out of its own comment for its extractor.
                       :maxlength="config.max_text_len"
                       x-model="block.text"
                       @input.debounce.300ms="announceText()"
-                      placeholder="What do you want to say?"></textarea>
+                      placeholder="O que você quer dizer?"></textarea>
           </template>
 
           {% comment %}
@@ -108,23 +108,23 @@ script tag out of its own comment for its extractor.
           {% endcomment %}
           <template x-if="block.type !== 'text' && block.type !== 'card'">
             <div class="bc-row">
-              <label class="sr-only" :for="`block-media-${index}`">Media library id or URL</label>
+              <label class="sr-only" :for="`block-media-${index}`">ID da biblioteca de mídia ou URL</label>
               <input :id="`block-media-${index}`" type="text" class="form-input-styled" style="width: 22rem;"
-                     x-model="block.media" placeholder="Media library id, or https://…">
+                     x-model="block.media" placeholder="ID da biblioteca de mídia ou endereço da web">
               <input type="text" class="form-input-styled" style="width: 16rem;"
-                     x-model="block.caption" placeholder="Caption (optional)">
+                     x-model="block.caption" placeholder="Legenda (opcional)">
             </div>
           </template>
 
           <template x-if="block.type === 'card'">
             <div>
               <div class="bc-row">
-                <input type="text" class="form-input-styled" style="width: 18rem;" x-model="block.title" placeholder="Card title" maxlength="200">
-                <input type="text" class="form-input-styled" style="width: 18rem;" x-model="block.subtitle" placeholder="Subtitle" maxlength="400">
+                <input type="text" class="form-input-styled" style="width: 18rem;" x-model="block.title" placeholder="Título do cartão" maxlength="200">
+                <input type="text" class="form-input-styled" style="width: 18rem;" x-model="block.subtitle" placeholder="Subtítulo" maxlength="400">
               </div>
               <div class="bc-row">
                 <input type="text" class="form-input-styled" style="width: 22rem;" x-model="block.image"
-                       placeholder="Image: media library id, or https://…">
+                       placeholder="Imagem: ID da biblioteca de mídia ou endereço da web">
               </div>
             </div>
           </template>
@@ -132,12 +132,12 @@ script tag out of its own comment for its extractor.
       </template>
 
       <div class="bc-actions">
-        <button type="button" class="btn-outline btn-inline" @click="addBlock('text')">Add text</button>
+        <button type="button" class="btn-outline btn-inline" @click="addBlock('text')">Adicionar texto</button>
         <template x-for="kind in config.blocks" :key="kind">
           <button type="button" class="btn-outline btn-inline" @click="addBlock(kind)"
-                  x-text="`Add ${kind}`"></button>
+                  x-text="`Adicionar ${({text: 'texto', image: 'imagem', audio: 'áudio', video: 'vídeo', file: 'arquivo', card: 'cartão'})[kind] || kind}`"></button>
         </template>
-        <a class="btn-link" href="{% url 'media:library' workspace_id=request.workspace.id %}" target="_blank" rel="noopener">Open media library</a>
+        <a class="btn-link" href="{% url 'media:library' workspace_id=request.workspace.id %}" target="_blank" rel="noopener">Abrir biblioteca de mídia</a>
       </div>
     </div>
 
@@ -151,40 +151,40 @@ script tag out of its own comment for its extractor.
     {% endcomment %}
     <div class="bc-panel" x-show="mode === 'message' && config.allows_buttons">
       <div class="bc-panel-head">
-        <span class="bc-panel-title">Buttons</span>
-        <span class="bc-hint">A reply button parks the contact in a waiting run until they answer.</span>
+        <span class="bc-panel-title">Botões</span>
+        <span class="bc-hint">Um botão de resposta mantém o contato aguardando até que ele responda.</span>
       </div>
 
       <template x-for="(button, index) in buttons" :key="index">
         <div class="bc-row">
-          <input type="text" class="form-input-styled" style="width: 12rem;" x-model="button.label" placeholder="Label" maxlength="80">
+          <input type="text" class="form-input-styled" style="width: 12rem;" x-model="button.label" placeholder="Rótulo" maxlength="80">
           <select class="bb-filter-select" x-model="button.action">
-            <option value="postback">Reply</option>
-            <option value="url" x-show="config.allows_url_buttons">Open a link</option>
+            <option value="postback">Resposta</option>
+            <option value="url" x-show="config.allows_url_buttons">Abrir um link</option>
           </select>
           <input type="url" class="form-input-styled" style="width: 18rem;" x-model="button.url"
                  x-show="button.action === 'url'" placeholder="https://">
           <button type="button" class="bc-remove" @click="buttons.splice(index, 1)"
-                  :aria-label="`Remove button ${index + 1}`">&times;</button>
+                  :aria-label="`Remover botão ${index + 1}`">&times;</button>
         </div>
       </template>
 
       <div class="bc-actions">
         <button type="button" class="btn-outline btn-inline"
                 :disabled="buttons.length >= config.max_buttons"
-                @click="addButton()">Add button</button>
-        <span class="bc-hint" x-text="`${buttons.length} of ${config.max_buttons}`"></span>
+                @click="addButton()">Adicionar botão</button>
+        <span class="bc-hint" x-text="`${buttons.length} de ${config.max_buttons}`"></span>
       </div>
     </div>
 
     {# ── Approved template ────────────────────────────────────── #}
     <div class="bc-panel" x-show="mode === 'template'">
       <div class="bc-panel-head">
-        <span class="bc-panel-title">Approved template</span>
+        <span class="bc-panel-title">Modelo aprovado</span>
         <span class="bc-hint" x-show="costHint" x-text="costHint"></span>
       </div>
       <select class="bb-filter-select" x-model="templateId">
-        <option value="">Choose a template…</option>
+        <option value="">Escolha um modelo…</option>
         <template x-for="template in config.templates" :key="template.id">
           <option :value="template.id" x-text="`${template.name} · ${template.language} · ${template.category}`"></option>
         </template>
@@ -209,11 +209,11 @@ script tag out of its own comment for its extractor.
     {% if composer.tag_choices %}
     <div class="bc-panel">
       <div class="bc-panel-head">
-        <span class="bc-panel-title">Message tag</span>
-        <span class="bc-hint">Required for contacts outside the {{ composer.window_hours }}-hour window.</span>
+        <span class="bc-panel-title">Etiqueta da mensagem</span>
+        <span class="bc-hint">Obrigatória para contatos fora da janela de {{ composer.window_hours }} horas.</span>
       </div>
       <select class="bb-filter-select" x-model="tag">
-        <option value="">No tag: in-window contacts only</option>
+        <option value="">Sem tag: somente contatos dentro da janela</option>
         {% for choice in composer.tag_choices %}
         <option value="{{ choice }}">{{ choice }}</option>
         {% endfor %}
@@ -236,35 +236,35 @@ script tag out of its own comment for its extractor.
       the picture is a library id or a link here, and fetching it to draw a
       thumbnail is the detail page's job, not a keystroke's.
     {% endcomment %}
-    <div class="bc-preview-chat" aria-label="Preview" role="group">
-      <p class="side-panel-title">Preview</p>
+    <div class="bc-preview-chat" aria-label="Prévia" role="group">
+      <p class="side-panel-title">Prévia</p>
       <div class="chat-thread">
         <template x-if="mode === 'message'">
           <div class="flex flex-col gap-1.5 items-start">
             <template x-for="(block, index) in blocks" :key="index">
               <div class="chat-bubble chat-bubble-out">
-                <template x-if="block.type === 'text'"><span class="whitespace-pre-wrap" x-text="block.text || 'Your message…'"></span></template>
-                <template x-if="block.type === 'card'"><span><strong x-text="block.title || 'Card title'"></strong><br><span x-text="block.subtitle"></span></span></template>
-                <template x-if="block.type !== 'text' && block.type !== 'card'"><span x-text="'[' + block.type + '] ' + (block.caption || '')"></span></template>
+                <template x-if="block.type === 'text'"><span class="whitespace-pre-wrap" x-text="block.text || 'Sua mensagem…'"></span></template>
+                <template x-if="block.type === 'card'"><span><strong x-text="block.title || 'Título do cartão'"></strong><br><span x-text="block.subtitle"></span></span></template>
+                <template x-if="block.type !== 'text' && block.type !== 'card'"><span x-text="'[' + ({image: 'imagem', audio: 'áudio', video: 'vídeo', file: 'arquivo'}[block.type] || block.type) + '] ' + (block.caption || '')"></span></template>
               </div>
             </template>
-            <template x-if="!blocks.length"><div class="chat-bubble chat-bubble-out" style="opacity: .6;">Your message…</div></template>
+            <template x-if="!blocks.length"><div class="chat-bubble chat-bubble-out" style="opacity: .6;">Sua mensagem…</div></template>
             <div class="flex flex-wrap gap-1.5" x-show="buttons.length">
               <template x-for="(button, index) in buttons" :key="index">
-                <span class="chat-button" x-text="button.label || 'Button'"></span>
+                <span class="chat-button" x-text="button.label || 'Botão'"></span>
               </template>
             </div>
           </div>
         </template>
         <template x-if="mode === 'template'">
-          <div class="chat-bubble chat-bubble-out whitespace-pre-wrap" x-text="selectedTemplate ? selectedTemplate.body : 'Choose a template…'"></div>
+          <div class="chat-bubble chat-bubble-out whitespace-pre-wrap" x-text="selectedTemplate ? selectedTemplate.body : 'Escolha um modelo…'"></div>
         </template>
       </div>
     </div>
 
     <div class="wizard-actions">
       {% include "broadcasts/_step_back.html" %}
-      <button type="submit" class="btn-pill-primary">Continue</button>
+      <button type="submit" class="btn-pill-primary">Continuar</button>
     </div>
   </form>
 </div>

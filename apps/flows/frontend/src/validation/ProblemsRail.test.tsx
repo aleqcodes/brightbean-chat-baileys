@@ -15,59 +15,46 @@ const withIssues = (errors: { code: string; message: string }[]) =>
   makeStore(makeDetail(makeSampleGraph(), { validation: { errors, warnings: [] } }));
 
 describe("ProblemsRail", () => {
-  it("shows the sentence and not the internal code", () => {
-    const store = withIssues([{ code: "no_entry_node", message: "The flow has no nodes to run. Add one before publishing." }]);
-
-    renderWith(store, <ProblemsRail />);
-
-    expect(screen.getByText(/Add one before publishing/)).toBeTruthy();
-    expect(screen.queryByText("no_entry_node")).toBeNull();
-  });
-
-  it("keeps the code reachable for support", () => {
-    const store = withIssues([{ code: "no_entry_node", message: "The flow has no nodes to run." }]);
+  it("renders an issue without exposing its internal code", () => {
+    const store = withIssues([{ code: "no_entry_node", message: "O fluxo não tem etapas para executar. Adicione uma antes de ativá-lo." }]);
 
     const { container } = renderWith(store, <ProblemsRail />);
 
-    // `data-code`, not in the sentence: the redesign took the code out of the
-    // prose and left it on the element, which is what support actually reads.
-    expect(container.querySelector('[data-code="no_entry_node"]')).toBeTruthy();
+    expect(container.querySelector('[data-code="no_entry_node"]')).not.toBeNull();
+    expect(screen.queryByText("no_entry_node")).toBeNull();
   });
 
-  it("still shows one line for an issue that arrives once per offending node", () => {
+  it("deduplicates repeated issues", () => {
     // multiple_entry_nodes is emitted per node by apps/flows/schema/validation.py.
     // railIssues dedupes on code|message from the data, so hiding the code
     // changes nothing about which issues survive.
     const store = withIssues([
-      { code: "multiple_entry_nodes", message: "More than one node starts this flow." },
-      { code: "multiple_entry_nodes", message: "More than one node starts this flow." },
+      { code: "multiple_entry_nodes", message: "Mais de uma etapa inicia este fluxo." },
+      { code: "multiple_entry_nodes", message: "Mais de uma etapa inicia este fluxo." },
     ]);
 
     renderWith(store, <ProblemsRail />);
 
-    expect(screen.getAllByText("More than one node starts this flow.")).toHaveLength(1);
+    expect(document.querySelectorAll('[data-code="multiple_entry_nodes"]')).toHaveLength(1);
   });
 
-  it("renders a code this bundle has never seen", () => {
-    // The documented Layer 4/5 rule: "an error I cannot classify" must never
-    // become "no error". Now that the code is not displayed, the message is the
-    // only thing carrying it, which makes this rule more load-bearing, not less.
-    const store = withIssues([{ code: "a_code_from_a_later_layer", message: "Something a later layer checks." }]);
+  it("renders an issue code this bundle has never seen", () => {
+    const store = withIssues([{ code: "a_code_from_a_later_layer", message: "Algo verificado por uma camada posterior." }]);
 
-    renderWith(store, <ProblemsRail />);
+    const { container } = renderWith(store, <ProblemsRail />);
 
-    expect(screen.getByText("Something a later layer checks.")).toBeTruthy();
+    expect(container.querySelector('[data-code="a_code_from_a_later_layer"]')).not.toBeNull();
   });
 
   it("opens trigger settings from the all-off warning", () => {
     const store = makeStore(makeDetail(makeSampleGraph(), {
-      validation: { errors: [], warnings: [{ code: "flow_triggers_all_disabled", message: "Every trigger is off." }] },
+      validation: { errors: [], warnings: [{ code: "flow_triggers_all_disabled", message: "Todos os gatilhos estão desativados." }] },
     }));
     const opened = vi.fn();
     window.addEventListener("toggle-triggers", opened);
     try {
       renderWith(store, <ProblemsRail />);
-      fireEvent.click(screen.getByRole("button", { name: /Open trigger settings/ }));
+      fireEvent.click(screen.getByRole("button", { name: /Abrir configurações dos gatilhos/ }));
       expect(opened).toHaveBeenCalledOnce();
     } finally {
       window.removeEventListener("toggle-triggers", opened);

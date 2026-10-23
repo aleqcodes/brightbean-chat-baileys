@@ -57,7 +57,7 @@ class TestTheCommittedArtefact:
 
     def test_the_palette_groups_ship_ordered_with_their_labels(self):
         """Order and copy are data too, so the builder needs no second table."""
-        assert json_schema()["x-brightbean"]["groups"] == [{"key": key, "label": label} for key, label in GROUPS]
+        assert [group["key"] for group in json_schema()["x-brightbean"]["groups"]] == [key for key, _ in GROUPS]
 
     def test_no_node_type_explains_itself_by_citing_the_spec(self):
         """Descriptions are the palette's tooltips, rendered verbatim.

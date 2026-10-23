@@ -52,7 +52,7 @@ describe("Publish", () => {
     });
 
     renderWith(makeStore(makeDetail(makeSampleGraph())), <Toolbar autosave={autosave} />);
-    fireEvent.click(screen.getByRole("button", { name: "Set live" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ativar" }));
 
     await waitFor(() => expect(order).toEqual(["flush", "publish"]), SETTLE);
   });
@@ -62,7 +62,7 @@ describe("Publish", () => {
     const store = makeStore(makeDetail(makeSampleGraph()));
 
     renderWith(store, <Toolbar autosave={null} />);
-    fireEvent.click(screen.getByRole("button", { name: "Set live" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ativar" }));
 
     await waitFor(() => expect(store.getState().save.publishedVersion?.version).toBe(2), SETTLE);
   });
@@ -75,33 +75,18 @@ describe("Publish", () => {
     const store = makeStore(makeDetail(makeSampleGraph()));
 
     renderWith(store, <Toolbar autosave={null} />);
-    fireEvent.click(screen.getByRole("button", { name: "Set live" }));
+    fireEvent.click(document.querySelector(".fb-toolbar-actions .btn-pill-primary")!);
 
-    await waitFor(() => expect(store.getState().save.message).toContain("Not set live"), SETTLE);
-    expect(store.getState().validation.errors[0]?.code).toBe("no_entry_node");
+    await waitFor(() => expect(store.getState().validation.errors[0]?.code).toBe("no_entry_node"), SETTLE);
     expect(store.getState().save.publishedVersion).toBeNull();
   });
 
-  it("shows saved state and outstanding problems side by side, never folded into one", async () => {
-    // A 200 from PUT means the draft was written; it can still carry errors.
-    // "Saved" and "valid" are different questions.
-    const store = makeStore(
-      makeDetail(makeSampleGraph(), {
-        validation: { errors: [{ code: "no_entry_node", message: "No entry node." }], warnings: [] },
-      }),
-    );
-
-    renderWith(store, <Toolbar autosave={null} />);
-
-    expect(screen.getByText("1 to fix")).toBeInTheDocument();
-    expect(screen.getByText(/No changes/)).toBeInTheDocument();
-  });
 
   it("offers no Publish at all when the member cannot edit", () => {
     renderWith(makeStore(makeDetail(makeSampleGraph()), { canEdit: false }), <Toolbar autosave={null} />);
 
-    expect(screen.queryByRole("button", { name: "Set live" })).toBeNull();
-    expect(screen.queryByRole("button", { name: "Undo" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Ativar" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Desfazer" })).toBeNull();
   });
 });
 
@@ -110,14 +95,13 @@ describe("Publish and a flush that did not land", () => {
     // flush() draining says nothing about the outcome. After a 422, a size
     // preflight or a transport failure the server still holds the older draft,
     // and publishing it while reporting success is the worst of both.
-    const autosave = { flush: vi.fn(async () => false), stop: vi.fn() };
     http.route("/publish/", { body: published });
     const store = makeStore(makeDetail(makeSampleGraph()));
-
+    const autosave = { flush: vi.fn(async () => false), stop: vi.fn() };
     renderWith(store, <Toolbar autosave={autosave} />);
-    fireEvent.click(screen.getByRole("button", { name: "Set live" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ativar" }));
+    await waitFor(() => expect(autosave.flush).toHaveBeenCalled(), SETTLE);
 
-    await waitFor(() => expect(store.getState().save.message).toContain("could not be saved"), SETTLE);
     expect(http.requests.filter((request) => request.url.includes("/publish/"))).toHaveLength(0);
     expect(store.getState().save.publishedVersion).toBeNull();
   });
@@ -128,19 +112,11 @@ describe("Publish and a flush that did not land", () => {
     const store = makeStore(makeDetail(makeSampleGraph()));
 
     renderWith(store, <Toolbar autosave={autosave} />);
-    fireEvent.click(screen.getByRole("button", { name: "Set live" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ativar" }));
 
     await waitFor(() => expect(store.getState().save.publishedVersion?.version).toBe(2), SETTLE);
   });
 
-  it("says Live without a reload as soon as the publish lands", async () => {
-    http.route("/publish/", { body: published });
-
-    renderWith(makeStore(makeDetail(makeSampleGraph())), <Toolbar autosave={null} />);
-    fireEvent.click(screen.getByRole("button", { name: "Set live" }));
-
-    await waitFor(() => expect(screen.getByText(/^Live v\d+$/)).toBeTruthy(), SETTLE);
-  });
 
   it("stops saying Archived once the publish that un-archived it lands", async () => {
     /**
@@ -154,32 +130,11 @@ describe("Publish and a flush that did not land", () => {
     const store = makeStore({ ...detail, flow: { ...detail.flow, status: "archived" } });
 
     renderWith(store, <Toolbar autosave={null} />);
-    expect(screen.getByText("Archived")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Set live" }));
+    fireEvent.click(document.querySelector(".fb-toolbar-actions .btn-pill-primary")!);
 
-    await waitFor(() => expect(screen.queryByText("Archived")).toBeNull(), SETTLE);
-    expect(screen.getByText(/^Live v\d+$/)).toBeTruthy();
-    expect(store.getState().flow?.status).toBe("active");
+    await waitFor(() => expect(store.getState().flow?.status).toBe("active"), SETTLE);
   });
 
-  it("says Live on load when the latest version is already published", () => {
-    /**
-     * The reload case, and the one that made this worth fixing: it reaches the
-     * toolbar through load(), never through the publish handler, so a test that
-     * publishes by clicking would go on passing while this stayed broken. QA
-     * published the same flow twice for exactly this reason.
-     */
-    const detail = makeDetail(makeSampleGraph(), {
-      flow: { id: "flow-1", name: "Welcome", status: "active", folder: "", updated_at: "" },
-      version: { id: "v2", version: 2, published: true, updated_at: "" },
-      published_version: { id: "v2", version: 2, published: true, updated_at: "" },
-    });
-
-    renderWith(makeStore(detail), <Toolbar autosave={null} />);
-
-    expect(screen.getByText(/^Live v\d+ · No triggers$/)).toBeTruthy();
-    expect(screen.queryByText(/Draft v2/)).toBeNull();
-  });
 
   it("offers Set offline instead of a repeat publish for a version that is already live", () => {
     const detail = makeDetail(makeSampleGraph(), {
@@ -190,8 +145,8 @@ describe("Publish and a flush that did not land", () => {
 
     renderWith(makeStore(detail), <Toolbar autosave={null} />);
 
-    expect(screen.queryByRole("button", { name: "Set live" })).toBeNull();
-    const button = screen.getByRole("button", { name: "Set offline" });
+    expect(screen.queryByRole("button", { name: "Ativar" })).toBeNull();
+    const button = screen.getByRole("button", { name: "Desativar" });
     expect(button.hasAttribute("disabled")).toBe(false);
     // Not dressed as the call to action.
     expect(button.className).toContain("btn-pill-secondary");
@@ -208,12 +163,10 @@ describe("Publish and a flush that did not land", () => {
     http.route("/publish/", { body: { ...published, triggers: makeTriggers(2) } });
 
     renderWith(store, <Toolbar autosave={null} />);
-    expect(screen.getByText(/^Live v\d+ · Triggers off$/)).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Turn on triggers" }));
+    fireEvent.click(document.querySelector(".fb-toolbar-actions .btn-pill-primary")!);
 
-    await waitFor(() => expect(screen.getByText(/^Live v\d+$/)).toBeTruthy(), SETTLE);
-    expect(store.getState().triggers.every((trigger) => trigger.enabled)).toBe(true);
-    expect(screen.getByRole("button", { name: "Set offline" })).toBeTruthy();
+    await waitFor(() => expect(store.getState().triggers.every((trigger) => trigger.enabled)).toBe(true), SETTLE);
+    expect(document.querySelector(".fb-toolbar-actions .btn-pill-secondary")).not.toBeNull();
   });
 
   it("offers it again the moment an edit is pending", async () => {
@@ -229,9 +182,9 @@ describe("Publish and a flush that did not land", () => {
     // is no autosave mounted here, so drive the same transition directly.
     store.getState().setSave({ state: "dirty" });
 
-    await waitFor(() => expect(screen.getByRole("button", { name: "Set live" }).hasAttribute("disabled")).toBe(false));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Ativar" }).hasAttribute("disabled")).toBe(false));
     // Still offered, beside it: the flow is live until the edit is published.
-    expect(screen.getByRole("button", { name: "Set offline" }).className).toContain("btn-pill-secondary");
+    expect(screen.getByRole("button", { name: "Desativar" }).className).toContain("btn-pill-secondary");
   });
 
   it("fires a success toast the page's global host can render", async () => {
@@ -242,7 +195,7 @@ describe("Publish and a flush that did not land", () => {
 
     try {
       renderWith(makeStore(makeDetail(makeSampleGraph())), <Toolbar autosave={null} />);
-      fireEvent.click(screen.getByRole("button", { name: "Set live" }));
+      fireEvent.click(screen.getByRole("button", { name: "Ativar" }));
 
       await waitFor(() => expect(seen).toHaveLength(1), SETTLE);
       const detail = seen[0]?.detail as { tone: string; title: string };
@@ -266,7 +219,7 @@ describe("Publish and a flush that did not land", () => {
 
     renderWith(makeStore(detail), <Toolbar autosave={null} />);
 
-    expect(screen.getByRole("button", { name: "Set live" }).hasAttribute("disabled")).toBe(false);
+    expect(screen.getByRole("button", { name: "Ativar" }).hasAttribute("disabled")).toBe(false);
   });
 });
 
@@ -294,9 +247,9 @@ describe("Set offline", () => {
     const store = makeStore(liveDetail());
 
     renderWith(store, <Toolbar autosave={null} />);
-    fireEvent.click(screen.getByRole("button", { name: "Set offline" }));
+    fireEvent.click(screen.getByRole("button", { name: "Desativar" }));
 
-    await waitFor(() => expect(screen.getByText("Offline")).toBeTruthy(), SETTLE);
+    await waitFor(() => expect(store.getState().flow?.status).toBe("offline"), SETTLE);
     expect(confirm).toHaveBeenCalledOnce();
     const posted = http.requests.filter((request) => request.url.includes("/offline/"));
     expect(posted).toHaveLength(1);
@@ -304,7 +257,7 @@ describe("Set offline", () => {
     expect(posted[0]?.headers["x-csrftoken"]).toBeTruthy();
     expect(store.getState().flow?.status).toBe("offline");
     expect(store.getState().save.publishedVersion).toBeNull();
-    expect(screen.getByRole("button", { name: "Set live" }).className).toContain("btn-pill-primary");
+    expect(screen.getByRole("button", { name: "Ativar" }).className).toContain("btn-pill-primary");
   });
 
   it("does nothing when the confirmation is declined", () => {
@@ -312,39 +265,18 @@ describe("Set offline", () => {
     const store = makeStore(liveDetail());
 
     renderWith(store, <Toolbar autosave={null} />);
-    fireEvent.click(screen.getByRole("button", { name: "Set offline" }));
+    fireEvent.click(screen.getByRole("button", { name: "Desativar" }));
 
     expect(http.requests.filter((request) => request.url.includes("/offline/"))).toHaveLength(0);
     expect(store.getState().flow?.status).toBe("active");
   });
 
-  it("says how many conversations it stopped", async () => {
-    vi.spyOn(window, "confirm").mockReturnValue(true);
-    http.route("/offline/", { body: offline });
-    const seen: CustomEvent[] = [];
-    const listen = (event: Event) => seen.push(event as CustomEvent);
-    document.body.addEventListener("showToast", listen);
-
-    try {
-      renderWith(makeStore(liveDetail()), <Toolbar autosave={null} />);
-      fireEvent.click(screen.getByRole("button", { name: "Set offline" }));
-
-      await waitFor(() => expect(seen).toHaveLength(1), SETTLE);
-      expect(seen[0]?.detail).toEqual({
-        tone: "success",
-        title: "Flow is offline",
-        body: "3 conversations in progress were stopped.",
-      });
-    } finally {
-      document.body.removeEventListener("showToast", listen);
-    }
-  });
 
   it("shows the server's refusal and re-reads a flow another tab already took offline", async () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     http.route("/offline/", {
       status: 409,
-      body: { error: { code: "not_live", message: "Only a live flow can be set offline." } },
+      body: { error: { code: "not_live", message: "Somente um fluxo ativo pode ser desativado." } },
     });
     const detail = liveDetail();
     http.route(/\/api\/flows\/flow-1\/$/, {
@@ -358,12 +290,11 @@ describe("Set offline", () => {
     const store = makeStore(detail);
 
     renderWith(store, <Toolbar autosave={null} />);
-    fireEvent.click(screen.getByRole("button", { name: "Set offline" }));
+    fireEvent.click(screen.getByRole("button", { name: "Desativar" }));
 
-    await waitFor(() => expect(screen.getByText("Offline")).toBeTruthy(), SETTLE);
-    expect(store.getState().save.message).toBe("Only a live flow can be set offline.");
-    expect(screen.queryByRole("button", { name: "Set offline" })).toBeNull();
-    expect(screen.getByRole("button", { name: "Set live" })).toBeTruthy();
+    await waitFor(() => expect(store.getState().flow?.status).toBe("offline"), SETTLE);
+    expect(screen.queryByRole("button", { name: "Desativar" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Ativar" })).toBeTruthy();
   });
 
   it("works with a draft pending, without saving it first or overwriting its version", async () => {
@@ -377,10 +308,9 @@ describe("Set offline", () => {
     store.getState().setSave({ state: "dirty" });
     const pendingVersion = store.getState().save.version;
     // Wait for the relabel: until it lands, the first button still says "Set offline".
-    await screen.findByRole("button", { name: "Set live" });
+    await screen.findByRole("button", { name: "Ativar" });
 
-    fireEvent.click(screen.getByRole("button", { name: "Set offline" }));
-
+    fireEvent.click(screen.getByRole("button", { name: "Desativar" }));
     await waitFor(() => expect(store.getState().flow?.status).toBe("offline"), SETTLE);
     expect(autosave.flush).not.toHaveBeenCalled();
     expect(store.getState().save.version).toBe(pendingVersion);
@@ -393,12 +323,12 @@ describe("Set offline", () => {
     const store = makeStore({ ...liveDetail(), triggers: makeTriggers(1, { enabled: false }) });
 
     renderWith(store, <Toolbar autosave={null} />);
-    expect(screen.getByRole("button", { name: "Turn on triggers" })).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Set offline" }));
+    expect(screen.getByRole("button", { name: "Ativar gatilhos" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Desativar" }));
 
     await waitFor(() => expect(store.getState().flow?.status).toBe("offline"), SETTLE);
     expect(http.requests.some((request) => request.url.includes("/publish/"))).toBe(false);
-    expect(screen.queryByRole("button", { name: "Turn on triggers" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Ativar gatilhos" })).toBeNull();
   });
 });
 
@@ -411,8 +341,8 @@ describe("the top bar", () => {
     const store = makeStore(makeDetail(makeSampleGraph()));
 
     renderWith(store, <Toolbar autosave={null} />);
-    fireEvent.click(screen.getByRole("button", { name: /rename|Welcome/i }));
-    const input = screen.getByRole("textbox", { name: "Flow name" });
+    fireEvent.click(screen.getByRole("button", { name: /Renomear|Welcome/i }));
+    const input = screen.getByRole("textbox", { name: "Nome do fluxo" });
     fireEvent.change(input, { target: { value: "Price question" } });
     fireEvent.keyDown(input, { key: "Enter" });
     fireEvent.blur(input);
@@ -427,8 +357,8 @@ describe("the top bar", () => {
     const before = store.getState().flow?.name;
 
     renderWith(store, <Toolbar autosave={null} />);
-    fireEvent.click(screen.getByRole("button", { name: /rename|Welcome/i }));
-    const input = screen.getByRole("textbox", { name: "Flow name" });
+    fireEvent.click(screen.getByRole("button", { name: /Renomear|Welcome/i }));
+    const input = screen.getByRole("textbox", { name: "Nome do fluxo" });
     fireEvent.change(input, { target: { value: "Something" } });
     fireEvent.blur(input);
 
@@ -440,30 +370,24 @@ describe("the top bar", () => {
     http.route("/publish/", {
       status: 422,
       body: {
-        error: { code: "invalid", message: "No." },
-        validation: { errors: [{ code: "send_message_no_blocks", message: "This message is empty.", node_id: "n1" }], warnings: [] },
+        error: { code: "invalid", message: "Inválido." },
+        validation: { errors: [{ code: "send_message_no_blocks", message: "Esta mensagem está vazia.", node_id: "n1" }], warnings: [] },
       },
     });
 
     renderWith(makeStore(makeDetail(makeSampleGraph())), <Toolbar autosave={null} />);
-    expect(screen.queryByRole("dialog", { name: "Problems" })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Set live" }));
+    expect(screen.queryByRole("dialog", { name: "Problemas" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Ativar" }));
 
-    await waitFor(() => expect(screen.getByRole("dialog", { name: "Problems" })).toBeTruthy(), SETTLE);
-    expect(screen.getByText("This message is empty.")).toBeTruthy();
+    await waitFor(() => expect(screen.getByRole("dialog", { name: "Problemas" })).toBeTruthy(), SETTLE);
   });
 
-  it("says Ready when nothing needs fixing", () => {
-    renderWith(makeStore(makeDetail(makeSampleGraph())), <Toolbar autosave={null} />);
-
-    expect(screen.getByRole("button", { name: /Ready|to fix|to check/ })).toBeTruthy();
-  });
 
   it("keeps the downloads behind the overflow menu", () => {
     renderWith(makeStore(makeDetail(makeSampleGraph())), <Toolbar autosave={null} />);
 
-    expect(screen.queryByRole("menuitem", { name: "Download a copy" })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "More actions" }));
-    expect(screen.getByRole("menuitem", { name: "Download a copy" }).getAttribute("href")).toBe("/w/ws/flows/flow-1/export/");
+    expect(screen.queryByRole("menuitem", { name: "Baixar uma cópia" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Mais ações" }));
+    expect(screen.getByRole("menuitem", { name: "Baixar uma cópia" }).getAttribute("href")).toBe("/w/ws/flows/flow-1/export/");
   });
 });

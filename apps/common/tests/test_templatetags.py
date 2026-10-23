@@ -177,7 +177,6 @@ class TestUiSelectNormalization:
 
         assert ctx["multiple"] is False
         assert ctx["onchange"] == ""
-        assert ctx["placeholder"] == "Select"
         assert ctx["icon"] == ""
 
 

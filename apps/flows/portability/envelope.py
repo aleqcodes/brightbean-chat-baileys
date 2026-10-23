@@ -251,9 +251,9 @@ def parse(raw: bytes | str) -> tuple[dict[str, Any] | None, list[Issue]]:
     """
     size = len(raw.encode("utf-8") if isinstance(raw, str) else raw)
     if size > MAX_DOCUMENT_BYTES:
-        return None, [_issue(f"The file is {size} bytes; the limit is {MAX_DOCUMENT_BYTES} bytes.", "document")]
+        return None, [_issue(f"O arquivo tem {size} bytes; o limite é {MAX_DOCUMENT_BYTES} bytes.", "document")]
     if not size:
-        return None, [_issue("The file is empty.", "document")]
+        return None, [_issue("O arquivo está vazio.", "document")]
 
     try:
         payload = json.loads(raw)
@@ -261,15 +261,15 @@ def parse(raw: bytes | str) -> tuple[dict[str, Any] | None, list[Issue]]:
         # RecursionError is belt and braces: CPython's parser handles deeper
         # nesting than the depth cap allows, so in practice the cap catches
         # those first — but a parser that gives up must not be a 500.
-        return None, [_issue("The file is not valid JSON.", "document")]
+        return None, [_issue("O arquivo não contém JSON válido.", "document")]
 
     if not isinstance(payload, dict):
-        return None, [_issue("A flow template must be a JSON object.", "document")]
+        return None, [_issue("Um modelo de fluxo precisa ser um objeto JSON.", "document")]
 
     if json_depth(payload, limit=MAX_DOCUMENT_DEPTH) > MAX_DOCUMENT_DEPTH:
-        return None, [_issue(f"The file nests deeper than the limit of {MAX_DOCUMENT_DEPTH} levels.", "document")]
+        return None, [_issue(f"O arquivo ultrapassa o limite de {MAX_DOCUMENT_DEPTH} níveis de profundidade.", "document")]
     if _contains_nul(payload):
-        return None, [_issue("The file contains a null character, which cannot be stored.", "document")]
+        return None, [_issue("O arquivo contém um caractere nulo, que não pode ser armazenado.", "document")]
     return payload, []
 
 
@@ -320,7 +320,7 @@ def validate_envelope(document: Any) -> list[Issue]:
     the one that describes the actual problem.
     """
     if not isinstance(document, dict):
-        return [_issue("A flow template must be a JSON object.", "document")]
+        return [_issue("O modelo de fluxo precisa ser um objeto JSON.", "document")]
 
     issues = validate_instance(document_schema(), document, path="")
     if issues:
@@ -332,10 +332,10 @@ def validate_envelope(document: Any) -> list[Issue]:
     keys = [flow["key"] for flow in document["flows"]]
     duplicates = sorted({key for key in keys if keys.count(key) > 1})
     for key in duplicates:
-        issues.append(_issue(f"Two flows share the key {key!r}.", "flows"))
+        issues.append(_issue(f"Há dois fluxos com a mesma chave {key!r}.", "flows"))
 
     if document["entry"] not in keys:
-        issues.append(_issue(f"entry names {document['entry']!r}, which is not a flow in this file.", "entry"))
+        issues.append(_issue(f"entry indica {document['entry']!r}, que não é um fluxo deste arquivo.", "entry"))
 
     return issues
 

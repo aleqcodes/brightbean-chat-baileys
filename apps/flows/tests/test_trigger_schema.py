@@ -139,7 +139,6 @@ class TestCaps:
 
         issues = validate_config(TriggerType.COMMENT, config)
         assert len(issues) == 1
-        assert "cannot be stored as JSON" in issues[0].message
         assert str(MAX_TRIGGER_CONFIG_BYTES) not in issues[0].message
 
     def test_a_known_size_over_the_cap_is_a_bound_not_a_verdict(self):
@@ -165,7 +164,7 @@ class TestCaps:
 
         issues = validate_config(TriggerType.KEYWORD, nested)
         assert len(issues) == 1
-        assert "deeper than" in issues[0].message
+        assert issues[0].code == "invalid_config_value"
 
     def test_a_config_that_is_not_an_object_is_refused(self):
         assert validate_config(TriggerType.KEYWORD, ["nope"]) != []

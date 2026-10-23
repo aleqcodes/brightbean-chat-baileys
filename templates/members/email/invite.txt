@@ -1,6 +1,6 @@
-{{ invited_by.display_name|default:"Someone" }} invited you to join {{ org_name }} on BrightBean Chat.
+{{ invited_by.display_name|default:"Alguém" }} convidou você para participar de {{ org_name }} no BrightBean Chat.
 
-Accept the invitation:
+Aceite o convite:
 {{ accept_url }}
 
-This link expires in 7 days. If you were not expecting it, you can ignore this email.
+Este link expira em 7 dias. Se você não estava esperando este e-mail, pode ignorá-lo.

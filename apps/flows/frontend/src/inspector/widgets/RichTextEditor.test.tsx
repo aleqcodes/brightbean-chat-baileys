@@ -102,7 +102,7 @@ describe("RichTextEditor", () => {
 
   it("renders the value into the editable surface", () => {
     renderEditor("<p>Hello</p>");
-    expect(screen.getByRole("textbox", { name: "Email body" }).innerHTML).toBe("<p>Hello</p>");
+    expect(screen.getByRole("textbox", { name: "Corpo do e-mail" }).innerHTML).toBe("<p>Hello</p>");
   });
 
   it("does not write hostile markup from the stored value into the DOM", () => {
@@ -111,7 +111,7 @@ describe("RichTextEditor", () => {
     // send_email node and have Alpine execute it in an Admin's session when the
     // Admin opened the flow.
     renderEditor('<p>hi</p><div x-data x-init="steal()"></div><img src=x onerror="steal()">');
-    const surface = screen.getByRole("textbox", { name: "Email body" });
+    const surface = screen.getByRole("textbox", { name: "Corpo do e-mail" });
 
     expect(surface.innerHTML).not.toContain("x-init");
     expect(surface.innerHTML).not.toContain("x-data");
@@ -121,20 +121,20 @@ describe("RichTextEditor", () => {
 
   it("sanitizes the stored value even when the canvas is read-only", () => {
     renderEditor('<div x-data x-init="steal()"></div>', { readOnly: true });
-    expect(screen.getByRole("textbox", { name: "Email body" }).innerHTML).not.toContain("x-init");
+    expect(screen.getByRole("textbox", { name: "Corpo do e-mail" }).innerHTML).not.toContain("x-init");
   });
 
   it("issues the right command for each toolbar button", () => {
     renderEditor("<p>a</p>");
     const exec = document.execCommand as unknown as ReturnType<typeof vi.fn>;
 
-    fireEvent.mouseDown(screen.getByRole("button", { name: "Bold" }));
+    fireEvent.mouseDown(screen.getByRole("button", { name: "Negrito" }));
     expect(exec).toHaveBeenCalledWith("bold", false, undefined);
 
-    fireEvent.mouseDown(screen.getByRole("button", { name: "Bulleted list" }));
+    fireEvent.mouseDown(screen.getByRole("button", { name: "Lista com marcadores" }));
     expect(exec).toHaveBeenCalledWith("insertUnorderedList", false, undefined);
 
-    fireEvent.mouseDown(screen.getByRole("button", { name: "Heading" }));
+    fireEvent.mouseDown(screen.getByRole("button", { name: "Título" }));
     expect(exec).toHaveBeenCalledWith("formatBlock", false, "<h2>");
   });
 
@@ -142,12 +142,12 @@ describe("RichTextEditor", () => {
     // An older engine, or a test environment. The panel must survive it.
     delete (document as unknown as { execCommand?: unknown }).execCommand;
     renderEditor("<p>a</p>");
-    expect(() => fireEvent.mouseDown(screen.getByRole("button", { name: "Bold" }))).not.toThrow();
+    expect(() => fireEvent.mouseDown(screen.getByRole("button", { name: "Negrito" }))).not.toThrow();
   });
 
   it("pushes the edited value upward on input", () => {
     const written = renderEditor("<p>a</p>");
-    const surface = screen.getByRole("textbox", { name: "Email body" });
+    const surface = screen.getByRole("textbox", { name: "Corpo do e-mail" });
     surface.innerHTML = "<p>ab</p>";
     fireEvent.input(surface);
     expect(written.at(-1)?.value).toBe("<p>ab</p>");
@@ -155,7 +155,7 @@ describe("RichTextEditor", () => {
 
   it("sanitizes on blur", () => {
     const written = renderEditor("<p>a</p>");
-    const surface = screen.getByRole("textbox", { name: "Email body" });
+    const surface = screen.getByRole("textbox", { name: "Corpo do e-mail" });
     surface.innerHTML = '<p onclick="x()">a</p><script>alert(1)</script>';
     fireEvent.blur(surface);
     expect(written.at(-1)?.value).toBe("<p>a</p>");
@@ -165,7 +165,7 @@ describe("RichTextEditor", () => {
     // Paste is the one path by which markup from anywhere at all enters the
     // document, so it is intercepted rather than trusted and cleaned later.
     const written = renderEditor("");
-    const surface = screen.getByRole("textbox", { name: "Email body" });
+    const surface = screen.getByRole("textbox", { name: "Corpo do e-mail" });
     const exec = document.execCommand as unknown as ReturnType<typeof vi.fn>;
 
     fireEvent.paste(surface, {
@@ -178,7 +178,7 @@ describe("RichTextEditor", () => {
 
   it("escapes a plain-text paste", () => {
     renderEditor("");
-    const surface = screen.getByRole("textbox", { name: "Email body" });
+    const surface = screen.getByRole("textbox", { name: "Corpo do e-mail" });
     const exec = document.execCommand as unknown as ReturnType<typeof vi.fn>;
 
     fireEvent.paste(surface, {
@@ -190,7 +190,7 @@ describe("RichTextEditor", () => {
 
   it("offers the placeholder tokens, including custom fields", () => {
     renderEditor("<p>a</p>");
-    fireEvent.click(screen.getByRole("button", { name: "Insert a contact field" }));
+    fireEvent.click(screen.getByRole("button", { name: "Inserir campo de contato" }));
     expect(screen.getByRole("option", { name: "{{first_name}}" })).toBeTruthy();
     expect(screen.getByRole("option", { name: "{{plan}}" })).toBeTruthy();
   });
@@ -198,14 +198,14 @@ describe("RichTextEditor", () => {
   it("inserts a token as literal text", () => {
     renderEditor("<p>a</p>");
     const exec = document.execCommand as unknown as ReturnType<typeof vi.fn>;
-    fireEvent.click(screen.getByRole("button", { name: "Insert a contact field" }));
+    fireEvent.click(screen.getByRole("button", { name: "Inserir campo de contato" }));
     fireEvent.mouseDown(screen.getByRole("option", { name: "{{first_name}}" }));
     expect(exec).toHaveBeenCalledWith("insertHTML", false, "{{first_name}}");
   });
 
   it("swaps to a raw-HTML textarea and back", () => {
     renderEditor("<p>Hello</p>");
-    fireEvent.click(screen.getByRole("button", { name: "Edit the HTML directly" }));
+    fireEvent.click(screen.getByRole("button", { name: "Editar HTML diretamente" }));
     const textarea = screen.getByRole("textbox") as HTMLTextAreaElement;
     expect(textarea.tagName).toBe("TEXTAREA");
     expect(textarea.value).toBe("<p>Hello</p>");
@@ -217,24 +217,24 @@ describe("RichTextEditor", () => {
     // already showing the body, so the editor came back blank — and the next
     // keystroke would then push that emptiness over the real value.
     renderEditor("<p>Hello</p>");
-    const toggle = screen.getByRole("button", { name: "Edit the HTML directly" });
+    const toggle = screen.getByRole("button", { name: "Editar HTML diretamente" });
     fireEvent.click(toggle);
     fireEvent.click(toggle);
-    expect(screen.getByRole("textbox", { name: "Email body" }).innerHTML).toBe("<p>Hello</p>");
+    expect(screen.getByRole("textbox", { name: "Corpo do e-mail" }).innerHTML).toBe("<p>Hello</p>");
   });
 
   it("does not report the empty surface as an edit after a source round trip", () => {
     const written = renderEditor("<p>Hello</p>");
-    const toggle = screen.getByRole("button", { name: "Edit the HTML directly" });
+    const toggle = screen.getByRole("button", { name: "Editar HTML diretamente" });
     fireEvent.click(toggle);
     fireEvent.click(toggle);
-    fireEvent.input(screen.getByRole("textbox", { name: "Email body" }));
+    fireEvent.input(screen.getByRole("textbox", { name: "Corpo do e-mail" }));
     expect(written.at(-1)?.value).toBe("<p>Hello</p>");
   });
 
   it("writes what the source view types", () => {
     const written = renderEditor("<p>Hello</p>");
-    fireEvent.click(screen.getByRole("button", { name: "Edit the HTML directly" }));
+    fireEvent.click(screen.getByRole("button", { name: "Editar HTML diretamente" }));
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "<p>Edited</p>" } });
     expect(written.at(-1)?.value).toBe("<p>Edited</p>");
   });
@@ -243,14 +243,14 @@ describe("RichTextEditor", () => {
     // Sanitizing per keystroke would delete the author's work in front of them:
     // `<a href="https://x` parses to nothing until the tag is closed.
     const written = renderEditor("<p>Hello</p>");
-    fireEvent.click(screen.getByRole("button", { name: "Edit the HTML directly" }));
+    fireEvent.click(screen.getByRole("button", { name: "Editar HTML diretamente" }));
     fireEvent.change(screen.getByRole("textbox"), { target: { value: '<a href="https://x' } });
     expect(written.at(-1)?.value).toBe('<a href="https://x');
   });
 
   it("sanitizes what the source view typed, on blur", () => {
     const written = renderEditor("<p>Hello</p>");
-    fireEvent.click(screen.getByRole("button", { name: "Edit the HTML directly" }));
+    fireEvent.click(screen.getByRole("button", { name: "Editar HTML diretamente" }));
     const textarea = screen.getByRole("textbox");
     fireEvent.change(textarea, { target: { value: '<p onclick="x()">hi</p><script>steal()</script>' } });
     fireEvent.blur(textarea, { target: { value: '<p onclick="x()">hi</p><script>steal()</script>' } });
@@ -259,15 +259,15 @@ describe("RichTextEditor", () => {
 
   it("is not editable when the canvas is read-only", () => {
     renderEditor("<p>a</p>", { readOnly: true });
-    const surface = screen.getByRole("textbox", { name: "Email body" });
+    const surface = screen.getByRole("textbox", { name: "Corpo do e-mail" });
     expect(surface.getAttribute("contenteditable")).toBe("false");
-    expect(screen.getByRole("button", { name: "Bold" })).toHaveProperty("disabled", true);
+    expect(screen.getByRole("button", { name: "Negrito" })).toHaveProperty("disabled", true);
   });
 
   it("does not run a command when read-only", () => {
     renderEditor("<p>a</p>", { readOnly: true });
     const exec = document.execCommand as unknown as ReturnType<typeof vi.fn>;
-    fireEvent.mouseDown(screen.getByRole("button", { name: "Bold" }));
+    fireEvent.mouseDown(screen.getByRole("button", { name: "Negrito" }));
     expect(exec).not.toHaveBeenCalled();
   });
 });

@@ -1,30 +1,29 @@
 {% extends "layouts/workspace_settings.html" %}
-{% block title %}WhatsApp templates · BrightBean Chat{% endblock %}
-{% block page_header %}<h1 class="page-title mb-4">WhatsApp message templates</h1>{% endblock %}
+{% block title %}Modelos do WhatsApp · BrightBean Chat{% endblock %}
+{% block page_header %}<h1 class="page-title mb-4">Modelos de mensagem do WhatsApp</h1>{% endblock %}
 
 {% block content %}
   <p class="muted">
-    More than 24 hours after a contact's last message, WhatsApp accepts nothing
-    but a template Meta has already approved. Write one here, submit it, and it
-    becomes available to flows and broadcasts once the review comes back.
-  </p>
+    Mais de 24 horas após a última mensagem de um contato, o WhatsApp aceita apenas
+    modelos já aprovados pela Meta. Crie um modelo aqui e envie para análise; ele
+    ficará disponível nos fluxos e envios em massa quando a análise for concluída.
 
   {% if not connections %}
     <div class="alert-warn">
-      <p>No WhatsApp number is connected yet, so there is nothing to submit a template against.</p>
+      <p>Nenhum número de WhatsApp conectado. Não há onde enviar um modelo para análise.</p>
     </div>
   {% endif %}
 
   <p>
-    <a href="{{ new_url }}">New template</a> ·
-    <a href="{{ cost_url }}">Cost estimates</a>
-    <span class="muted">({{ cost_hint.currency }}, estimates only, never metered)</span>
+    <a href="{{ new_url }}">Novo modelo</a> ·
+    <a href="{{ cost_url }}">Estimativas de custo</a>
+    <span class="muted">({{ cost_hint.currency }}, apenas estimativas; sem cobrança por uso)</span>
   </p>
 
   {% if templates %}
     <table>
       <thead>
-        <tr><th>Name</th><th>Language</th><th>Category</th><th>Number</th><th>Variables</th><th>Status</th><th></th></tr>
+        <tr><th>Nome</th><th>Idioma</th><th>Categoria</th><th>Número</th><th>Variáveis</th><th>Status</th><th></th></tr>
       </thead>
       <tbody>
         {% for row in templates %}
@@ -33,14 +32,14 @@
             <td><code>{{ row.template.language }}</code></td>
             <td>
               {{ row.template.get_category_display }}
-              <br /><span class="muted">≈ {{ cost_hint.currency }} {{ row.cost }} per message</span>
+              <br /><span class="muted">≈ {{ cost_hint.currency }} {{ row.cost }} por mensagem</span>
             </td>
             <td>{{ row.template.channel_connection.display_name }}</td>
             <td>
               {% if row.slots %}
                 {% for slot in row.slots %}<code>{{ slot }}</code>{% if not forloop.last %} {% endif %}{% endfor %}
               {% else %}
-                <span class="muted">None</span>
+                <span class="muted">Nenhuma</span>
               {% endif %}
             </td>
             <td>
@@ -57,18 +56,18 @@
             </td>
             <td>
               {% if row.template.status == "draft" or row.template.status == "rejected" %}
-                <a href="{% url 'channels:whatsapp_template_edit' workspace_id=request.workspace.id template_id=row.template.id %}">Edit</a>
+                <a href="{% url 'channels:whatsapp_template_edit' workspace_id=request.workspace.id template_id=row.template.id %}">Editar</a>
                 <form method="post"
                       action="{% url 'channels:whatsapp_template_submit' workspace_id=request.workspace.id template_id=row.template.id %}">
                   {% csrf_token %}
-                  <button type="submit">Submit for review</button>
+                  <button type="submit">Enviar para análise</button>
                 </form>
               {% endif %}
               <form method="post" x-data
-                    @submit="if (!window.confirm('Delete this template? This cannot be undone.')) $event.preventDefault()"
+                    @submit="if (!window.confirm('Excluir este modelo? Esta ação não pode ser desfeita.')) $event.preventDefault()"
                     action="{% url 'channels:whatsapp_template_delete' workspace_id=request.workspace.id template_id=row.template.id %}">
                 {% csrf_token %}
-                <button type="submit" class="btn-danger-link">Delete</button>
+                <button type="submit" class="btn-danger-link">Excluir</button>
               </form>
             </td>
           </tr>
@@ -76,15 +75,15 @@
       </tbody>
     </table>
   {% else %}
-    <p>No templates yet.</p>
+    <p>Ainda não há modelos.</p>
   {% endif %}
 
-  <h2>What review is like</h2>
+  <h2>Como funciona a análise</h2>
   <p class="muted">
-    Meta usually answers within minutes, occasionally within a day. BrightBean
-    Chat checks every hour and notifies workspace admins when the answer arrives;
-    a rejected template shows Meta's reason above and can be edited and
-    resubmitted. Marketing templates are reviewed most strictly and cost the most
-    to send.
+    A Meta geralmente responde em minutos, mas a análise pode levar até um dia. O BrightBean
+    Chat verifica a cada hora e notifica os administradores do espaço de trabalho quando há
+    uma resposta. Se um modelo for rejeitado, o motivo informado pela Meta aparecerá acima;
+    você poderá editar e reenviar o modelo. Modelos de marketing passam pela análise mais
+    rigorosa e têm o maior custo de envio.
   </p>
 {% endblock %}

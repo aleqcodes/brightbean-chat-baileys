@@ -547,13 +547,13 @@ def _validate(url: httpx.URL, *, own_hosts: frozenset[str], own_addresses: froze
     """
     scheme = url.scheme.lower()
     if scheme not in ("http", "https"):
-        raise BlockedURLError(f"{scheme or 'that'} is not a scheme this server will request; use http or https.")
+        raise BlockedURLError(f"{scheme or 'esse esquema'} não é permitido pelo servidor; use http ou https.")
     if url.userinfo:
-        raise BlockedURLError("A URL carrying a username or password is not allowed; use a header instead.")
+        raise BlockedURLError("Não é permitido incluir nome de usuário ou senha na URL; use um cabeçalho.")
 
     display = (url.host or "").strip().lower()
     if not display:
-        raise BlockedURLError("That URL has no host.")
+        raise BlockedURLError("A URL não tem um host.")
 
     # The **wire** forms, not the display ones. ``URL.host`` decodes an
     # internationalized name back to Unicode for humans to read, and putting
@@ -566,25 +566,25 @@ def _validate(url: httpx.URL, *, own_hosts: frozenset[str], own_addresses: froze
         lowered = url.raw_host.decode("ascii").lower()
         authority = url.netloc.decode("ascii")
     except (UnicodeDecodeError, AttributeError) as exc:  # pragma: no cover - httpx normalises to ASCII
-        raise BlockedURLError("That URL's host cannot be encoded for a request.") from exc
+        raise BlockedURLError("O host da URL não pode ser codificado para uma solicitação.") from exc
     if not lowered:
-        raise BlockedURLError("That URL has no host.")
+        raise BlockedURLError("A URL não tem um host.")
 
     # Both spellings, so a deployment listed under either its Unicode or its
     # punycode name is recognised under the other.
     if lowered in own_hosts or display in own_hosts:
-        raise BlockedURLError("That URL points back at this deployment.")
+        raise BlockedURLError("A URL aponta para esta própria instalação.")
 
     addresses = resolve_host(lowered)
     if not addresses:
-        raise BlockedURLError(f"{lowered} does not resolve.")
+        raise BlockedURLError(f"Não foi possível localizar o host {lowered}.")
 
     for address in addresses:
         refusal = refusal_for(address)
         if refusal:
-            raise BlockedURLError(f"{lowered} resolves to {refusal}.")
+            raise BlockedURLError(f"O host {lowered} aponta para um endereço {refusal}.")
         if str(_unwrap(address)) in own_addresses:
-            raise BlockedURLError("That URL points back at this deployment.")
+            raise BlockedURLError("A URL aponta para esta própria instalação.")
 
     port = url.port
     default_port = 443 if scheme == "https" else 80
@@ -594,7 +594,7 @@ def _validate(url: httpx.URL, *, own_hosts: frozenset[str], own_addresses: froze
         # Every refusal in this module has to be a BlockedURLError, because that
         # is what callers route on. A URL httpx will parse but not rebuild is
         # rare and is still an input, not a bug.
-        raise BlockedURLError("That URL cannot be requested against a fixed address.") from exc
+        raise BlockedURLError("Não é possível solicitar essa URL usando um endereço fixo.") from exc
     return _Target(
         logical=url,
         pinned=pinned,
@@ -616,7 +616,7 @@ def _parsed(url: str, *, base: httpx.URL | None = None) -> httpx.URL:
     try:
         return base.join(url) if base is not None else httpx.URL(url)
     except (httpx.InvalidURL, ValueError, TypeError) as exc:
-        raise BlockedURLError("That is not a URL this server can request.") from exc
+        raise BlockedURLError("O servidor não pode acessar essa URL.") from exc
 
 
 def _redirect_location(status: int, headers: httpx.Headers) -> str:
@@ -779,7 +779,7 @@ def guarded_request(
                     final_host=target.host,
                 )
             if hop == MAX_REDIRECTS:
-                raise BlockedURLError(f"{target.host} redirected more than {MAX_REDIRECTS} times.")
+                raise BlockedURLError(f"O servidor foi redirecionado mais de {MAX_REDIRECTS} vezes.")
 
             following = _validate(
                 _parsed(location, base=target.logical), own_hosts=own_hosts, own_addresses=own_addresses
@@ -838,7 +838,7 @@ def _send(
     def remaining() -> float:
         left = deadline - time.monotonic()
         if left <= 0:
-            raise OutboundTransportError(f"{target.host} took longer than the request budget allows")
+            raise OutboundTransportError(f"O host {target.host} excedeu o tempo limite da solicitação.")
         return left
 
     try:
@@ -902,10 +902,10 @@ def _send(
         # the flow engine's step back and put the request on the queue's retry
         # ladder. A stranger's server would be choosing when this deployment
         # retries, which is the storm SPEC §11.7 exists to avoid.
-        raise BlockedURLError(f"{target.host} answered with a location that is not a URL.") from exc
+        raise BlockedURLError("O servidor respondeu com um endereço de redirecionamento inválido.") from exc
     except httpx.TimeoutException as exc:
-        raise OutboundTransportError(f"{target.host} timed out") from exc
+        raise OutboundTransportError(f"O host {target.host} excedeu o tempo limite.") from exc
     except httpx.HTTPError as exc:
         # ``type(exc).__name__`` rather than ``str(exc)``: httpx puts the full
         # URL — query string and any credential in it — into transport errors.
-        raise OutboundTransportError(f"{target.host} could not be reached: {type(exc).__name__}") from exc
+        raise OutboundTransportError(f"O host {target.host} não pôde ser acessado: {type(exc).__name__}") from exc

@@ -167,14 +167,14 @@ def start_flow(
     it.
     """
     if contact.workspace_id != flow.workspace_id:
-        raise WorkspaceMismatchError("That flow belongs to a different workspace than the contact.")
+        raise WorkspaceMismatchError("Esse fluxo não pertence ao mesmo espaço de trabalho do contato.")
     if connection is not None and connection.workspace_id != flow.workspace_id:
         # `ContactScopedModel` checks the execution's contact against its
         # `peer_field` (the flow) and nothing else, so the connection FK is not
         # covered by any model-level guard. Storing a foreign one would hand
         # this workspace's contact to another tenant's channel on the first
         # send — the connection goes to `send_outbound` verbatim.
-        raise WorkspaceMismatchError("That channel connection belongs to a different workspace than the flow.")
+        raise WorkspaceMismatchError("Essa conexão de canal não pertence ao mesmo espaço de trabalho do fluxo.")
 
     with transaction.atomic(), contact_lock(contact):
         # Inside the transaction, not before it: resolving takes a share lock
@@ -186,8 +186,8 @@ def start_flow(
         entry = graph.entry_node_id()
         if entry is None:
             raise FlowNotRunnableError(
-                f"Flow {flow.pk} version {version.version} has no single entry node, so there is nowhere "
-                f"to start (SPEC §9.1). Publishing validates this; a draft preview does not."
+                f"O fluxo {flow.pk}, versão {version.version}, não tem um único nó de entrada para iniciar. "
+                "A publicação valida isso; a prévia do rascunho não."
             )
 
         superseded = _supersede(contact)
@@ -355,7 +355,7 @@ def _run(execution: FlowExecution, graph: Graph) -> FlowExecution:
         if node is None:
             # Only reachable for a draft: a published version's graph is frozen,
             # but SPEC §16's autosave rewrites the draft under a running preview.
-            return _fail(execution, f"node {node_id!r} is not in this flow version's graph")
+            return _fail(execution, f"o nó {node_id!r} não está nesta versão do fluxo")
 
         node_type = graph.node_type(node_id)
         node_class = node_class_for(node_type)
@@ -363,7 +363,7 @@ def _run(execution: FlowExecution, graph: Graph) -> FlowExecution:
             # A schema without a runtime: send_sms and send_email until
             # L5-D/E. Publishing allows it, so the run has to be the thing that
             # says no.
-            return _fail(execution, f"no runtime is registered for {node_type!r} nodes")
+            return _fail(execution, f"não há um executor registrado para nós do tipo {node_type!r}")
 
         ctx = NodeContext(
             execution=execution,
@@ -574,7 +574,7 @@ def _notify_failure(execution: FlowExecution, *, loop_cap: bool) -> None:
         # no workspace or contact column — so without a queryable id in
         # ``payload`` the name outlives the contact it names.
         "contact_id": str(execution.contact_id),
-        "node_label": execution.current_node_id or "the entry node",
+        "node_label": execution.current_node_id or "nó de entrada",
         "error": execution.last_error,
     }
     try:
@@ -616,20 +616,20 @@ def _resolve_version(flow: Flow, flow_version: FlowVersion | None) -> FlowVersio
 
     status = locked_status(flow, lock="key share")
     if status is None:
-        raise FlowNotRunnableError(f"Flow {flow.pk} no longer exists.")
+        raise FlowNotRunnableError(f"O fluxo {flow.pk} não existe mais.")
     flow.status = status
 
     if flow.status == FlowStatus.ARCHIVED:
-        raise FlowNotRunnableError(f"Flow {flow.pk} is archived.")
+        raise FlowNotRunnableError(f"O fluxo {flow.pk} está arquivado.")
 
     if flow_version is not None:
         if flow_version.flow_id != flow.pk:
-            raise ValueError("That flow version belongs to a different flow.")
+            raise ValueError("Essa versão pertence a outro fluxo.")
         return flow_version
 
     version = published_version(flow)
     if version is None:
-        raise FlowNotRunnableError(f"Flow {flow.pk} has no published version.")
+        raise FlowNotRunnableError(f"O fluxo {flow.pk} não tem uma versão publicada.")
     return version
 
 

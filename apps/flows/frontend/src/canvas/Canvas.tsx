@@ -331,20 +331,20 @@ function ZoomControl() {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   const { zoom } = useViewport();
   return (
-    <div className="fb-zoom" role="group" aria-label="Zoom">
-      <button type="button" aria-label="Zoom in" title="Zoom in" onClick={() => void zoomIn({ duration: 160 })}>
+    <div className="fb-zoom" role="group" aria-label="Controles de zoom">
+      <button type="button" aria-label="Aumentar zoom" title="Aumentar zoom" onClick={() => void zoomIn({ duration: 160 })}>
         +
       </button>
       <button
         type="button"
         className="fb-zoom-level"
-        title="Fit the whole flow"
-        aria-label={`Zoom ${Math.round(zoom * 100)}%. Fit the whole flow`}
+        title="Ajustar fluxo à tela"
+        aria-label={`Zoom ${Math.round(zoom * 100)}%. Ajustar fluxo à tela`}
         onClick={() => void fitView({ duration: 220, padding: 0.2, maxZoom: 1 })}
       >
         {Math.round(zoom * 100)}%
       </button>
-      <button type="button" aria-label="Zoom out" title="Zoom out" onClick={() => void zoomOut({ duration: 160 })}>
+      <button type="button" aria-label="Diminuir zoom" title="Diminuir zoom" onClick={() => void zoomOut({ duration: 160 })}>
         −
       </button>
     </div>

@@ -97,7 +97,7 @@ def _read_json_object(request: WorkspaceRequest) -> dict[str, Any] | JsonRespons
     except (TypeError, ValueError):
         declared = 0
     if declared > MAX_REQUEST_BYTES:
-        return _error("payload_too_large", f"The request exceeds {MAX_REQUEST_BYTES} bytes.", 413)
+        return _error("payload_too_large", f"A solicitação excede o limite de {MAX_REQUEST_BYTES} bytes.", 413)
 
     try:
         body = request.body
@@ -105,10 +105,10 @@ def _read_json_object(request: WorkspaceRequest) -> dict[str, Any] | JsonRespons
         # Django re-parses CONTENT_LENGTH inside request.body and lets the
         # ValueError escape, so a header of "twelve" is a 500 on any view that
         # reads a body. A malformed header is a malformed request.
-        return _error("malformed_request", "The Content-Length header is not a number.", 400)
+        return _error("malformed_request", "O cabeçalho Content-Length não é um número.", 400)
 
     if len(body) > MAX_REQUEST_BYTES:
-        return _error("payload_too_large", f"The request exceeds {MAX_REQUEST_BYTES} bytes.", 413)
+        return _error("payload_too_large", f"A solicitação excede o limite de {MAX_REQUEST_BYTES} bytes.", 413)
 
     try:
         payload = json.loads(body or b"{}")
@@ -116,10 +116,10 @@ def _read_json_object(request: WorkspaceRequest) -> dict[str, Any] | JsonRespons
         # RecursionError is belt and braces: CPython's json parser handles
         # deeper nesting than the graph depth cap allows, so in practice the cap
         # catches those first — but a parser that gives up must not be a 500.
-        return _error("malformed_json", "The request body is not valid JSON.", 400)
+        return _error("malformed_json", "O corpo da solicitação não é um JSON válido.", 400)
 
     if not isinstance(payload, dict):
-        return _error("malformed_json", "The request body must be a JSON object.", 400)
+        return _error("malformed_json", "O corpo da solicitação deve ser um objeto JSON.", 400)
     return payload
 
 
@@ -181,7 +181,7 @@ def _detail_save(request: WorkspaceRequest, workspace_id: str, flow_id: str) -> 
         return payload
 
     if "graph" not in payload:
-        return _error("missing_graph", 'The body must be {"graph": {...}}.', 400)
+        return _error("missing_graph", 'O corpo deve conter {"graph": {...}}.', 400)
 
     flow = _get_flow(request, flow_id)
     # The body was measured on the way in and Django caches it, so this is free
@@ -255,7 +255,7 @@ def flow_rename(request: WorkspaceRequest, workspace_id: str, flow_id: str) -> H
         return payload
     name = payload.get("name")
     if not isinstance(name, str) or not name.strip():
-        return _error("missing_name", "A flow needs a name.", 400)
+        return _error("missing_name", "O fluxo precisa ter um nome.", 400)
     flow = _get_flow(request, flow_id)
     services.rename_flow(flow, name.strip()[:MAX_NAME])
     return JsonResponse({"flow": _flow_payload(flow)})
@@ -286,7 +286,7 @@ def flow_trigger_enabled(request: WorkspaceRequest, workspace_id: str, flow_id: 
         return payload
     enabled = payload.get("enabled")
     if not isinstance(enabled, bool):
-        return _error("missing_enabled", 'The body must be {"enabled": true} or {"enabled": false}.', 400)
+        return _error("missing_enabled", 'O corpo deve conter {"enabled": true} ou {"enabled": false}.', 400)
     flow = _get_flow(request, flow_id)
     trigger = get_scoped_object_or_404(Trigger, request.workspace, pk=trigger_id, flow=flow)
     trigger_services.set_enabled(trigger, enabled)
@@ -312,6 +312,8 @@ def flow_take_offline(request: WorkspaceRequest, workspace_id: str, flow_id: str
     flow = _get_flow(request, flow_id)
     try:
         stopped = services.take_offline(flow)
+    except services.FlowInUseError as exc:
+        return _error("flow_in_use", str(exc), 409)
     except services.FlowNotLiveError as exc:
         return _error("not_live", str(exc), 409)
     latest = services.latest_version(flow)

@@ -23,14 +23,14 @@ which accounts this deployment runs.
         {% if link.available %}
         <div class="flex items-start gap-2" x-data="{ copied: false }">
             <img src="{% url 'flows:trigger_qr' workspace_id=request.workspace.id flow_id=trigger.flow_id trigger_id=trigger.id connection_id=link.connection.id %}"
-                 width="96" height="96" alt="QR code for {{ link.connection.display_name }}"
+                 width="96" height="96" alt="Código QR de {{ link.connection.display_name }}"
                  class="rounded" style="background: var(--surface-0);">
             <div class="min-w-0 flex-1">
                 <code class="block text-xs break-all" style="color: var(--text-secondary);">{{ link.url }}</code>
                 <div class="flex flex-wrap items-center gap-2 mt-1.5">
                     <button type="button" class="btn-pill-secondary btn-pill-sm"
                             @click="navigator.clipboard.writeText($el.closest('div').parentElement.querySelector('code').textContent).then(() => { copied = true; setTimeout(() => copied = false, 1500) })">
-                        <span x-text="copied ? 'Copied' : 'Copy link'">Copy link</span>
+                        <span x-text="copied ? 'Copiado' : 'Copiar link'">Copiar link</span>
                     </button>
                     <a class="btn-link text-xs"
                        href="{% url 'flows:trigger_qr' workspace_id=request.workspace.id flow_id=trigger.flow_id trigger_id=trigger.id connection_id=link.connection.id %}?format=svg&amp;download=1">SVG</a>

@@ -43,10 +43,10 @@ HEAD_BYTES = 64
 class MediaKind(models.TextChoices):
     """The four block types SPEC §11.1 lets a ``send_message`` carry."""
 
-    IMAGE = "image", "Image"
-    AUDIO = "audio", "Audio"
-    VIDEO = "video", "Video"
-    FILE = "file", "File"
+    IMAGE = "image", "Imagem"
+    AUDIO = "audio", "Áudio"
+    VIDEO = "video", "Vídeo"
+    FILE = "file", "Arquivo"
 
 
 #: mime -> (kind, canonical extension). The extension is used for the

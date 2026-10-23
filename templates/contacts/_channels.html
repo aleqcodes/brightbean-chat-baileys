@@ -18,7 +18,7 @@ attacker-controlled (SECURITY-BASELINE §2): rendered escaped, never as a link.
          hx-get="{% url 'contacts:channels' workspace_id=request.workspace.id contact_id=contact.id %}"
          hx-trigger="contactChannelsChanged from:body"
          hx-swap="outerHTML">
-  <h2>Channels</h2>
+  <h2>Canais</h2>
 
   {% for channel in channels %}
     <div class="crm-channel">
@@ -34,11 +34,11 @@ attacker-controlled (SECURITY-BASELINE §2): rendered escaped, never as a link.
 
       <div class="crm-channel-state">
         {% if channel.is_opted_out %}
-          <span class="status-pill status-pill-disabled">Opted out {{ channel.opted_out_at }}</span>
+          <span class="status-pill status-pill-disabled">Sem consentimento desde {{ channel.opted_out_at }}</span>
         {% elif channel.opt_in %}
-          <span class="status-pill status-pill-active">Opted in</span>
+          <span class="status-pill status-pill-active">Com consentimento</span>
         {% else %}
-          <span class="status-pill status-pill-needs_reauth">No consent recorded</span>
+          <span class="status-pill status-pill-needs_reauth">Nenhum consentimento registrado</span>
         {% endif %}
 
         {% if channel.is_pending %}
@@ -48,11 +48,25 @@ attacker-controlled (SECURITY-BASELINE §2): rendered escaped, never as a link.
             is nothing wrong here — but it is worth saying, because the row has
             no channel behind it yet.
           {% endcomment %}
-          <span class="status-pill status-pill-disabled" title="Captured before a connection existed; it attaches at first send">Pending</span>
+          <span class="status-pill status-pill-disabled" title="Capturado antes de existir uma conexão; será associado no primeiro envio">Pendente</span>
         {% elif channel.window_open %}
-          <span class="status-pill status-pill-active">Window closes in {{ channel.window_expires_at|timeuntil:now }}</span>
+          <span class="status-pill status-pill-active">A janela fecha em {{ channel.window_expires_at|timeuntil:now }}</span>
         {% else %}
-          <span class="status-pill status-pill-disabled">Window closed</span>
+          <span class="status-pill status-pill-disabled">Janela fechada</span>
+        {% endif %}
+
+        {% if channel.is_pending %}
+          {% comment %}
+            An address captured before any connection of that platform existed
+            (ROADMAP contract 1). It is upgraded lazily at first send, so there
+            is nothing wrong here — but it is worth saying, because the row has
+            no channel behind it yet.
+          {% endcomment %}
+          <span class="status-pill status-pill-disabled" title="Capturado antes de existir uma conexão; será associado no primeiro envio">Pendente</span>
+        {% elif channel.window_open %}
+          <span class="status-pill status-pill-active">A janela fecha em {{ channel.window_expires_at|timeuntil:now }}</span>
+        {% else %}
+          <span class="status-pill status-pill-disabled">Janela fechada</span>
         {% endif %}
       </div>
 
@@ -60,15 +74,15 @@ attacker-controlled (SECURITY-BASELINE §2): rendered escaped, never as a link.
         <form class="mb-0"
               hx-post="{% url 'contacts:identity_opt_out' workspace_id=request.workspace.id contact_id=contact.id identity_id=channel.identity.id %}"
               hx-swap="none"
-              hx-confirm="Opt this contact out on {{ channel.platform }}? This cannot be undone from here. Only the contact can re-subscribe.">
-          <button type="submit" class="btn-outline btn-inline btn-danger-soft">Opt out</button>
+              hx-confirm="Remover o consentimento deste contato em {{ channel.platform }}? Isso não pode ser desfeito por aqui. Somente o contato pode se inscrever novamente.">
+          <button type="submit" class="btn-outline btn-inline btn-danger-soft">Remover consentimento</button>
         </form>
       {% endif %}
     </div>
   {% empty %}
     <p class="muted text-xs">
-      No channels yet. A contact becomes reachable when they message one of this
-      workspace's connections. Importing an address does not create one.
+      Nenhum canal ainda. Um contato fica acessível quando envia uma mensagem para uma
+      conexão deste espaço de trabalho. Importar um endereço não cria um canal.
     </p>
   {% endfor %}
 </section>

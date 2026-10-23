@@ -263,12 +263,12 @@ def fetch_media(connection: "ChannelConnection", media_id: str) -> ResolvedMedia
     distinctions are deliberately not exposed.
     """
     if not isinstance(media_id, str) or not media_id.strip():
-        raise MediaUnavailableError("This attachment was recorded without an identifier.")
+        raise MediaUnavailableError("Este anexo foi registrado sem identificador.")
 
     try:
         adapter = adapter_for(connection.platform)
     except AdapterNotRegisteredError as exc:
-        raise MediaUnavailableError("This channel cannot resolve attachments.") from exc
+        raise MediaUnavailableError("Este canal não permite recuperar anexos.") from exc
 
     source = _resolve(adapter, connection, media_id)
     response = _download(connection, source)
@@ -277,11 +277,11 @@ def fetch_media(connection: "ChannelConnection", media_id: str) -> ResolvedMedia
         logger.info(
             "Media on connection %s: %s answered HTTP %s.", connection.pk, response.final_host, response.status_code
         )
-        raise MediaUnavailableError("The platform would not serve this attachment.")
+        raise MediaUnavailableError("A plataforma não disponibilizou este anexo.")
     if response.truncated:
-        raise MediaUnavailableError("This attachment is too large to show here.")
+        raise MediaUnavailableError("Este anexo é grande demais para ser exibido.")
     if not response.content:
-        raise MediaUnavailableError("The platform served an empty attachment.")
+        raise MediaUnavailableError("A plataforma disponibilizou um anexo vazio.")
 
     return _describe(response.content)
 
@@ -322,10 +322,10 @@ def _resolve(adapter: Any, connection: "ChannelConnection", media_id: str) -> Me
             type(exc).__name__,
             connection.pk,
         )
-        raise MediaUnavailableError("This attachment could not be resolved.") from exc
+        raise MediaUnavailableError("Não foi possível recuperar este anexo.") from exc
 
     if source is None:
-        raise MediaUnavailableError("This attachment is no longer available from the platform.")
+        raise MediaUnavailableError("Este anexo não está mais disponível na plataforma.")
     return _validated(source, connection)
 
 
@@ -347,11 +347,11 @@ def _validated(source: Any, connection: "ChannelConnection") -> MediaSource:
         logger.error(
             "Adapter for %s returned %s rather than a MediaSource.", connection.platform, type(source).__name__
         )
-        raise MediaUnavailableError("This attachment could not be resolved.")
+        raise MediaUnavailableError("Não foi possível recuperar este anexo.")
 
     if not isinstance(source.url, str) or not source.url.strip():
         logger.error("Adapter for %s returned a MediaSource with no usable url.", connection.platform)
-        raise MediaUnavailableError("This attachment could not be resolved.")
+        raise MediaUnavailableError("Não foi possível recuperar este anexo.")
 
     raw = source.headers
     try:
@@ -366,7 +366,7 @@ def _validated(source: Any, connection: "ChannelConnection") -> MediaSource:
             connection.platform,
             type(exc).__name__,
         )
-        raise MediaUnavailableError("This attachment could not be resolved.") from exc
+        raise MediaUnavailableError("Não foi possível recuperar este anexo.") from exc
 
     return MediaSource(url=source.url, headers=headers)
 
@@ -394,10 +394,10 @@ def _download(connection: "ChannelConnection", source: MediaSource) -> Any:
         # that — but the *URL* would carry a bot token in its path, so neither
         # it nor ``source.url`` appears here.
         logger.info("Media on connection %s could not be fetched: %s", connection.pk, exc)
-        raise MediaUnavailableError("This attachment could not be fetched.") from exc
+        raise MediaUnavailableError("Não foi possível baixar este anexo.") from exc
     except Exception as exc:
         logger.error("Fetching media on connection %s raised an unexpected %s.", connection.pk, type(exc).__name__)
-        raise MediaUnavailableError("This attachment could not be fetched.") from exc
+        raise MediaUnavailableError("Não foi possível baixar este anexo.") from exc
 
 
 def _describe(content: bytes) -> ResolvedMedia:

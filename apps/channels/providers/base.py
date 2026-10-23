@@ -89,24 +89,24 @@ def request_json(
     try:
         response = http.request(method, url, timeout=effective_timeout, **kwargs)
     except httpx.TimeoutException as exc:
-        raise APIError(f"{method} {_host(url)} timed out") from exc
+        raise APIError(f"{method} {_host(url)} excedeu o tempo limite") from exc
     except httpx.HTTPError as exc:
         # type(exc).__name__ rather than str(exc): httpx puts the full URL —
         # query string and any token in it — into transport error messages.
-        raise APIError(f"{method} {_host(url)} failed: {type(exc).__name__}") from exc
+        raise APIError(f"{method} {_host(url)} falhou: {type(exc).__name__}") from exc
     finally:
         if owned:
             http.close()
 
     if response.status_code == httpx.codes.TOO_MANY_REQUESTS:
         raise RateLimitError(
-            f"{_host(url)} is rate limiting this connection",
+            f"{_host(url)} está limitando as requisições desta conexão",
             retry_after=_retry_after(response),
             code=_error_code(response),
         )
     if response.status_code >= httpx.codes.BAD_REQUEST:
         raise APIError(
-            f"{method} {_host(url)} was rejected",
+            f"{method} {_host(url)} rejeitou a requisição",
             status_code=response.status_code,
             code=_error_code(response),
         )
@@ -114,9 +114,9 @@ def request_json(
     try:
         payload = response.json()
     except ValueError as exc:
-        raise APIError(f"{_host(url)} returned a non-JSON body", status_code=response.status_code) from exc
+        raise APIError(f"{_host(url)} retornou um corpo que não é JSON", status_code=response.status_code) from exc
     if not isinstance(payload, dict):
-        raise APIError(f"{_host(url)} returned {type(payload).__name__}, expected an object")
+        raise APIError(f"{_host(url)} retornou {type(payload).__name__}; era esperado um objeto")
     return payload
 
 
@@ -128,9 +128,9 @@ def _host(url: str) -> str:
     logged and shown in the inbox (SECURITY-BASELINE §5).
     """
     try:
-        return httpx.URL(url).host or "the platform"
+        return httpx.URL(url).host or "a plataforma"
     except (httpx.InvalidURL, ValueError, TypeError):
-        return "the platform"
+        return "a plataforma"
 
 
 def _retry_after(response: httpx.Response) -> float | None:

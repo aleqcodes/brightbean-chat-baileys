@@ -29,19 +29,19 @@ the menu with the other twice-a-year action.
 
       <div class="flex-1 min-w-0">
         <div class="list-row-title truncate">{{ tag.name }}</div>
-        <div class="list-row-meta">On {{ tag.contact_count }} contact{{ tag.contact_count|pluralize }}</div>
+        <div class="list-row-meta">Em {{ tag.contact_count }} {% if tag.contact_count == 1 %}contato{% else %}contatos{% endif %}</div>
       </div>
 
-      <button type="button" class="btn-pill-secondary btn-pill-sm flex-shrink-0" @click="renaming = true; merging = false; $nextTick(() => $refs.name.focus())">Rename</button>
+      <button type="button" class="btn-pill-secondary btn-pill-sm flex-shrink-0" @click="renaming = true; merging = false; $nextTick(() => $refs.name.focus())">Renomear</button>
 
-      <button type="button" class="btn-icon-round flex-shrink-0" @click="openMenu($event)" aria-haspopup="menu" :aria-expanded="menuOpen ? 'true' : 'false'" aria-label="More actions for {{ tag.name }}">
+      <button type="button" class="btn-icon-round flex-shrink-0" @click="openMenu($event)" aria-haspopup="menu" :aria-expanded="menuOpen ? 'true' : 'false'" aria-label="Mais ações para {{ tag.name }}">
         <svg width="17" height="17" fill="currentColor" stroke="none" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
       </button>
 
       <div x-show="menuOpen" x-cloak @click.away="menuOpen = false" :style="`top:${menuTop}px; left:${menuLeft}px;`" class="row-menu-panel fixed z-50 w-[200px]" role="menu">
-        <button type="button" class="row-menu-item" role="menuitem" @click="merging = true; renaming = false; menuOpen = false">Merge into another tag…</button>
+        <button type="button" class="row-menu-item" role="menuitem" @click="merging = true; renaming = false; menuOpen = false">Mesclar com outra tag…</button>
         <div class="row-menu-sep"></div>
-        <button type="button" class="row-menu-item row-menu-item-danger" role="menuitem" hx-post="{% url 'contacts:tag_delete' workspace_id=request.workspace.id tag_id=tag.id %}" hx-confirm="Delete “{{ tag.name }}”? It will be removed from {{ tag.contact_count }} contact{{ tag.contact_count|pluralize }}." @click="menuOpen = false">Delete</button>
+        <button type="button" class="row-menu-item row-menu-item-danger" role="menuitem" hx-post="{% url 'contacts:tag_delete' workspace_id=request.workspace.id tag_id=tag.id %}" hx-confirm="Excluir “{{ tag.name }}”? Ela será removida de {{ tag.contact_count }} {% if tag.contact_count == 1 %}contato{% else %}contatos{% endif %}." @click="menuOpen = false">Excluir</button>
       </div>
 
       {% comment %}
@@ -49,20 +49,20 @@ the menu with the other twice-a-year action.
         under the row rather than colliding with the action buttons.
       {% endcomment %}
       <form x-show="renaming" x-cloak class="w-full order-last flex flex-wrap items-center gap-2 pt-3" hx-post="{% url 'contacts:tag_rename' workspace_id=request.workspace.id tag_id=tag.id %}" @htmx:after-request="if (bbChanged($event, 'tagsChanged')) renaming = false">
-        <label class="sr-only" for="tag-name-{{ tag.id }}">Name</label>
+        <label class="sr-only" for="tag-name-{{ tag.id }}">Nome</label>
         <input class="form-input-styled" id="tag-name-{{ tag.id }}" x-ref="name" type="text" name="name" value="{{ tag.name }}" maxlength="100" required style="width: 16rem;">
-        <button type="submit" class="btn-pill-secondary btn-pill-sm">Save</button>
-        <button type="button" class="btn-pill-secondary btn-pill-sm" @click="renaming = false">Cancel</button>
+        <button type="submit" class="btn-pill-secondary btn-pill-sm">Salvar</button>
+        <button type="button" class="btn-pill-secondary btn-pill-sm" @click="renaming = false">Cancelar</button>
       </form>
 
-      <form x-show="merging" x-cloak class="w-full order-last flex flex-wrap items-center gap-2 pt-3" hx-post="{% url 'contacts:tag_merge' workspace_id=request.workspace.id tag_id=tag.id %}" hx-confirm="Merge “{{ tag.name }}” into the chosen tag? “{{ tag.name }}” is deleted and its {{ tag.contact_count }} contact{{ tag.contact_count|pluralize }} keep the other one." @htmx:after-request="if (bbChanged($event, 'tagsChanged')) merging = false">
-        <label class="sr-only" for="tag-merge-{{ tag.id }}">Merge {{ tag.name }} into</label>
+      <form x-show="merging" x-cloak class="w-full order-last flex flex-wrap items-center gap-2 pt-3" hx-post="{% url 'contacts:tag_merge' workspace_id=request.workspace.id tag_id=tag.id %}" hx-confirm="Mesclar “{{ tag.name }}” com a tag escolhida? “{{ tag.name }}” será excluída e os contatos serão associados à outra." @htmx:after-request="if (bbChanged($event, 'tagsChanged')) merging = false">
+        <label class="sr-only" for="tag-merge-{{ tag.id }}">Mesclar {{ tag.name }} com</label>
         <select class="form-input-styled bb-select" id="tag-merge-{{ tag.id }}" name="target_id" required style="width: 16rem;">
-          <option value="">Choose a tag…</option>
+          <option value="">Escolha uma tag…</option>
           {% for other in tags %}{% if other.id != tag.id %}<option value="{{ other.id }}">{{ other.name }}</option>{% endif %}{% endfor %}
         </select>
-        <button type="submit" class="btn-pill-secondary btn-pill-sm">Merge</button>
-        <button type="button" class="btn-pill-secondary btn-pill-sm" @click="merging = false">Cancel</button>
+        <button type="submit" class="btn-pill-secondary btn-pill-sm">Mesclar</button>
+        <button type="button" class="btn-pill-secondary btn-pill-sm" @click="merging = false">Cancelar</button>
       </form>
     </div>
     {% endfor %}
@@ -73,12 +73,11 @@ the menu with the other twice-a-year action.
     primary action. It opens the same modal as the header's, by id.
   {% endcomment %}
   <div class="empty-state">
-    <p class="empty-state-title">No tags yet</p>
+    <p class="empty-state-title">Nenhuma tag ainda</p>
     <p class="empty-state-body">
-      A tag is how a flow says "this person asked about pricing", so a filter can find them again
-      later.
+      Uma tag indica, por exemplo, que alguém se interessou por preços, para que um filtro encontre essa pessoa depois.
     </p>
-    <button type="button" class="btn-pill-secondary mt-4" @click="$modal('new-tag')">New tag</button>
+    <button type="button" class="btn-pill-secondary mt-4" @click="$modal('new-tag')">Nova tag</button>
   </div>
   {% endif %}
 </div>

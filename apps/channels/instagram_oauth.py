@@ -176,9 +176,9 @@ def app_credentials(workspace: Any) -> tuple[str, str]:
     client_secret = _first(resolution.credentials, "client_secret", "app_secret")
     if not client_id or not client_secret:
         raise InstagramCredentialsMissingError(
-            "This deployment has no Instagram app credentials. Set "
-            "PLATFORM_INSTAGRAM_CLIENT_ID and PLATFORM_INSTAGRAM_CLIENT_SECRET "
-            "in the environment."
+            "Esta implantação não tem credenciais do app do Instagram configuradas. Defina "
+            "PLATFORM_INSTAGRAM_CLIENT_ID e PLATFORM_INSTAGRAM_CLIENT_SECRET "
+            "no ambiente."
         )
     return client_id, client_secret
 
@@ -280,7 +280,7 @@ def exchange_code(*, code: str, client_id: str, client_secret: str) -> tuple[str
     token = body.get("access_token")
     user_id = body.get("user_id")
     if not isinstance(token, str) or not token:
-        raise APIError("Instagram returned no access token for that code")
+        raise APIError("O Instagram não retornou um token de acesso para esse código")
     return token, str(user_id) if user_id is not None else ""
 
 
@@ -320,7 +320,7 @@ def refresh_long_lived(token: str) -> tuple[str, datetime]:
 def _token_and_expiry(body: dict[str, Any]) -> tuple[str, datetime]:
     token = body.get("access_token")
     if not isinstance(token, str) or not token:
-        raise APIError("Instagram returned no long-lived access token")
+        raise APIError("O Instagram não retornou um token de acesso de longa duração")
     expires_in = body.get("expires_in")
     lifetime = DEFAULT_TOKEN_LIFETIME
     if isinstance(expires_in, int) and not isinstance(expires_in, bool) and 0 < expires_in < 60 * 60 * 24 * 365:
@@ -347,7 +347,7 @@ def account_profile(token: str) -> dict[str, str]:
     user_id = body.get("user_id") or body.get("id")
     username = body.get("username")
     if user_id is None or not isinstance(username, str) or not username:
-        raise APIError("Instagram returned an unusable account profile")
+        raise APIError("O Instagram retornou um perfil de conta inválido")
     return {"user_id": str(user_id)[:200], "username": username[:200]}
 
 
@@ -408,7 +408,7 @@ def _credentials(connection: Any) -> dict[str, Any]:
     try:
         credentials: Any = connection.credentials or {}
     except ValueError:
-        logger.error("Connection %s: credentials could not be decrypted.", connection.pk)
+        logger.error("Conexão %s: não foi possível descriptografar as credenciais.", connection.pk)
         return {}
     return credentials if isinstance(credentials, dict) else {}
 
@@ -440,7 +440,7 @@ def mark_needs_reauth(connection: Any) -> None:
     if not updated:
         return
     connection.status = ConnectionStatus.NEEDS_REAUTH
-    logger.warning("Instagram connection %s needs reconnecting.", connection.pk)
+    logger.warning("A conexão do Instagram %s precisa ser reconectada.", connection.pk)
     try:
         notify(
             connection.workspace,
@@ -455,7 +455,7 @@ def mark_needs_reauth(connection: Any) -> None:
     except Exception:
         # The status is the thing that matters; a notification failure must not
         # leave the connection looking healthy.
-        logger.exception("Could not notify about connection %s needing reauth.", connection.pk)
+        logger.exception("Não foi possível notificar que a conexão %s precisa de nova autenticação.", connection.pk)
 
 
 # ---------------------------------------------------------------------------
@@ -524,11 +524,11 @@ def _refresh_one(connection: Any) -> bool:
     except APIError:
         # No exception detail in the log: this code path is one of the few
         # places a live token exists in plain text (SECURITY-BASELINE §5).
-        logger.info("Instagram token refresh was rejected for connection %s.", connection.pk)
+        logger.info("A atualização do token do Instagram foi recusada para a conexão %s.", connection.pk)
         mark_needs_reauth(connection)
         return False
     except Exception:
-        logger.exception("Instagram token refresh failed for connection %s.", connection.pk)
+        logger.exception("Falha ao atualizar o token do Instagram da conexão %s.", connection.pk)
         return False
 
     store_credentials(connection, token=fresh, expires_at=expires_at, user_id=connection.external_id)

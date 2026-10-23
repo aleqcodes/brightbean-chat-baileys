@@ -1,26 +1,26 @@
 {% extends "layouts/workspace_settings.html" %}
-{% block title %}WhatsApp template · BrightBean Chat{% endblock %}
+{% block title %}Modelo do WhatsApp · BrightBean Chat{% endblock %}
 {% block page_header %}
-  <h1 class="page-title mb-4">{% if template %}Edit template{% else %}New template{% endif %}</h1>
+  <h1 class="page-title mb-4">{% if template %}Editar modelo{% else %}Novo modelo{% endif %}</h1>
 {% endblock %}
 
 {% block content %}
   {% if not editable %}
     <div class="alert-warn">
       <p>
-        This template is with Meta, or already approved, so it cannot be edited.
-        the copy under review is the one Meta holds. Delete it and write a new one
-        if it needs to change.
+        Este modelo está com a Meta para análise ou já foi aprovado, por isso não pode ser editado.
+        A versão em análise é a que está armazenada na Meta. Para alterá-la, exclua o modelo
+        e crie outro.
       </p>
     </div>
   {% endif %}
 
   <p class="muted">
-    Write the message once and mark the parts that change with
+    Escreva a mensagem uma vez e marque as partes variáveis com
     <code>{{ open_brace }}1{{ close_brace }}</code>,
-    <code>{{ open_brace }}2{{ close_brace }}</code> and so on. Meta numbers
-    variables per section, so a header's first variable and a body's first
-    variable are two different values.
+    <code>{{ open_brace }}2{{ close_brace }}</code> e assim por diante. A Meta numera
+    as variáveis por seção; portanto, a primeira variável do cabeçalho e a primeira
+    variável do corpo são valores diferentes.
   </p>
 
   {% comment %}
@@ -39,11 +39,11 @@
     {% csrf_token %}
     {{ form.as_p }}
 
-    <h2>Preview</h2>
-    <div id="template-preview" class="muted"><p>Start typing to see the message.</p></div>
+    <h2>Pré-visualização</h2>
+    <div id="template-preview" class="muted"><p>Comece a digitar para ver a mensagem.</p></div>
 
-    {% if editable %}<button type="submit" class="btn-pill-primary btn-pill-sm">Save draft</button>{% endif %}
+    {% if editable %}<button type="submit" class="btn-pill-primary btn-pill-sm">Salvar rascunho</button>{% endif %}
   </form>
 
-  <p><a href="{{ list_url }}">Back to templates</a></p>
+  <p><a href="{{ list_url }}">Voltar aos modelos</a></p>
 {% endblock %}

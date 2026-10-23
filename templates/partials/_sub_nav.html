@@ -12,7 +12,7 @@ Args:
           campaigns/list.html, flows/template_gallery.html), or the tab that
           was just clicked vanishes along with its neighbours.
 {% endcomment %}
-<nav class="tabs" aria-label="Section">
+<nav class="tabs" aria-label="Seção">
     {% for group in groups %}{% for item in group.items %}
     <a href="{{ item.url }}" class="tab{% if item.active %} active{% endif %}"
        {% if item.active %}aria-current="page"{% endif %}>{{ item.label }}</a>

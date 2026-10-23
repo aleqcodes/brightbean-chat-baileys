@@ -14,7 +14,7 @@ keystroke buys nothing; it also sidesteps the $nextTick trap documented in
 list.html, which exists only because htmx has to serialise a form first.
 {% endcomment %}
 
-{% block title %}Templates · BrightBean Chat{% endblock %}
+{% block title %}Modelos · BrightBean Chat{% endblock %}
 
 {% comment %}
 The Templates tab lands here, so the strip it was clicked in has to survive the
@@ -32,14 +32,12 @@ cancel.
 {% block page_header %}
 <div class="page-header max-w-[1060px]">
     <div class="page-header-text">
-        <h1 class="page-title">Templates</h1>
+        <h1 class="page-title">Modelos</h1>
         <p class="page-lede">
-            Ready-made flows. Pick one and change the words to suit you — you will see exactly what it needs before anything is created.
+            Fluxos prontos para usar. Escolha um e adapte o texto — você verá exatamente do que ele precisa antes que qualquer coisa seja criada.
         </p>
-    </div>
-    <div class="page-header-actions">
         <a href="{{ upload_url }}" class="btn-pill-secondary">
-            {% include "partials/_nav_icon.html" with name="upload" icon_size=16 %} Upload a file
+            {% include "partials/_nav_icon.html" with name="upload" icon_size=16 %} Enviar arquivo
         </a>
     </div>
 </div>
@@ -50,7 +48,7 @@ cancel.
 {% if errors %}
 <div class="rounded-xl border p-4 mb-4" role="alert"
      style="border-color: var(--error-500); background: var(--error-50);">
-    <p class="text-sm font-medium" style="color: var(--text-primary);">That template could not be read</p>
+    <p class="text-sm font-medium" style="color: var(--text-primary);">Não foi possível ler este modelo</p>
     <ul class="mt-2 space-y-1">
         {% for error in errors %}
         <li class="text-sm" style="color: var(--text-secondary);">{{ error }}</li>
@@ -80,10 +78,10 @@ cancel.
     <div class="list-toolbar">
         <label class="search-field w-full sm:w-64">
             {% include "partials/_nav_icon.html" with name="search" icon_size=16 %}
-            <input type="search" x-model="q" placeholder="Search {{ cards|length }} templates"
-                   class="search-input" aria-label="Search templates">
+            <input type="search" x-model="q" placeholder="Buscar entre {{ cards|length }} modelos"
+                   class="search-input" aria-label="Buscar modelos">
         </label>
-        {% filter_popover groups=filter_groups noun="template" %}
+        {% filter_popover groups=filter_groups noun="modelo" %}
     </div>
     {% filter_chips groups=filter_groups %}
     </div>
@@ -96,17 +94,17 @@ cancel.
 
     <div class="rounded-lg p-3 mt-6" style="background: var(--surface-2);">
         <p class="text-xs" style="color: var(--text-secondary);">
-            Every template arrives as an <strong>unpublished draft</strong> with its triggers switched off,
-            and its links and tags are placeholders. Nothing runs until you edit it and publish it yourself.
+            Todos os modelos chegam como <strong>rascunhos não publicados</strong>, com os gatilhos desativados,
+            e links e etiquetas como marcadores. Nada será executado até que você edite e publique.
         </p>
     </div>
 </div>
 {% else %}
 <div class="rounded-xl border p-6 text-center" style="border-color: var(--border); background: var(--surface-1);">
-    <p class="text-sm font-medium" style="color: var(--text-primary);">No templates are installed</p>
+    <p class="text-sm font-medium" style="color: var(--text-primary);">Nenhum modelo instalado</p>
     <p class="text-sm mt-1" style="color: var(--text-secondary);">
-        This installation ships none, or none of them could be read.
-        You can still <a href="{{ upload_url }}" class="btn-link">upload a template file</a>.
+        Esta instalação não inclui modelos ou não foi possível ler nenhum deles.
+        Você ainda pode <a href="{{ upload_url }}" class="btn-link">enviar um arquivo de modelo</a>.
     </p>
 </div>
 {% endif %}

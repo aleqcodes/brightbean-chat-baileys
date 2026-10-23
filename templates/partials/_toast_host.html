@@ -77,7 +77,7 @@ success waits — which a single aria-live on the container cannot express.
             '<span class="bb-toast-icon">' + svg(TONES[tone], 17) + '</span>' +
             '<div class="min-w-0"><div class="bb-toast-title"></div>' +
             (detail.body ? '<div class="bb-toast-body"></div>' : '') + '</div>' +
-            '<button type="button" class="bb-toast-dismiss" aria-label="Dismiss">' + svg(DISMISS_ICON, 14) + '</button>';
+            '<button type="button" class="bb-toast-dismiss" aria-label="Dispensar">' + svg(DISMISS_ICON, 14) + '</button>';
 
         // Server-supplied text, via textContent only.
         el.querySelector('.bb-toast-title').textContent = detail.title;
@@ -111,7 +111,7 @@ success waits — which a single aria-live on the container cannot express.
             // boilerplate the user cannot act on, and under DEBUG the exception
             // and traceback from Django's technical 500 page. Neither belongs in
             // a toast. Studio renders whatever it gets.
-            message = 'Something went wrong. Please try again.';
+            message = 'Algo deu errado. Tente novamente.';
         }
 
         var inline = elt && elt.closest('[data-inline-error]');

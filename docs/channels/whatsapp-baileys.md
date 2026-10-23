@@ -8,6 +8,7 @@ WhatsApp (Baileys) is a separate, unofficial WhatsApp Web channel. It does not r
 - One persistent linked-device session per connection, encrypted at rest by the gateway, with session state kept separate from Django's channel status.
 - New 1:1 incoming text messages are normalized through the existing channel event log and messaging ingest pipeline. Historical sync, groups, broadcasts/statuses, newsletters, and messages sent by the linked account are ignored.
 - 1:1 text sends go through the existing opt-in, opt-out, 24-hour product window, and message retry pipeline. Outside the product window, messages are blocked. This 24-hour rule is a conservative product choice, not a claim about WhatsApp Web's technical requirements.
+- Flow quick replies are rendered as numbered text options instead of tappable controls. Contacts can answer with the number or visible label, and either response follows the matching flow branch.
 - Cloud API templates, broadcasts, and campaigns are disabled for Baileys.
 
 **Not yet supported:** inbound or outbound media transfer, delivery/read receipts, group chats, campaigns, multi-part send reconciliation, and real-device E2E verification. Text replies support phone-number JIDs and direct LID JIDs; the gateway does not attempt to reverse-resolve an LID to a phone number. Unsupported events are ignored; sends are not reported as delivered. An ambiguous gateway send remains retry-protected by the persisted Django message UUID and gateway command journal, but the UI has no separate `unknown` status.

@@ -12,16 +12,16 @@ no receipt path of its own.
 <div class="bc-panel">
     <div class="bc-panel-head">
         <span class="bc-panel-title">
-            Progress
+            Progresso
             {# Polled, so it follows the broadcast through scheduled → sending → sent. #}
             <span class="status-pill status-pill-{{ broadcast.status }}">{{ broadcast.get_status_display }}</span>
         </span>
         {% if broadcast.is_live %}
         <form hx-post="{% url 'broadcasts:cancel' workspace_id=request.workspace.id broadcast_id=broadcast.id %}"
               hx-swap="none"
-              hx-confirm="Cancel this broadcast? Messages already sent cannot be recalled.">
+              hx-confirm="Cancelar este disparo? As mensagens já enviadas não podem ser recuperadas.">
             {% csrf_token %}
-            <button type="submit" class="btn-outline btn-inline btn-danger-soft">Cancel broadcast</button>
+            <button type="submit" class="btn-outline btn-inline btn-danger-soft">Cancelar disparo</button>
         </form>
         {% endif %}
     </div>
@@ -33,14 +33,14 @@ no receipt path of its own.
       value until the denominator is real, and says what it is doing instead.
     {% endcomment %}
     {% if expanding %}
-    <div class="bc-bar" role="progressbar" aria-label="Broadcast progress" aria-valuetext="Working out who this reaches">
+    <div class="bc-bar" role="progressbar" aria-label="Progresso do disparo" aria-valuetext="Calculando quem receberá a mensagem">
         <div class="bc-bar-fill bc-bar-indeterminate"></div>
     </div>
-    <p class="bc-hint mt-1">Working out who this reaches…</p>
+    <p class="bc-hint mt-1">Calculando quem receberá a mensagem…</p>
     {% else %}
     <div class="bc-bar" role="progressbar"
          aria-valuenow="{{ counters.percent }}" aria-valuemin="0" aria-valuemax="100"
-         aria-label="Broadcast progress">
+         aria-label="Progresso do disparo">
         <div class="bc-bar-fill" style="width: {{ counters.percent }}%"></div>
     </div>
     {% endif %}
@@ -48,41 +48,41 @@ no receipt path of its own.
     <div class="bc-tiles mt-3">
         <div class="bc-tile">
             <div class="bc-tile-figure">{{ counters.queued }}</div>
-            <div class="bc-tile-label">Queued</div>
+            <div class="bc-tile-label">Na fila</div>
         </div>
         <div class="bc-tile">
             <div class="bc-tile-figure">{{ counters.sent }}</div>
-            <div class="bc-tile-label">Sent</div>
+            <div class="bc-tile-label">Enviadas</div>
         </div>
         <div class="bc-tile">
             <div class="bc-tile-figure">{{ counters.delivered }}</div>
-            <div class="bc-tile-label">Delivered</div>
+            <div class="bc-tile-label">Entregues</div>
         </div>
         <div class="bc-tile">
             <div class="bc-tile-figure">{{ counters.failed }}</div>
-            <div class="bc-tile-label">Failed</div>
+            <div class="bc-tile-label">Com falha</div>
         </div>
         <div class="bc-tile">
             <div class="bc-tile-figure">{{ counters.skipped }}</div>
-            <div class="bc-tile-label">Skipped</div>
+            <div class="bc-tile-label">Ignoradas</div>
         </div>
         {% if counters.cancelled %}
         <div class="bc-tile">
             <div class="bc-tile-figure">{{ counters.cancelled }}</div>
-            <div class="bc-tile-label">Cancelled</div>
+            <div class="bc-tile-label">Canceladas</div>
         </div>
         {% endif %}
         {% if counters.pending %}
         <div class="bc-tile">
             <div class="bc-tile-figure">{{ counters.pending }}</div>
-            <div class="bc-tile-label">Waiting</div>
+            <div class="bc-tile-label">Aguardando</div>
         </div>
         {% endif %}
     </div>
 
     {% if reasons %}
     <div class="mt-3">
-        <p class="bc-tile-label">Why people were skipped</p>
+        <p class="bc-tile-label">Por que alguns contatos foram ignorados</p>
         {% for reason in reasons %}
         <div class="bc-reason">
             <span>{{ reason.label }}</span>

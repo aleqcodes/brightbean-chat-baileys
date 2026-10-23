@@ -46,7 +46,7 @@ def whatsapp_baileys_connect(request: WorkspaceRequest, workspace_id: str) -> Ht
     if request.method == "POST":
         name = (request.POST.get("display_name") or "WhatsApp (Baileys)").strip()[:200]
         if request.POST.get("accept_risk") != "yes":
-            messages.error(request, "You must acknowledge the unofficial-channel risks before connecting.")
+            messages.error(request, "É necessário reconhecer os riscos do canal não oficial antes de conectar.")
         elif refusal := plan_refusal(request.workspace):
             messages.error(request, refusal)
         else:
@@ -62,7 +62,7 @@ def whatsapp_baileys_connect(request: WorkspaceRequest, workspace_id: str) -> Ht
                     connection.save()
                     BaileysSession.objects.create(connection=connection, risk_accepted_at=timezone.now())
             except IntegrityError:
-                messages.error(request, "Could not create this channel. Please retry.")
+                messages.error(request, "Não foi possível criar este canal. Tente novamente.")
             else:
                 return redirect("channels:whatsapp_baileys_detail", workspace_id=workspace_id, connection_id=connection.pk)
     return render(request, "channels/whatsapp_baileys_connect.html", {
@@ -97,11 +97,11 @@ def whatsapp_baileys_pair(request: WorkspaceRequest, workspace_id: str, connecti
     try:
         gateway_request("POST", f"/v1/sessions/{connection.pk}/pair", {"request_id": str(uuid.uuid4())})
     except APIError:
-        messages.error(request, "Baileys gateway is unavailable; the connection remains unpaired.")
+        messages.error(request, "O gateway do Baileys está indisponível; a conexão continua sem pareamento.")
     else:
         session.state = "connecting"
         session.save(update_fields=["state", "updated_at"])
-        messages.success(request, "Pairing started. Scan the current QR code with WhatsApp linked devices.")
+        messages.success(request, "Pareamento iniciado. Escaneie o QR code atual com os aparelhos conectados do WhatsApp.")
     return redirect("channels:whatsapp_baileys_detail", workspace_id=workspace_id, connection_id=connection.pk)
 
 
@@ -171,7 +171,7 @@ def whatsapp_baileys_logout(request: WorkspaceRequest, workspace_id: str, connec
     try:
         gateway_request("POST", f"/v1/sessions/{connection.pk}/logout", {"request_id": str(uuid.uuid4())})
     except APIError:
-        messages.error(request, "Gateway is unavailable; logout could not be confirmed.")
+        messages.error(request, "O gateway está indisponível; não foi possível confirmar a desconexão.")
     else:
         connection.status = ConnectionStatus.NEEDS_REAUTH
         connection.save(update_fields=["status"])
@@ -179,5 +179,5 @@ def whatsapp_baileys_logout(request: WorkspaceRequest, workspace_id: str, connec
         if session:
             session.state = "logged_out"
             session.save(update_fields=["state", "updated_at"])
-        messages.success(request, "Session closed. Pair again to reconnect; stored conversations were retained.")
+        messages.success(request, "Sessão encerrada. Pareie novamente para reconectar; as conversas armazenadas foram mantidas.")
     return redirect("channels:whatsapp_baileys_detail", workspace_id=workspace_id, connection_id=connection.pk)

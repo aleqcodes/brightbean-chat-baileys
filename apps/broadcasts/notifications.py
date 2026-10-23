@@ -27,11 +27,11 @@ def register() -> None:
     register_event(
         NotificationEvent(
             key=EVENT_BROADCAST_FINISHED,
-            label="Broadcast finished",
+            label="Disparo concluído",
             icon="broadcasts",
             tone="success",
-            title='Broadcast "{broadcast_name}" finished',
-            body="{sent} sent, {failed} failed, {skipped} skipped.",
+            title='Disparo "{broadcast_name}" concluído',
+            body="{sent} enviados, {failed} com falha, {skipped} ignorados.",
             required_context=("broadcast_name",),
             emails_by_default=False,
         )

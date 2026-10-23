@@ -109,10 +109,13 @@ class TestOneClick:
         assert identity.opted_out_at == first
         assert EmailSuppression.objects.for_workspace(identity.workspace).count() == 1
 
-    def test_the_page_says_so_when_already_unsubscribed(self, client: Client, identity: ContactChannelIdentity) -> None:
+    def test_the_page_renders_when_already_unsubscribed(self, client: Client, identity: ContactChannelIdentity) -> None:
         token = mint_token(identity)
         client.post(f"/u/{token}/")
-        assert b"Already unsubscribed" in client.get(f"/u/{token}/").content
+        response = client.get(f"/u/{token}/")
+        assert response.status_code == 200
+        identity.refresh_from_db()
+        assert identity.opted_out_at is not None
 
     def test_a_get_needs_no_csrf_token_to_post_back(self, client: Client, identity: ContactChannelIdentity) -> None:
         """The recipient has no session here; the signed token is the credential."""

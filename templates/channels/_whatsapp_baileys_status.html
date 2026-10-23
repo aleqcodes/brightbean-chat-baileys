@@ -1,22 +1,22 @@
 <section id="baileys-status" class="space-y-3" hx-get="{{ status_url }}" hx-trigger="every 2s" hx-swap="outerHTML">
   {% if not status_data.gateway_available %}
-  <div class="health health-warn"><span class="health-dot"></span>Gateway unavailable; showing the last saved state.</div>
+  <div class="health health-warn"><span class="health-dot"></span>Gateway indisponível; exibindo o último estado salvo.</div>
   {% else %}
   <div class="health {% if status_data.state == 'connected' %}health-ok{% elif status_data.state == 'error' or status_data.state == 'needs_reauth' %}health-bad{% elif status_data.state == 'disabled' or status_data.state == 'logged_out' %}health-off{% else %}health-warn{% endif %}">
-    <span class="health-dot"></span>Gateway: {{ status_data.state|capfirst }}
+    <span class="health-dot"></span>Gateway: {% if status_data.state == "connected" %}Conectado{% elif status_data.state == "connecting" %}Conectando{% elif status_data.state == "reconnecting" %}Reconectando{% elif status_data.state == "pending_pairing" %}Aguardando pareamento{% elif status_data.state == "qr_ready" %}QR code disponível{% elif status_data.state == "needs_reauth" %}Precisa reconectar{% elif status_data.state == "logged_out" %}Desconectado{% elif status_data.state == "disabled" %}Desativado{% elif status_data.state == "error" %}Erro{% else %}Estado desconhecido{% endif %}
   </div>
   {% endif %}
   <div class="card-row flex flex-wrap items-baseline justify-between gap-4 pt-3">
-    <span class="text-[13px] font-semibold" style="color: var(--text-secondary);">Channel</span>
-    <span class="text-sm" style="color: var(--text-primary);">{{ status_data.connection_status|capfirst }}</span>
+    <span class="text-[13px] font-semibold" style="color: var(--text-secondary);">Canal</span>
+    <span class="text-sm" style="color: var(--text-primary);">{% if status_data.connection_status == "active" %}Ativo{% elif status_data.connection_status == "needs_reauth" %}Precisa reconectar{% elif status_data.connection_status == "disabled" %}Desativado{% else %}Desconhecido{% endif %}</span>
   </div>
   {% if status_data.last_connected_at %}
   <div class="card-row flex flex-wrap items-baseline justify-between gap-4 py-3">
-    <span class="text-[13px] font-semibold" style="color: var(--text-secondary);">Last connected</span>
+    <span class="text-[13px] font-semibold" style="color: var(--text-secondary);">Última conexão</span>
     <time class="text-sm" style="color: var(--text-primary);" datetime="{{ status_data.last_connected_at }}">{{ status_data.last_connected_at }}</time>
   </div>
   {% endif %}
   {% if status_data.last_error_code %}
-  <p class="text-sm" style="color: var(--error-700);" role="status">Connection issue: {{ status_data.last_error_code }}</p>
+  <p class="text-sm" style="color: var(--error-700);" role="status">Problema de conexão: {{ status_data.last_error_code }}</p>
   {% endif %}
 </section>

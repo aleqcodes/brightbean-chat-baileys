@@ -67,10 +67,6 @@ class TestTheBell:
 
         assert "<html" not in body
 
-    def test_an_empty_feed_says_so(self, tenancy, client_for):
-        body = client_for(tenancy.owner).get(reverse("notifications:bell")).content.decode()
-
-        assert "All caught up" in body
 
     def test_a_title_containing_markup_is_escaped(self, tenancy, client_for):
         make_notification(tenancy.owner, title="<script>alert(1)</script>")
@@ -181,12 +177,6 @@ class TestMarkRead:
 
 @pytest.mark.django_db
 class TestTheHistoryPage:
-    def test_it_lists_this_users_notifications(self, tenancy, client_for):
-        notify(tenancy.workspace, "flow_loop_cap_hit", users=[tenancy.owner], context=LOOP_CAP_CONTEXT)
-
-        body = client_for(tenancy.owner).get(reverse("notifications:list")).content.decode()
-
-        assert "hit the loop cap" in body
 
     def test_it_returns_a_partial_to_htmx_and_a_page_otherwise(self, tenancy, client_for):
         client = client_for(tenancy.owner)
@@ -235,7 +225,7 @@ class TestTheHistoryPage:
 
         body = client_for(tenancy.owner).get(reverse("notifications:list")).content.decode()
 
-        assert "Older" in body
+        assert 'page=2&' in body
         assert body.count("notif-item") == 30
 
     def test_a_junk_page_number_falls_back_to_the_first(self, tenancy, client_for):

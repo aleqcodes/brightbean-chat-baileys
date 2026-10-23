@@ -135,8 +135,8 @@ export function HandleLabelEdge({
               <button
                 type="button"
                 className="fb-edge-insert-button"
-                aria-label="Add a step here"
-                title="Add a step here"
+                aria-label="Adicionar uma etapa aqui"
+                title="Adicionar uma etapa aqui"
                 aria-haspopup="menu"
                 aria-expanded={open}
                 onClick={() => setOpen((was) => !was)}

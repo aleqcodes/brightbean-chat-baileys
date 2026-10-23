@@ -32,7 +32,7 @@ Args:
   <div class="cn-copy" x-data="{ copied: false }">
     <code class="cn-copy-value" x-ref="value">{{ value }}</code>
     <button type="button" class="btn-pill-secondary btn-pill-sm flex-shrink-0" @click="navigator.clipboard?.writeText($refs.value.textContent.trim())?.then(() => { copied = true; setTimeout(() => copied = false, 1600) })">
-      <span x-text="copied ? 'Copied' : 'Copy'">Copy</span>
+      <span x-text="copied ? 'Copiado' : 'Copiar'">Copiar</span>
     </button>
   </div>
   {% if hint %}<p class="field-hint">{{ hint }}</p>{% endif %}

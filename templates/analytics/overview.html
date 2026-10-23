@@ -11,14 +11,14 @@ flow list already answers "what exists"; this page answers "what has been
 running", and a page of zeroes answers neither.
 {% endcomment %}
 
-{% block title %}Insights · BrightBean Chat{% endblock %}
+{% block title %}Análises · BrightBean Chat{% endblock %}
 
 {% block page_header %}
 <div class="page-header max-w-[1060px]">
     <div class="page-header-text">
-        <h1 class="page-title">Insights</h1>
+        <h1 class="page-title">Análises</h1>
         <p class="page-lede">
-            How each flow did, step by step, and how each connected account is delivering.
+            Veja o desempenho de cada fluxo, etapa por etapa, e a entrega de cada conta conectada.
         </p>
     </div>
     <div class="page-header-actions">{% include "analytics/_range.html" %}</div>
@@ -33,27 +33,27 @@ running", and a page of zeroes answers neither.
   Failures carry the red dot only when there are some.
 {% endcomment %}
 <div class="summary-cards mb-5">
-    <div class="summary-card"><span class="dot dot-neutral" aria-hidden="true"></span><span class="summary-card-value">{{ totals.sent }}</span><span class="summary-card-label">sent</span></div>
-    <div class="summary-card"><span class="dot dot-success" aria-hidden="true"></span><span class="summary-card-value">{{ totals.delivered }}</span><span class="summary-card-label">delivered</span></div>
-    <div class="summary-card"><span class="dot {% if totals.failed %}dot-error{% else %}dot-neutral{% endif %}" aria-hidden="true"></span><span class="summary-card-value">{{ totals.failed }}</span><span class="summary-card-label">failed</span></div>
-    <div class="summary-card"><span class="dot dot-info" aria-hidden="true"></span><span class="summary-card-value">{{ totals.clicked }}</span><span class="summary-card-label">clicked{% if click_rate is not None %} · {{ click_rate|floatformat:1 }}% of sends{% endif %}</span></div>
+    <div class="summary-card"><span class="dot dot-neutral" aria-hidden="true"></span><span class="summary-card-value">{{ totals.sent }}</span><span class="summary-card-label">enviadas</span></div>
+    <div class="summary-card"><span class="dot dot-success" aria-hidden="true"></span><span class="summary-card-value">{{ totals.delivered }}</span><span class="summary-card-label">entregues</span></div>
+    <div class="summary-card"><span class="dot {% if totals.failed %}dot-error{% else %}dot-neutral{% endif %}" aria-hidden="true"></span><span class="summary-card-value">{{ totals.failed }}</span><span class="summary-card-label">com falha</span></div>
+    <div class="summary-card"><span class="dot dot-info" aria-hidden="true"></span><span class="summary-card-value">{{ totals.clicked }}</span><span class="summary-card-label">cliques{% if click_rate is not None %} · {{ click_rate|floatformat:1 }}% dos envios{% endif %}</span></div>
 </div>
 
 <div class="an-panel" style="margin-top: 0;">
     <div class="an-panel-head">
-        <span class="an-panel-title">Flows</span>
-        <span class="an-hint">Counted when the message actually leaves, not when the step runs.</span>
+        <span class="an-panel-title">Fluxos</span>
+        <span class="an-hint">Contabilizados quando a mensagem é realmente enviada, não quando a etapa é executada.</span>
     </div>
     {% if flow_rows %}
     <div style="overflow-x: auto;">
         <table class="an-table">
             <thead>
                 <tr>
-                    <th scope="col">Flow</th>
-                    <th scope="col" class="an-num">Sent</th>
-                    <th scope="col" class="an-num">Delivered</th>
-                    <th scope="col" class="an-num">Failed</th>
-                    <th scope="col" class="an-num">Clicked</th>
+                    <th scope="col">Fluxo</th>
+                    <th scope="col" class="an-num">Enviadas</th>
+                    <th scope="col" class="an-num">Entregues</th>
+                    <th scope="col" class="an-num">Com falha</th>
+                    <th scope="col" class="an-num">Cliques</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,7 +61,7 @@ running", and a page of zeroes answers neither.
                 <tr>
                     <td>
                         <a href="{% url 'analytics:flow_detail' workspace_id=request.workspace.id flow_id=row.flow.id %}?days={{ days }}">{{ row.flow.name }}</a>
-                        <span class="status-pill status-pill-{{ row.flow.status }}"><span class="status-pill-dot" aria-hidden="true"></span>{% if row.flow.status == "active" %}Live{% else %}{{ row.flow.get_status_display }}{% endif %}</span>
+                        <span class="status-pill status-pill-{{ row.flow.status }}"><span class="status-pill-dot" aria-hidden="true"></span>{% if row.flow.status == "active" %}Ativo{% else %}{{ row.flow.get_status_display }}{% endif %}</span>
                     </td>
                     <td class="an-num">{{ row.sent }}</td>
                     <td class="an-num">{{ row.delivered }}</td>
@@ -73,26 +73,26 @@ running", and a page of zeroes answers neither.
         </table>
     </div>
     {% else %}
-    <p class="an-hint">No flow has sent anything in this range.</p>
+    <p class="an-hint">Nenhum fluxo enviou mensagens neste período.</p>
     {% endif %}
 </div>
 
 <div class="an-panel">
     <div class="an-panel-head">
-        <span class="an-panel-title">Deliverability</span>
-        <span class="an-hint">Every outbound message on each connection, including agent replies and API sends.</span>
+        <span class="an-panel-title">Entregabilidade</span>
+        <span class="an-hint">Todas as mensagens enviadas por cada conexão, incluindo respostas dos atendentes e envios pela API.</span>
     </div>
     {% if connections %}
     <div style="overflow-x: auto;">
         <table class="an-table">
             <thead>
                 <tr>
-                    <th scope="col">Connection</th>
-                    <th scope="col" class="an-num">Messages</th>
-                    <th scope="col" class="an-num">Sent</th>
-                    <th scope="col" class="an-num">Delivered</th>
-                    <th scope="col" class="an-num">Failed</th>
-                    <th scope="col" class="an-num">Delivery rate</th>
+                    <th scope="col">Conexão</th>
+                    <th scope="col" class="an-num">Mensagens</th>
+                    <th scope="col" class="an-num">Enviadas</th>
+                    <th scope="col" class="an-num">Entregues</th>
+                    <th scope="col" class="an-num">Com falha</th>
+                    <th scope="col" class="an-num">Taxa de entrega</th>
                 </tr>
             </thead>
             <tbody>
@@ -113,14 +113,14 @@ running", and a page of zeroes answers neither.
                       webhook) legitimately sits at 0% — the column says
                       "delivered", not "arrived".
                     {% endcomment %}
-                    <td class="an-num">{% if row.delivery_rate is not None %}{{ row.delivery_rate }}%{% else %}<span class="an-muted">N/A</span>{% endif %}</td>
+                    <td class="an-num">{% if row.delivery_rate is not None %}{{ row.delivery_rate }}%{% else %}<span class="an-muted">N/D</span>{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <p class="an-hint">Nothing has been sent from this workspace in this range.</p>
+    <p class="an-hint">Nenhuma mensagem foi enviada deste espaço de trabalho neste período.</p>
     {% endif %}
 </div>
 </div>

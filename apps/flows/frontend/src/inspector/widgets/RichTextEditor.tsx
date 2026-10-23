@@ -76,16 +76,16 @@ interface Command {
 }
 
 const COMMANDS: Command[] = [
-  { label: "B", title: "Bold", run: (exec) => exec("bold") },
-  { label: "I", title: "Italic", run: (exec) => exec("italic") },
-  { label: "U", title: "Underline", run: (exec) => exec("underline") },
-  { label: "H", title: "Heading", run: (exec) => exec("formatBlock", "<h2>") },
-  { label: "¶", title: "Paragraph", run: (exec) => exec("formatBlock", "<p>") },
-  { label: "• List", title: "Bulleted list", run: (exec) => exec("insertUnorderedList") },
-  { label: "1. List", title: "Numbered list", run: (exec) => exec("insertOrderedList") },
-  { label: "❝", title: "Quote", run: (exec) => exec("formatBlock", "<blockquote>") },
-  { label: "―", title: "Divider", run: (exec) => exec("insertHorizontalRule") },
-  { label: "Clear", title: "Remove formatting", run: (exec) => exec("removeFormat") },
+  { label: "B", title: "Negrito", run: (exec) => exec("bold") },
+  { label: "I", title: "Itálico", run: (exec) => exec("italic") },
+  { label: "U", title: "Sublinhado", run: (exec) => exec("underline") },
+  { label: "H", title: "Título", run: (exec) => exec("formatBlock", "<h2>") },
+  { label: "¶", title: "Parágrafo", run: (exec) => exec("formatBlock", "<p>") },
+  { label: "• Lista", title: "Lista com marcadores", run: (exec) => exec("insertUnorderedList") },
+  { label: "1. Lista", title: "Lista numerada", run: (exec) => exec("insertOrderedList") },
+  { label: "❝", title: "Citação", run: (exec) => exec("formatBlock", "<blockquote>") },
+  { label: "―", title: "Separador", run: (exec) => exec("insertHorizontalRule") },
+  { label: "Limpar", title: "Remover formatação", run: (exec) => exec("removeFormat") },
 ];
 
 /**
@@ -244,7 +244,7 @@ export function RichTextEditor(props: FieldProps) {
   );
 
   const link = useCallback(() => {
-    const url = window.prompt("Link to which URL?");
+    const url = window.prompt("Qual é o URL do link?");
     if (url && SAFE_SCHEME.test(url.trim())) {
       exec("createLink", url.trim());
     }
@@ -266,7 +266,7 @@ export function RichTextEditor(props: FieldProps) {
 
   return (
     <FieldShell {...props}>
-      <div className="fb-subgroup" role="toolbar" aria-label="Formatting">
+      <div className="fb-subgroup" role="toolbar" aria-label="Formatação">
         {COMMANDS.map((command) => (
           <button
             key={command.label}
@@ -289,7 +289,7 @@ export function RichTextEditor(props: FieldProps) {
         <button
           type="button"
           className="fb-palette-item"
-          title="Link"
+          title="Inserir link"
           disabled={readOnly}
           onMouseDown={(event) => {
             event.preventDefault();
@@ -301,10 +301,10 @@ export function RichTextEditor(props: FieldProps) {
         <button
           type="button"
           className="fb-palette-item"
-          title="Insert a contact field"
+          title="Inserir campo de contato"
           // An explicit label because the visible text is punctuation: without
           // it a screen reader announces "brace brace".
-          aria-label="Insert a contact field"
+          aria-label="Inserir campo de contato"
           disabled={readOnly}
           onClick={() => setTokensOpen((open) => !open)}
         >
@@ -313,17 +313,17 @@ export function RichTextEditor(props: FieldProps) {
         <button
           type="button"
           className="fb-palette-item"
-          title="Edit the HTML directly"
-          aria-label="Edit the HTML directly"
+          title="Editar HTML diretamente"
+          aria-label="Editar HTML diretamente"
           aria-pressed={source}
           onClick={() => setSource((on) => !on)}
         >
-          Source
+          Código-fonte
         </button>
       </div>
 
       {tokensOpen && !readOnly ? (
-        <div className="fb-subgroup" role="listbox" aria-label="Insert a placeholder">
+        <div className="fb-subgroup" role="listbox" aria-label="Inserir variável">
           {tokens.map((token) => (
             <button
               key={token}
@@ -367,15 +367,15 @@ export function RichTextEditor(props: FieldProps) {
           suppressContentEditableWarning
           role="textbox"
           aria-multiline="true"
-          aria-label="Email body"
+          aria-label="Corpo do e-mail"
           onInput={onInput}
           onBlur={onBlur}
           onPaste={onPaste}
         />
       )}
       <p className="fb-field-help">
-        Formatting, links and images. Use the <code>{"{{ }}"}</code> button to insert a contact field;
-        values are escaped when the email is built.
+        Formatação, links e imagens. Use o botão <code>{"{{ }}"}</code> para inserir um campo de contato;
+        os valores são escapados ao criar o e-mail.
       </p>
     </FieldShell>
   );

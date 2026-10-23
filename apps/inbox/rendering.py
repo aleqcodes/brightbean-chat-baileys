@@ -62,6 +62,7 @@ from typing import Any
 
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 from django.utils.timesince import timeuntil
 
 from apps.common.validators import is_renderable_url, is_valid_hex_color
@@ -100,8 +101,8 @@ _MEDIA_KINDS = frozenset({"image", "audio", "video", "file"})
 
 #: What a retracted message says in the thread and in the list. Copy, written
 #: here, never anything derived from the payload — there is no payload left.
-DELETED_REASON = "This message was deleted."
-DELETED_PREVIEW = "[deleted]"
+DELETED_REASON = "Esta mensagem foi excluída."
+DELETED_PREVIEW = "[excluída]"
 
 #: How much of a message the conversation list shows. Inbound text is capped at
 #: ``ingest.MAX_TEXT_CHARS`` (100k), so a list of a hundred rows would otherwise
@@ -133,7 +134,7 @@ class Image:
         two branches without this quietly demoted every image's alt text to the
         weaker of the two.
         """
-        return "Attached image"
+        return "Imagem anexada"
 
 
 @dataclass(frozen=True)
@@ -170,7 +171,7 @@ class Media:
         platform named, and an alt that promised "image" for the second case
         would be describing a guess.
         """
-        return "Attachment"
+        return "Anexo"
 
 
 @dataclass(frozen=True)
@@ -379,7 +380,7 @@ def render_message(message: Message) -> RenderedMessage:
         # is not withdrawn by rendering it differently.
         parts = [Tombstone(reason=DELETED_REASON)]
     elif not parts:
-        parts.append(Tombstone(reason="This message has no displayable content."))
+        parts.append(Tombstone(reason="Esta mensagem não tem conteúdo que possa ser exibido."))
     return RenderedMessage(
         message=message,
         parts=tuple(parts),
@@ -453,19 +454,20 @@ def preview_of_body(raw: Any) -> str:
             # platform-hosted attachment of that kind would get, so a list row
             # does not read differently depending on which field carried it.
             declared = _text(item.get("media_kind"))
-            fallback = f"[{declared}]" if declared in _MEDIA_KINDS else "[attachment]"
+            fallback = f"[{_MEDIA_LABELS.get(declared, 'anexo')}]" if declared in _MEDIA_KINDS else "[anexo]"
         elif not fallback and (kind in _MEDIA_KINDS or kind in ("card", "gallery")):
-            fallback = f"[{kind}]"
+            label = _MEDIA_LABELS.get(kind, {"card": "cartão", "gallery": "galeria"}.get(kind, "conteúdo"))
+            fallback = f"[{label}]"
     return fallback
 
 
 def _part(item: Any, index: int, message: Message) -> Part:
     if not isinstance(item, dict):
-        return Tombstone(reason="Unreadable content.")
+        return Tombstone(reason="Conteúdo ilegível.")
     kind = _text(item.get("type"))
     if kind == "text":
         text = _text(item.get("text"))
-        return Text(text=text) if text else Tombstone(reason="Empty message.")
+        return Text(text=text) if text else Tombstone(reason="Mensagem vazia.")
     if kind == "media":
         return _media_ref(item, index, message)
     if kind in _MEDIA_KINDS:
@@ -479,8 +481,8 @@ def _part(item: Any, index: int, message: Message) -> Part:
             if isinstance(cards, list)
             else ()
         )
-        return Gallery(cards=rendered) if rendered else Tombstone(reason="Empty gallery.")
-    return Tombstone(reason="Unsupported content.")
+        return Gallery(cards=rendered) if rendered else Tombstone(reason="Galeria vazia.")
+    return Tombstone(reason="Conteúdo não compatível.")
 
 
 def _media(kind: str, item: dict[str, Any]) -> Part:
@@ -489,10 +491,11 @@ def _media(kind: str, item: dict[str, Any]) -> Part:
     if not is_renderable_url(url):
         # Deliberately does not echo the URL: the reason line is copy, and the
         # rejected value is the payload we just refused to hand the browser.
-        return Tombstone(reason=f"An attachment was hidden because its address is not a web link ({kind}).")
+        label = _MEDIA_LABELS.get(kind, kind)
+        return Tombstone(reason=f"Um anexo foi ocultado porque o endereço não é um link da web ({label}).")
     if kind == "image":
         return Image(url=url, caption=caption)
-    return Link(url=url, media_kind=kind, caption=caption)
+    return Link(url=url, media_kind=_MEDIA_LABELS.get(kind, kind), caption=caption)
 
 
 def _media_ref(item: dict[str, Any], index: int, message: Message) -> Part:
@@ -508,7 +511,7 @@ def _media_ref(item: dict[str, Any], index: int, message: Message) -> Part:
     written once, rather than a second vocabulary for the proxied case.
     """
     if not _text(item.get("media_id")):
-        return Tombstone(reason="An attachment was recorded without an identifier.")
+        return Tombstone(reason="Um anexo foi registrado sem identificador.")
     try:
         url = reverse(
             "inbox:media",
@@ -522,12 +525,12 @@ def _media_ref(item: dict[str, Any], index: int, message: Message) -> Part:
     except NoReverseMatch:
         # Unreachable while the route exists, and a tombstone rather than a
         # raise regardless: this module's contract is that a thread renders.
-        return Tombstone(reason="An attachment could not be linked.")
+        return Tombstone(reason="Não foi possível criar um link para o anexo.")
 
     caption = _text(item.get("caption"))
     kind = _text(item.get("media_kind"))
     if kind in _MEDIA_KINDS and kind != "image":
-        return Link(url=url, media_kind=kind, caption=caption)
+        return Link(url=url, media_kind=_MEDIA_LABELS[kind], caption=caption)
     # "image", and also "" — a platform that did not say. An <img> is the right
     # bet for the unknown case: it is what the overwhelming majority of inbound
     # media is, and when it loses the alt text shows inside a link that still
@@ -615,7 +618,7 @@ def failed_scheduled_reply(reply: Any) -> FailedScheduledReply:
         id=str(reply.pk),
         preview=preview_of_body(reply.body),
         due_at=reply.send_at,
-        reason=describe_inbox_failure(reply.error) if reply.error else "It could not be sent.",
+        reason=describe_inbox_failure(reply.error) if reply.error else "Não foi possível enviar.",
     )
 
 
@@ -641,20 +644,23 @@ def rule_summary(rule: Any, *, labels: Any, members: Any, connections: Any) -> R
     platform_labels = dict(Platform.choices)
     platforms = [str(platform_labels.get(value, value)) for value in channel.get("platforms") or []]
     if platforms:
-        conditions.append("Channel is " + _joined(platforms))
+        conditions.append("Canal: " + _joined(platforms))
     names = [connections.get(str(value), _MISSING) for value in channel.get("connection_ids") or []]
     if names:
-        conditions.append("Connection is " + _joined(names))
+        conditions.append("Conexão: " + _joined(names))
 
     words = [str(item.get("text", "")) for item in document.get("keywords") or [] if isinstance(item, dict)]
     if words:
-        conditions.append("Message mentions " + _joined(words))
+        conditions.append("Mensagem menciona " + _joined(words))
 
     contact = document.get("contact")
     if isinstance(contact, dict) and contact.get("rules"):
         count = len(contact["rules"])
-        mode = "all" if contact.get("match", "all") == "all" else "any"
-        conditions.append(f"Contact matches {mode} of {count} condition{'' if count == 1 else 's'}")
+        if count == 1:
+            conditions.append("Contato atende à condição")
+        else:
+            mode = "todas as" if contact.get("match", "all") == "all" else "qualquer uma das"
+            conditions.append(f"Contato atende a {mode} {count} condições")
 
     actions: list[str] = []
     for item in rule.actions_json if isinstance(rule.actions_json, list) else []:
@@ -662,11 +668,11 @@ def rule_summary(rule: Any, *, labels: Any, members: Any, connections: Any) -> R
             continue
         kind = item.get("type")
         if kind == "add_label":
-            actions.append("Add label " + labels.get(str(item.get("label_id")), _MISSING))
+            actions.append("Adicionar etiqueta " + labels.get(str(item.get("label_id")), _MISSING))
         elif kind == "assign_to_member":
-            actions.append("Assign to " + members.get(str(item.get("user_id")), _MISSING))
+            actions.append("Atribuir a " + members.get(str(item.get("user_id")), _MISSING))
         elif kind == "mark_done":
-            actions.append("Mark done")
+            actions.append("Marcar como concluído")
 
     return RuleSummary(
         id=str(rule.pk),
@@ -680,20 +686,28 @@ def rule_summary(rule: Any, *, labels: Any, members: Any, connections: Any) -> R
 
 #: What a rule prints for an id that no longer resolves. Copy, like
 #: :attr:`Tombstone.reason`, and never the id itself.
-_MISSING = "(deleted)"
+_MISSING = "(excluído)"
+
+
+_MEDIA_LABELS = {
+    "image": "imagem",
+    "audio": "áudio",
+    "video": "vídeo",
+    "file": "arquivo",
+}
 
 
 def _joined(values: list[str]) -> str:
-    """ "a, b or c" — the reader's conjunction, since every list here is an OR."""
+    """Une valores de condição, que podem ser combinados com OU."""
     if len(values) == 1:
         return values[0]
-    return ", ".join(values[:-1]) + " or " + values[-1]
+    return ", ".join(values[:-1]) + " ou " + values[-1]
 
 
 def _display_name(user: Any) -> str:
     if user is None:
-        return "someone who has left"
-    return getattr(user, "display_name", "") or getattr(user, "email", "") or "a teammate"
+        return "alguém que saiu"
+    return getattr(user, "display_name", "") or getattr(user, "email", "") or "alguém da equipe"
 
 
 def short_age(when: datetime | None, *, now: datetime | None = None) -> str:
@@ -713,26 +727,24 @@ def short_age(when: datetime | None, *, now: datetime | None = None) -> str:
     now = now or timezone.now()
     delta = now - when
     if delta < timedelta(minutes=1):
-        return "now"
+        return "agora"
     if delta < timedelta(hours=1):
-        return f"{int(delta.total_seconds() // 60)}m"
+        return f"{int(delta.total_seconds() // 60)} min"
     local_now, local_then = timezone.localtime(now), timezone.localtime(when)
     days = (local_now.date() - local_then.date()).days
     if days == 0:
         return f"{int(delta.total_seconds() // 3600)}h"
     if days == 1:
-        return "Yesterday"
+        return "Ontem"
     if days < 7:
-        return local_then.strftime("%a")
+        return date_format(local_then, "D")
     if local_then.year == local_now.year:
-        return f"{local_then.day} {local_then.strftime('%b')}"
-    return f"{local_then.day} {local_then.strftime('%b %Y')}"
+        return date_format(local_then, "j M")
+    return date_format(local_then, "j M Y")
 
 
 def time_left(until: datetime | None, *, now: datetime | None = None) -> str:
-    """ "3h 12m", "45m" — what is left of a messaging window, or "" once it has
-    closed. Minutes are the finest grain on purpose: the thread's ETag folds
-    this string in, so a finer one would re-render the pane every poll."""
+    """Retorna o tempo restante de uma janela de mensagens, ou vazio após fechar."""
     if until is None:
         return ""
     seconds = int((until - (now or timezone.now())).total_seconds())
@@ -742,21 +754,18 @@ def time_left(until: datetime | None, *, now: datetime | None = None) -> str:
     if hours >= 24:
         return f"{hours // 24}d {hours % 24}h"
     if hours:
-        return f"{hours}h {minutes}m"
-    return f"{max(minutes, 1)}m"
+        return f"{hours}h {minutes} min"
+    return f"{max(minutes, 1)} min"
 
 
 def day_label(when: datetime, *, now: datetime | None = None) -> str:
-    """The divider above a day's messages: "Today", "Yesterday", "Mon 6 Oct",
-    or "6 Oct 2025" for another year. In the reader's time zone, because that is
-    whose "today" it is. The thread's ETag folds in today's date so the words
-    roll over at midnight."""
+    """Rótulo do divisor de data, no fuso horário de quem lê a conversa."""
     local_now, local_then = timezone.localtime(now or timezone.now()), timezone.localtime(when)
     days = (local_now.date() - local_then.date()).days
     if days == 0:
-        return "Today"
+        return "Hoje"
     if days == 1:
-        return "Yesterday"
+        return "Ontem"
     if local_then.year == local_now.year:
-        return f"{local_then.strftime('%a')} {local_then.day} {local_then.strftime('%b')}"
-    return f"{local_then.day} {local_then.strftime('%b %Y')}"
+        return date_format(local_then, "D j M")
+    return date_format(local_then, "j M Y")

@@ -17,17 +17,17 @@ code, never a provider's own text.
   <ul class="ib-deferred">
     {% for reminder in pending_reminders %}
       <li class="ib-deferred-item">
-        <span class="ib-chip">Reminder</span>
+        <span class="ib-chip">Lembrete</span>
         <span>
-          {% if reminder.is_mine %}You{% else %}{{ reminder.who }}{% endif %}
-          {{ reminder.due_in }} from now{% if reminder.note %} · {{ reminder.note }}{% endif %}
+          {% if reminder.is_mine %}Você{% else %}{{ reminder.who }}{% endif %}
+          {{ reminder.due_in }} a partir de agora{% if reminder.note %} · {{ reminder.note }}{% endif %}
         </span>
         {% if can_reply %}
           <form class="ml-auto"
                 hx-post="{% url 'inbox:cancel_reminder' workspace_id=request.workspace.id conversation_id=conversation.id reminder_id=reminder.id %}"
                 hx-swap="none">
             {% csrf_token %}
-            <button type="submit" class="btn-link btn-inline">Cancel</button>
+            <button type="submit" class="btn-link btn-inline">Cancelar</button>
           </form>
         {% endif %}
       </li>
@@ -35,14 +35,14 @@ code, never a provider's own text.
 
     {% for reply in pending_replies %}
       <li class="ib-deferred-item">
-        <span class="ib-chip">Scheduled</span>
-        <span>Sending {{ reply.due_in }} from now · {{ reply.preview }}</span>
+      <span class="ib-chip">Agendada</span>
+        <span>Envio em {{ reply.due_in }} · {{ reply.preview }}</span>
         {% if can_reply %}
           <form class="ml-auto"
                 hx-post="{% url 'inbox:cancel_scheduled_reply' workspace_id=request.workspace.id conversation_id=conversation.id scheduled_reply_id=reply.id %}"
                 hx-swap="none">
             {% csrf_token %}
-            <button type="submit" class="btn-link btn-inline">Cancel</button>
+            <button type="submit" class="btn-link btn-inline">Cancelar</button>
           </form>
         {% endif %}
       </li>
@@ -50,14 +50,14 @@ code, never a provider's own text.
 
     {% for reply in failed_replies %}
       <li class="ib-deferred-item ib-deferred-failed">
-        <span class="ib-chip">Not sent</span>
+        <span class="ib-chip">Não enviada</span>
         <span>{{ reply.reason }} · {{ reply.preview }}</span>
         {% if can_reply %}
           <form class="ml-auto"
                 hx-post="{% url 'inbox:cancel_scheduled_reply' workspace_id=request.workspace.id conversation_id=conversation.id scheduled_reply_id=reply.id %}"
                 hx-swap="none">
             {% csrf_token %}
-            <button type="submit" class="btn-link btn-inline">Dismiss</button>
+            <button type="submit" class="btn-link btn-inline">Dispensar</button>
           </form>
         {% endif %}
       </li>

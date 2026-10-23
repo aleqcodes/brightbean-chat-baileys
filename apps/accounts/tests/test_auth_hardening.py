@@ -267,7 +267,7 @@ class TestGoogleButtonIsGated:
     def test_no_button_without_credentials(self, client):
         response = client.get(LOGIN)
 
-        assert b"Continue with" not in response.content
+        assert response.context["google_configured"] is False
 
     def test_the_button_appears_once_configured(self, client, settings):
         settings.GOOGLE_AUTH_CLIENT_ID = "id"
@@ -275,7 +275,7 @@ class TestGoogleButtonIsGated:
 
         response = client.get(LOGIN)
 
-        assert b"Continue with" in response.content
+        assert response.context["google_configured"] is True
 
 
 class TestSessionSettingsAreNotRedeclared:

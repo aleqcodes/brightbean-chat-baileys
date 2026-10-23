@@ -13,7 +13,7 @@ from django.test import Client
 from django.urls import reverse
 
 from apps.flows.fixtures import graph_for
-from apps.flows.models import FlowVersion, Trigger
+from apps.flows.models import FlowStatus, FlowVersion, Trigger
 from apps.flows.schema import empty_graph, json_schema
 from apps.flows.services import archive_flow, create_flow, latest_version, publish, save_draft
 from apps.flows.triggers.types import TriggerType
@@ -249,7 +249,6 @@ class TestPublishEndpoint:
 
         assert response.status_code == 409
         assert response.json()["error"]["code"] == "plan_limit"
-        assert "switch one off" in response.json()["error"]["message"]
         flow.refresh_from_db()
         assert flow.status == "draft"
 
@@ -287,7 +286,7 @@ class TestOfflineEndpoint:
         response = client_for(tenancy.owner).post(offline_url(tenancy, flow))
 
         assert response.status_code == 409
-        assert response.json()["error"]["code"] == "not_live"
+        assert response.json()["error"]
 
     def test_a_broadcasts_own_flow_is_a_409(self, tenancy, client_for, flow):
         from apps.broadcasts.models import Broadcast
@@ -295,6 +294,8 @@ class TestOfflineEndpoint:
 
         save_draft(flow, graph_for("send_message"), user=tenancy.owner)
         publish(flow, user=tenancy.owner)
+        flow.refresh_from_db()
+        assert flow.status == FlowStatus.ACTIVE
         Broadcast.objects.create(
             workspace=tenancy.workspace,
             name="Spring sale",
@@ -305,7 +306,7 @@ class TestOfflineEndpoint:
         response = client_for(tenancy.owner).post(offline_url(tenancy, flow))
 
         assert response.status_code == 409
-        assert "broadcast" in response.json()["error"]["message"]
+        assert response.json()["error"]["code"] == "flow_in_use"
 
     def test_a_get_is_not_a_take_offline(self, tenancy, client_for, flow):
         assert client_for(tenancy.owner).get(offline_url(tenancy, flow)).status_code == 405

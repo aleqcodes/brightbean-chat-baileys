@@ -259,7 +259,7 @@ def _oauth_token(form: dict[str, str]) -> str:
     )
     token = body.get("access_token")
     if not isinstance(token, str) or not token:
-        raise APIError("Facebook returned no access token")
+        raise APIError("O Facebook não retornou um token de acesso")
     return token
 
 

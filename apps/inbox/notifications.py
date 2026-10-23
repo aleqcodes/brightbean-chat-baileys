@@ -27,10 +27,10 @@ EVENT_SCHEDULED_REPLY_FAILED = "scheduled_reply_failed"
 register_event(
     NotificationEvent(
         key=EVENT_SCHEDULED_REPLY_FAILED,
-        label="Scheduled reply failed",
+        label="Falha no envio agendado",
         icon="inbox",
         tone="error",
-        title="Scheduled reply to {contact_name} was not sent",
+        title="A resposta para {contact_name} não foi enviada",
         body="{reason}",
         # This one **does** earn an email, unlike the reminder beside it. The
         # test ``apps/notifications/events.py`` sets is "can the recipient act on
@@ -38,7 +38,7 @@ register_event(
         # is a single event about a message the agent believed had gone out
         # hours ago. Finding out at their next login is finding out too late.
         emails_by_default=True,
-        email_subject="A scheduled reply was not sent",
+        email_subject="Uma resposta agendada não foi enviada",
         # Without the reason the notification says a send failed and nothing
         # about why, which is the sentence-with-a-hole this field exists to stop.
         required_context=("reason",),

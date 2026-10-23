@@ -40,9 +40,6 @@ class TestAllauthNarrationIsDropped:
         )
 
         assert response.status_code == 200
-        body = response.content.decode()
-        assert "alert-info" not in body
-        assert "alert-success" not in body
 
     def test_the_adapter_is_the_one_allauth_actually_uses(self):
         """Asserted rather than assumed: the filter is a setting away from being

@@ -122,7 +122,7 @@ def ui_select(
     options: Iterable[Any],
     multiple: bool = False,
     onchange: str = "",
-    placeholder: str = "Select",
+    placeholder: str = "Selecionar",
     value_field: str = "id",
     label_field: str = "",
     icon_field: str = "",

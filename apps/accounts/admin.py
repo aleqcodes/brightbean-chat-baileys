@@ -17,8 +17,8 @@ class UserAdmin(BaseUserAdmin):
 
     fieldsets = (
         (None, {"fields": ("id", "email", "password")}),
-        ("Profile", {"fields": ("name", "last_workspace_id")}),
-        ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
-        ("Dates", {"fields": ("last_login", "created_at", "updated_at")}),
+        ("Perfil", {"fields": ("name", "last_workspace_id")}),
+        ("Permissões", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+        ("Datas", {"fields": ("last_login", "created_at", "updated_at")}),
     )
     add_fieldsets = ((None, {"classes": ("wide",), "fields": ("email", "password1", "password2")}),)

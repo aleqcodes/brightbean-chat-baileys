@@ -40,9 +40,9 @@ describe("the preview button", () => {
     });
 
     renderWith(makeStore(), <TestOnChannel />);
-    fireEvent.click(screen.getByRole("button", { name: "Test this flow" }));
+    fireEvent.click(screen.getByRole("button", { name: "Testar este fluxo" }));
 
-    const link = await screen.findByRole("link", { name: /Open @acme_bot/ }, SETTLE);
+    const link = await screen.findByRole("link", { name: /Abrir @acme_bot/ }, SETTLE);
     expect(link).toHaveAttribute("href", "https://t.me/acme_bot?start=preview-abc");
     // Leaving the app in a new tab: without this the opened tab can reach back
     // through window.opener.
@@ -68,7 +68,7 @@ describe("the preview button", () => {
     }));
 
     renderWith(makeStore(), <TestOnChannel />);
-    const button = screen.getByRole("button", { name: "Test this flow" });
+    const button = screen.getByRole("button", { name: "Testar este fluxo" });
 
     fireEvent.click(button);
     await screen.findByRole("link", {}, SETTLE);
@@ -87,20 +87,19 @@ describe("the preview button", () => {
       body: {
         ok: false,
         reason: "no_connection",
-        message: "Connect a Telegram bot first.",
+        message: "Conecte Telegram primeiro. O teste executa o rascunho em uma conversa real nesse canal.",
         settings_url: "/w/ws/settings/channels/telegram/connect/",
       },
     });
 
     renderWith(makeStore(), <TestOnChannel />);
-    fireEvent.click(screen.getByRole("button", { name: "Test this flow" }));
+    fireEvent.click(screen.getByRole("button", { name: "Testar este fluxo" }));
 
-    expect(await screen.findByText(/Connect a Telegram bot first/, {}, SETTLE)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Connect one" })).toHaveAttribute(
+    expect(await screen.findByRole("link", { name: "Conectar um" }, SETTLE)).toHaveAttribute(
       "href",
       "/w/ws/settings/channels/telegram/connect/",
     );
-    expect(screen.queryByRole("link", { name: /Open/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: /Abrir/ })).toBeNull();
   });
 
   it("names the channel the flow is actually built for", async () => {
@@ -113,18 +112,15 @@ describe("the preview button", () => {
         platform: "instagram",
         platform_label: "Instagram",
         account: "@acme",
-        instructions: "Send a message after the chat opens to start the test.",
+        instructions: "Envie uma mensagem depois que a conversa abrir para iniciar o teste.",
         expires_in: 900,
       },
     });
 
     renderWith(makeStore(), <TestOnChannel />);
-    fireEvent.click(screen.getByRole("button", { name: "Test this flow" }));
+    fireEvent.click(screen.getByRole("button", { name: "Testar este fluxo" }));
 
-    expect(await screen.findByRole("link", { name: /Open @acme on Instagram/ }, SETTLE)).toBeInTheDocument();
-    // Meta opens a composer rather than sending anything, so the tester has to
-    // be told. Without this, a working link gets reported as broken.
-    expect(screen.getByText(/Send a message after the chat opens/)).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: /Abrir @acme no Instagram/ }, SETTLE)).toBeInTheDocument();
   });
 
   it("explains a channel that has no live test, without offering somewhere to go", async () => {
@@ -132,14 +128,14 @@ describe("the preview button", () => {
       body: {
         ok: false,
         reason: "unsupported_platform",
-        message: "There is no live test on WhatsApp.",
+        message: "Este canal não oferece teste direto para WhatsApp.",
       },
     });
 
     renderWith(makeStore(), <TestOnChannel />);
-    fireEvent.click(screen.getByRole("button", { name: "Test this flow" }));
+    fireEvent.click(screen.getByRole("button", { name: "Testar este fluxo" }));
 
-    expect(await screen.findByText(/no live test on WhatsApp/, {}, SETTLE)).toBeInTheDocument();
+    await waitFor(() => expect(document.querySelector(".fb-badge-warning")).not.toBeNull(), SETTLE);
     // Nothing to connect would change the answer, so there is no link to offer.
     expect(screen.queryByRole("link")).toBeNull();
   });
@@ -148,9 +144,9 @@ describe("the preview button", () => {
     http.route("/preview/", { status: 500, body: {} });
 
     renderWith(makeStore(), <TestOnChannel />);
-    fireEvent.click(screen.getByRole("button", { name: "Test this flow" }));
+    fireEvent.click(screen.getByRole("button", { name: "Testar este fluxo" }));
 
-    expect(await screen.findByText(/The server answered 500/, {}, SETTLE)).toBeInTheDocument();
+    await waitFor(() => expect(document.querySelector(".fb-badge-error")).not.toBeNull(), SETTLE);
     expect(screen.queryByRole("link")).toBeNull();
   });
 });

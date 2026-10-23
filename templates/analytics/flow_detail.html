@@ -14,21 +14,21 @@ an interpolated script body. The page's CSP is nonce-based (SECURITY-BASELINE
 this issue), so nothing here reaches a CDN.
 {% endcomment %}
 
-{% block title %}{{ flow.name }} · Analytics · BrightBean Chat{% endblock %}
+{% block title %}{{ flow.name }} · Análises · BrightBean Chat{% endblock %}
 
 {% block page_header %}
 <div class="flex flex-wrap items-start justify-between gap-3 mb-6">
     <div>
         <h1 class="page-title">{{ flow.name }}</h1>
         <p class="text-sm" style="color: var(--text-secondary);">
-            Counters for the last {{ days }} days.
+Indicadores dos últimos {{ days }} dias.
             <span class="status-pill status-pill-{{ flow.status }}">{{ flow.get_status_display }}</span>
         </p>
     </div>
     <div class="flex items-center gap-2">
         {% include "analytics/_range.html" %}
-        <a class="btn-outline btn-inline" href="{% url 'analytics:overview' workspace_id=request.workspace.id %}?days={{ days }}">All analytics</a>
-        <a class="btn-outline btn-inline" href="{% url 'flows:edit' workspace_id=request.workspace.id flow_id=flow.id %}">Open in builder</a>
+        <a class="btn-outline btn-inline" href="{% url 'analytics:overview' workspace_id=request.workspace.id %}?days={{ days }}">Todas as análises</a>
+        <a class="btn-outline btn-inline" href="{% url 'flows:edit' workspace_id=request.workspace.id flow_id=flow.id %}">Abrir no construtor</a>
     </div>
 </div>
 {% endblock %}
@@ -38,29 +38,29 @@ this issue), so nothing here reaches a CDN.
 
 <div class="an-panel">
     <div class="an-panel-head">
-        <span class="an-panel-title">Trend</span>
-        <span class="an-hint">One point per UTC day. Preview runs are not counted.</span>
+        <span class="an-panel-title">Tendência</span>
+        <span class="an-hint">Um ponto por dia UTC. Execuções de prévia não são contabilizadas.</span>
     </div>
-    <div class="an-chart"><canvas id="flow-trend" role="img" aria-label="Daily sends, deliveries, failures and clicks"></canvas></div>
+    <div class="an-chart"><canvas id="flow-trend" role="img" aria-label="Envios, entregas, falhas e cliques diários"></canvas></div>
 </div>
 
 <div class="an-panel">
     <div class="an-panel-head">
-        <span class="an-panel-title">Steps</span>
-        <span class="an-hint">A step you deleted keeps its numbers. Those messages still went out.</span>
+        <span class="an-panel-title">Etapas</span>
+        <span class="an-hint">Uma etapa excluída mantém seus números. As mensagens ainda foram enviadas.</span>
     </div>
     {% if node_rows %}
     <div style="overflow-x: auto;">
         <table class="an-table">
             <thead>
                 <tr>
-                    <th scope="col">Step</th>
-                    <th scope="col" class="an-num">Sent</th>
-                    <th scope="col" class="an-num">Delivered</th>
-                    <th scope="col" class="an-num">Failed</th>
-                    <th scope="col" class="an-num">Clicked</th>
+                    <th scope="col">Etapa</th>
+                    <th scope="col" class="an-num">Enviadas</th>
+                    <th scope="col" class="an-num">Entregues</th>
+                    <th scope="col" class="an-num">Com falha</th>
+                    <th scope="col" class="an-num">Cliques</th>
                     {# Clicks per send, not a click-through rate — it can exceed 100%. #}
-                    <th scope="col" class="an-num">Clicks/send</th>
+                    <th scope="col" class="an-num">Cliques/envio</th>
                 </tr>
             </thead>
             <tbody>
@@ -74,14 +74,14 @@ this issue), so nothing here reaches a CDN.
                     <td class="an-num">{{ row.delivered }}</td>
                     <td class="an-num">{{ row.failed }}</td>
                     <td class="an-num">{{ row.clicked }}</td>
-                    <td class="an-num">{% if row.ctr is not None %}{{ row.ctr }}%{% else %}<span class="an-muted">N/A</span>{% endif %}</td>
+                    <td class="an-num">{% if row.ctr is not None %}{{ row.ctr }}%{% else %}<span class="an-muted">N/D</span>{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% else %}
-    <p class="an-hint">This flow has not sent anything in this range.</p>
+    <p class="an-hint">Este fluxo não enviou nada neste período.</p>
     {% endif %}
 </div>
 
@@ -101,10 +101,10 @@ this issue), so nothing here reaches a CDN.
     var style = getComputedStyle(document.documentElement);
     var token = function (name, fallback) { return (style.getPropertyValue(name) || fallback).trim(); };
     var lines = [
-      { key: "sent", label: "Sent", color: token("--primary", "#F97316") },
-      { key: "delivered", label: "Delivered", color: token("--success-700", "#5F6B27") },
-      { key: "failed", label: "Failed", color: token("--error-700", "#B91C1C") },
-      { key: "clicked", label: "Clicked", color: token("--text-secondary", "#57534E") }
+      { key: "sent", label: "Enviadas", color: token("--primary", "#F97316") },
+      { key: "delivered", label: "Entregues", color: token("--success-700", "#5F6B27") },
+      { key: "failed", label: "Com falha", color: token("--error-700", "#B91C1C") },
+      { key: "clicked", label: "Cliques", color: token("--text-secondary", "#57534E") }
     ];
     new Chart(canvas, {
       type: "line",

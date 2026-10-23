@@ -232,12 +232,12 @@ def _decoded(run: ContactImport) -> io.StringIO:
         # Either way this is a run that cannot proceed, not a transient fault:
         # raising a plain OSError here would spend SPEC §15's five-attempt
         # backoff ladder re-discovering that a deleted file is still deleted.
-        raise UnusableImportError("That file is no longer available.")
+        raise UnusableImportError("Este arquivo não está mais disponível.")
     try:
         with run.file.open("rb") as handle:
             raw = handle.read()
     except (OSError, ValueError) as exc:
-        raise UnusableImportError("That file could not be read.") from exc
+        raise UnusableImportError("Não foi possível ler este arquivo.") from exc
     try:
         text = raw.decode("utf-8-sig")
     except UnicodeDecodeError:
@@ -290,9 +290,9 @@ def _reader(run: ContactImport) -> tuple[Any, list[str]]:
     try:
         header = next(reader)
     except StopIteration as exc:
-        raise UnusableImportError("That file is empty.") from exc
+        raise UnusableImportError("Este arquivo está vazio.") from exc
     if len(header) > MAX_COLUMNS:
-        raise UnusableImportError(f"That file has more than {MAX_COLUMNS} columns.")
+        raise UnusableImportError(f"Este arquivo tem mais de {MAX_COLUMNS} colunas.")
     return reader, [name.strip() for name in header]
 
 
@@ -353,7 +353,7 @@ def resolve_mapping(workspace: Any, mapping: Any, header: list[str]) -> Resolved
     produces the same answer fifty thousand times.
     """
     if not isinstance(mapping, dict):
-        raise UnusableImportError("That import has no column mapping yet.")
+        raise UnusableImportError("Este arquivo ainda não tem um mapeamento de colunas.")
 
     resolved = ResolvedMapping()
     field_ids: dict[int, UUID] = {}
@@ -367,15 +367,15 @@ def resolve_mapping(workspace: Any, mapping: Any, header: list[str]) -> Resolved
         elif target.startswith("system:"):
             name = target.removeprefix("system:")
             if name not in IMPORTABLE_SYSTEM_FIELDS:
-                raise UnusableImportError(f"{name!r} is not an importable contact field.")
+                raise UnusableImportError(f"{name!r} não é um campo de contato importável.")
             resolved.system[index] = name
         elif target.startswith("field:"):
             try:
                 field_ids[index] = UUID(target.removeprefix("field:"))
             except ValueError as exc:
-                raise UnusableImportError("That mapping names a custom field that does not exist.") from exc
+                raise UnusableImportError("Este mapeamento aponta para um campo personalizado inexistente.") from exc
         else:
-            raise UnusableImportError(f"{target!r} is not a column target.")
+            raise UnusableImportError(f"{target!r} não é um destino de coluna.")
 
     if field_ids:
         # One query for every custom field the mapping names, scoped — so
@@ -387,13 +387,13 @@ def resolve_mapping(workspace: Any, mapping: Any, header: list[str]) -> Resolved
         for index, field_id in field_ids.items():
             row = found.get(field_id)
             if row is None:
-                raise UnusableImportError("That mapping names a custom field that has been deleted.")
+                raise UnusableImportError("O campo personalizado deste mapeamento foi excluído.")
             resolved.fields[index] = row
 
     if len(set(resolved.system.values())) != len(resolved.system):
-        raise UnusableImportError("Two columns are mapped to the same contact field.")
+        raise UnusableImportError("Duas colunas estão mapeadas para o mesmo campo de contato.")
     if resolved.is_empty:
-        raise UnusableImportError("Map at least one column before importing.")
+        raise UnusableImportError("Mapeie pelo menos uma coluna antes de importar.")
     return resolved
 
 
@@ -543,12 +543,12 @@ def _run_batch(run: ContactImport, *, mode: str, offset: int) -> None:
             # the run stops. Counting it would make `total_rows` one larger than
             # the work the import pass will do, so the progress bar would stop a
             # row short of full for every capped file.
-            errors.append(RowError(number, "", f"This file has more than {max_rows:,} rows; the rest were skipped."))
+            errors.append(RowError(number, "", f"Este arquivo tem mais de {max_rows:,} linhas; as demais foram ignoradas."))
             capped = True
             break
         processed += 1
         if sum(len(cell) for cell in row) > MAX_ROW_CHARS:
-            errors.append(RowError(number, "", "That row is too long to import."))
+            errors.append(RowError(number, "", "Esta linha é longa demais para importar."))
             continue
         try:
             outcome = _apply_row(run, mapping, row, number, write=mode == MODE_IMPORT, seen=seen)
@@ -726,7 +726,7 @@ def _apply_row(
         # import, and a dry run that skipped the check would promise a clean file
         # and then report the failure only after half of it had been written.
         if len(name) > MAX_TAG_NAME_CHARS:
-            return RowError(number, TAGS_TARGET, f"A tag name is at most {MAX_TAG_NAME_CHARS} characters.")
+            return RowError(number, TAGS_TARGET, f"Cada etiqueta pode ter no máximo {MAX_TAG_NAME_CHARS} caracteres.")
 
     key = _match_key(values, mapping)
     existing = _match(run.workspace_id, values, mapping) if mapping.match_field else None
@@ -807,7 +807,7 @@ def _validate_system(values: dict[str, str], number: int) -> RowError | None:
         try:
             validate_email(email)
         except ValidationError:
-            return RowError(number, "email", "That is not an email address.")
+            return RowError(number, "email", "Este endereço de e-mail não é válido.")
     return None
 
 

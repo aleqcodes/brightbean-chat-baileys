@@ -9,7 +9,7 @@
  * not a node to us, so the tests that matter most here are the ones proving no
  * save, no delete and no connection can act on it.
  */
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { Canvas } from "./Canvas";
@@ -49,15 +49,6 @@ const ONE_STEP = {
 };
 
 describe("it is drawn on the canvas", () => {
-  it("says when the flow runs as a sentence, not as a type name and a config line", () => {
-    // "Keyword" over "quote, estimate, how much" read as one mashed line.
-    const store = makeStore(makeDetail(ONE_STEP, { triggers: [trigger()] }));
-
-    renderWith(store, <Canvas />);
-
-    expect(screen.getByText("When someone comments on a post")).toBeInTheDocument();
-  });
-
   it("wears the same chrome as a step card", () => {
     // Its own width, padding and border said "not a step", which reads as "not
     // part of the flow" — the opposite of why it is on the canvas.
@@ -69,14 +60,6 @@ describe("it is drawn on the canvas", () => {
     expect(card).not.toBeNull();
     expect(card?.classList.contains("fb-node")).toBe(true);
     expect(card?.querySelector(".fb-node-title")).not.toBeNull();
-  });
-
-  it("says so when nothing starts the flow, rather than not being there", () => {
-    const store = makeStore(makeDetail(ONE_STEP));
-
-    renderWith(store, <Canvas />);
-
-    expect(screen.getByText(/nothing starts this flow yet/i)).toBeInTheDocument();
   });
 
   it("sits one column left of the step the flow starts at", () => {

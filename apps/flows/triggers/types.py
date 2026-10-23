@@ -64,15 +64,15 @@ class TriggerType(models.TextChoices):
     complete is that L5-A and L6-A add a matcher, not a schema change.
     """
 
-    KEYWORD = "keyword", "Keyword"
-    COMMENT = "comment", "Comment"
-    STORY_MENTION = "story_mention", "Story mention"
-    STORY_REPLY = "story_reply", "Story reply"
-    FOLLOW = "follow", "New follower"
-    REF_URL = "ref_url", "Ref URL"
-    DEFAULT_REPLY = "default_reply", "Default reply"
-    WELCOME = "welcome", "Welcome"
-    RULE = "rule", "Rule"
+    KEYWORD = "keyword", "Palavra-chave"
+    COMMENT = "comment", "Comentário"
+    STORY_MENTION = "story_mention", "Menção em story"
+    STORY_REPLY = "story_reply", "Resposta ao story"
+    FOLLOW = "follow", "Novo seguidor"
+    REF_URL = "ref_url", "URL de referência"
+    DEFAULT_REPLY = "default_reply", "Resposta padrão"
+    WELCOME = "welcome", "Boas-vindas"
+    RULE = "rule", "Regra"
     API = "api", "API"
 
 

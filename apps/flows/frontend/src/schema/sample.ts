@@ -95,30 +95,30 @@ export function placeholderFor(key: string, schema: JsonSchema): string {
     return stringForPattern(schema.pattern, key);
   }
   const copy: Record<string, string> = {
-    text: "New message",
-    label: "Button",
-    question: "What is your answer?",
-    subject: "Subject",
-    html_body: "<p>Hello {{first_name}}</p>",
+    text: "Nova mensagem",
+    label: "Botão",
+    question: "Qual é a sua resposta?",
+    subject: "Assunto",
+    html_body: "<p>Olá {{first_name}}</p>",
     url: "https://example.com",
     media_url: "https://example.com/file",
-    caption: "Caption",
-    title: "Title",
-    subtitle: "Subtitle",
+    caption: "Legenda",
+    title: "Título",
+    subtitle: "Subtítulo",
     image: "https://example.com/image.png",
-    tag: "tag",
-    field: "field",
-    value: "value",
-    sequence: "sequence",
-    member: "member",
+    tag: "etiqueta",
+    field: "campo",
+    value: "valor",
+    sequence: "sequência",
+    member: "membro",
     name: "X-Example",
     json_path: "$.result",
-    target: "field",
-    key: "field",
+    target: "campo",
+    key: "campo",
     flow_id: "",
-    invalid_text: "That did not look right. Try again.",
+    invalid_text: "Não entendi. Tente novamente.",
   };
-  const candidate = copy[key] ?? "Text";
+  const candidate = copy[key] ?? "Texto";
   const max = schema.maxLength;
   const trimmed = max !== undefined && candidate.length > max ? candidate.slice(0, max) : candidate;
   // A minLength of 1 with an empty placeholder is the failure this module

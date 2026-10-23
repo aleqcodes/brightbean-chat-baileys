@@ -27,19 +27,19 @@ __all__ = ["CONDITION_SCHEMA", "CONDITION_SCHEMA_IS_VENDORED"]
 # without its internal references needing to be rewritten.
 _SPEC_11_4_SCHEMA: dict[str, Any] = {
     "type": "object",
-    "title": "Condition filter",
+    "title": "Filtro de condição",
     # Kept in step with the real one in apps.contacts.conditions, which this
     # stands in for when that app is absent. Reader-facing for the same reason:
     # the builder renders it, and which copy it came from is not the reader's
     # business. Why this file exists at all is in the module docstring.
-    "description": "Dates are whole days, in this workspace's timezone rather than the contact's.",
+    "description": "As datas são contadas em dias inteiros, no fuso horário deste espaço de trabalho, não no do contato.",
     "additionalProperties": False,
     "required": ["match", "rules"],
     "properties": {
         "match": {
             "type": "string",
             "enum": ["all", "any"],
-            "description": "Whether every rule must hold, or any one of them.",
+            "description": "Indica se todas as regras devem ser atendidas ou se basta atender a uma delas.",
         },
         "rules": {
             "type": "array",
@@ -59,17 +59,17 @@ _SPEC_11_4_SCHEMA: dict[str, Any] = {
                         "type": "string",
                         "maxLength": 200,
                         "description": (
-                            "What the rule is about: a tag name, a custom-field name, a system field, "
-                            "a segment id. Omitted for sources that need no key, such as window."
+                            "O campo ao qual a regra se aplica: nome de etiqueta ou campo personalizado, campo do sistema "
+                            "ou identificador de segmento. Fontes que não precisam de campo, como janela, o omitem."
                         ),
                     },
                     "op": {
                         "type": "string",
                         "description": (
-                            "Operators by value type. Text: is, is_not, contains, has_value, no_value; "
-                            "number: =, !=, >, <, >=, <=; date/datetime: before, after, on, days_ago, "
-                            "days_from_now; boolean: is; tag: has, has_not; sequence: subscribed, "
-                            "not_subscribed; window: inside, outside."
+                            "Operadores por tipo de valor. Texto: is, is_not, contains, has_value, no_value; "
+                            "número: =, !=, >, <, >=, <=; data e hora: before, after, on, days_ago, "
+                            "days_from_now; booleano: is; etiqueta: has, has_not; sequência: subscribed, "
+                            "not_subscribed; janela: inside, outside."
                         ),
                         "enum": [
                             "is",
@@ -98,7 +98,7 @@ _SPEC_11_4_SCHEMA: dict[str, Any] = {
                     },
                     "value": {
                         "type": ["string", "number", "boolean", "null"],
-                        "description": "Absent for the operators that take no operand (has_value, no_value, has).",
+                        "description": "Ausente nos operadores que não recebem um valor (has_value, no_value, has).",
                     },
                 },
             },

@@ -20,7 +20,7 @@ pi-unknown, which is visible.
 Full setup notes live in docs/channels/telegram.md — a note to ourselves, so it
 stays in here rather than on the page.
 {% endcomment %}
-{% block title %}Connect Telegram · BrightBean Chat{% endblock %}
+{% block title %}Conectar Telegram · BrightBean Chat{% endblock %}
 {% block content_wrap %}{% endblock %}
 
 {% block content %}
@@ -30,11 +30,11 @@ stays in here rather than on the page.
     <div class="flex items-start gap-4 mb-7">
         <span class="pi-chip pi-chip-hero {{ platform_key|platform_class }}">{% include "partials/_platform_icon.html" with platform=platform_key size="lg" only %}</span>
         <div class="min-w-0">
-            <h1 class="page-title">Connect a Telegram bot</h1>
+            <h1 class="page-title">Conectar um bot do Telegram</h1>
             <p class="page-lede mt-1.5">
-                Telegram bots are created by talking to BotFather. The token it gives you is the
-                whole credential: anyone holding it can read and send as your bot, so it is stored
-                encrypted and never shown again.
+                Os bots do Telegram são criados conversando com o BotFather. O token fornecido é a
+                credencial completa: quem tiver acesso a ele poderá ler e enviar mensagens como seu bot.
+                Por isso, ele é armazenado criptografado e nunca é exibido novamente.
             </p>
         </div>
     </div>
@@ -47,17 +47,17 @@ stays in here rather than on the page.
     {% if error %}<div class="alert-error">{{ error }}</div>{% endif %}
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-4">Before you paste</h2>
+        <h2 class="section-title mb-4">Antes de colar o token</h2>
         <ol class="cn-steps" role="list">
-            <li class="cn-step">Open <code>@BotFather</code> in Telegram and send <code>/newbot</code>.</li>
-            <li class="cn-step">Choose a display name and a username ending in <code>bot</code>.</li>
-            <li class="cn-step">Copy the token it replies with. It looks like <code>123456789:AA…</code>.</li>
+            <li class="cn-step">Abra <code>@BotFather</code> no Telegram e envie <code>/newbot</code>.</li>
+            <li class="cn-step">Escolha um nome de exibição e um nome de usuário terminado em <code>bot</code>.</li>
+            <li class="cn-step">Copie o token recebido. Ele se parece com <code>123456789:AA…</code>.</li>
         </ol>
     </section>
 
     <form class="card p-6 mb-5" method="post">
         {% csrf_token %}
-        <h2 class="section-title mb-4">Paste the token</h2>
+        <h2 class="section-title mb-4">Cole o token</h2>
         <div class="field">
             <label class="field-label" for="bot_token">Bot token</label>
             {% comment %}
@@ -67,26 +67,26 @@ stays in here rather than on the page.
             and there never will be.
             {% endcomment %}
             <input class="form-input-styled" type="password" id="bot_token" name="bot_token" autocomplete="off" spellcheck="false" required>
-            <p class="field-hint">Pasted once. We verify it with Telegram before saving anything.</p>
+            <p class="field-hint">Informado uma vez. Validaremos com o Telegram antes de salvar.</p>
         </div>
         <div class="form-actions">
-            <button type="submit" class="btn-pill-primary">Connect</button>
+            <button type="submit" class="btn-pill-primary">Conectar</button>
         </div>
     </form>
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-3">What happens next</h2>
+        <h2 class="section-title mb-3">O que acontece depois</h2>
         <p class="section-note mb-4">
-            We call <code>getMe</code> to check the token and learn your bot's username, then point
-            Telegram at this deployment with <code>setWebhook</code> and a secret only the two of us
-            know.
+            Chamamos <code>getMe</code> para validar o token e identificar o nome de usuário do bot.
+            Depois, configuramos o Telegram para enviar dados a esta instalação usando <code>setWebhook</code>
+            e um segredo conhecido somente por nós.
         </p>
-        {% include "partials/_copy_field.html" with label="Deliveries arrive at" value=webhook_url hint="That URL has to be reachable from the public internet over HTTPS with a valid certificate. Telegram will not deliver to anything else. On a local machine, put a tunnel in front of it first. Full setup notes are in docs/channels/telegram.md." only %}
+        {% include "partials/_copy_field.html" with label="Endereço de recebimento" value=webhook_url hint="A URL precisa estar acessível pela internet pública via HTTPS e ter um certificado válido. O Telegram não enviará dados para outro endereço. Em uma máquina local, configure primeiro um túnel. As instruções completas estão em docs/channels/telegram.md." only %}
     </section>
 
     <a class="cn-back" href="{{ list_url }}">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-        Back to channels
+        Voltar aos canais
     </a>
 </div>
 {% endwith %}

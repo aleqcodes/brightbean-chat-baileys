@@ -201,17 +201,17 @@ def trigger_create(request: WorkspaceRequest, workspace_id: str, flow_id: str) -
     trigger_type = (request.POST.get("type") or "").strip()
     spec = spec_for(trigger_type)
     if spec is None:
-        return toast_response(tone="error", title="Unknown trigger type", body="Pick one from the list.")
+        return toast_response(tone="error", title="Tipo de gatilho desconhecido", body="Escolha uma opção da lista.")
 
     try:
         config = _config_from(request, trigger_type)
     except forms.KeywordMismatchError as exc:
-        return toast_response(tone="error", title="Keywords did not save", body=str(exc))
+        return toast_response(tone="error", title="As palavras-chave não foram salvas", body=str(exc))
     except ConditionError as exc:
         # A rule trigger's filter document, refused by the condition engine
         # before it could be stored. Its messages name keys and never echo
         # values, so it is safe to show verbatim.
-        return toast_response(tone="error", title="That filter is not valid", body=str(exc))
+        return toast_response(tone="error", title="Esse filtro é inválido", body=str(exc))
 
     refused = _refuse_duplicate_ref(flow, trigger_type, config)
     if refused is not None:
@@ -226,7 +226,7 @@ def trigger_create(request: WorkspaceRequest, workspace_id: str, flow_id: str) -
         )
     except services.TriggerValidationError as exc:
         return _refusal(exc)
-    return toast_response(tone="success", title="Trigger added", events={"triggersChanged": True})
+    return toast_response(tone="success", title="Gatilho adicionado", events={"triggersChanged": True})
 
 
 @login_required
@@ -237,17 +237,17 @@ def trigger_update(request: WorkspaceRequest, workspace_id: str, flow_id: str, t
     trigger = get_scoped_object_or_404(Trigger, request.workspace, pk=trigger_id, flow=flow)
     spec = spec_for(trigger.type)
     if spec is None:  # pragma: no cover - a stored type with no spec
-        return toast_response(tone="error", title="Unknown trigger type")
+        return toast_response(tone="error", title="Tipo de gatilho desconhecido")
 
     try:
         config = _config_from(request, trigger.type)
     except forms.KeywordMismatchError as exc:
-        return toast_response(tone="error", title="Keywords did not save", body=str(exc))
+        return toast_response(tone="error", title="As palavras-chave não foram salvas", body=str(exc))
     except ConditionError as exc:
         # A rule trigger's filter document, refused by the condition engine
         # before it could be stored. Its messages name keys and never echo
         # values, so it is safe to show verbatim.
-        return toast_response(tone="error", title="That filter is not valid", body=str(exc))
+        return toast_response(tone="error", title="Esse filtro é inválido", body=str(exc))
 
     refused = _refuse_duplicate_ref(flow, trigger.type, config, exclude=trigger)
     if refused is not None:
@@ -262,7 +262,7 @@ def trigger_update(request: WorkspaceRequest, workspace_id: str, flow_id: str, t
         )
     except services.TriggerValidationError as exc:
         return _refusal(exc)
-    return toast_response(tone="success", title="Trigger saved", events={"triggersChanged": True})
+    return toast_response(tone="success", title="Gatilho salvo", events={"triggersChanged": True})
 
 
 @login_required
@@ -274,7 +274,7 @@ def trigger_toggle(request: WorkspaceRequest, workspace_id: str, flow_id: str, t
     services.set_enabled(trigger, not trigger.enabled)
     return toast_response(
         tone="success",
-        title="Trigger enabled" if trigger.enabled else "Trigger paused",
+        title="Gatilho ativado" if trigger.enabled else "Gatilho pausado",
         events={"triggersChanged": True},
     )
 
@@ -289,7 +289,7 @@ def trigger_move(request: WorkspaceRequest, workspace_id: str, flow_id: str, tri
         services.move_trigger(trigger, direction=(request.POST.get("direction") or "").strip())
     except services.TriggerValidationError as exc:
         return _refusal(exc)
-    return toast_response(tone="success", title="Order updated", events={"triggersChanged": True})
+    return toast_response(tone="success", title="Ordem atualizada", events={"triggersChanged": True})
 
 
 @login_required
@@ -299,7 +299,7 @@ def trigger_delete(request: WorkspaceRequest, workspace_id: str, flow_id: str, t
     flow = get_scoped_object_or_404(Flow, request.workspace, pk=flow_id)
     trigger = get_scoped_object_or_404(Trigger, request.workspace, pk=trigger_id, flow=flow)
     services.delete_trigger(trigger)
-    return toast_response(tone="success", title="Trigger removed", events={"triggersChanged": True})
+    return toast_response(tone="success", title="Gatilho removido", events={"triggersChanged": True})
 
 
 @login_required
@@ -449,12 +449,12 @@ def _refuse_duplicate_ref(
     if ref and services.duplicate_refs(flow, ref, exclude=exclude):
         return toast_response(
             tone="error",
-            title="That reference is taken",
-            body=f"Another trigger in this workspace already uses “{ref}”.",
+            title="Esta referência já está em uso",
+            body=f"Outro gatilho neste espaço de trabalho já usa “{ref}”.",
         )
     return None
 
 
 def _refusal(error: services.TriggerValidationError) -> HttpResponse:
     first = error.issues[0].message if error.issues else str(error)
-    return toast_response(tone="error", title="Trigger not saved", body=first)
+    return toast_response(tone="error", title="Gatilho não salvo", body=first)

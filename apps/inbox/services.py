@@ -152,7 +152,7 @@ def apply_label(conversation: Conversation, label: ConversationLabel, *, by: Any
     """
     links = ConversationLabelLink.objects.for_workspace(conversation.workspace_id)
     if links.filter(conversation=conversation).count() >= MAX_LABELS_PER_CONVERSATION:
-        raise InboxError(f"A conversation can carry at most {MAX_LABELS_PER_CONVERSATION} labels.")
+        raise InboxError(f"Uma conversa pode ter no máximo {MAX_LABELS_PER_CONVERSATION} etiquetas.")
     try:
         with transaction.atomic():
             ConversationLabelLink(conversation=conversation, label=label, applied_by=by).save()
@@ -238,7 +238,7 @@ def schedule_reminder(
 ) -> InboxReminder:
     """Arrange an in-app nudge about this thread (SPEC §14)."""
     if remind_at <= timezone.now():
-        raise InboxError("Pick a time in the future.")
+        raise InboxError("Escolha um horário futuro.")
     existing = _already_arranged(InboxReminder, conversation, compose_token)
     if existing is not None:
         return existing
@@ -286,7 +286,7 @@ def schedule_reply(
     a gate.
     """
     if send_at <= timezone.now():
-        raise InboxError("Pick a time in the future.")
+        raise InboxError("Escolha um horário futuro.")
     existing = _already_arranged(ScheduledReply, conversation, compose_token)
     if existing is not None:
         return existing
@@ -313,9 +313,9 @@ def reschedule_reply(reply: ScheduledReply, *, body: dict[str, Any], send_at: da
     leave the key describing a moment that had passed.
     """
     if reply.status != DeferredStatus.PENDING:
-        raise InboxError("That reply has already been sent or cancelled.")
+        raise InboxError("Essa resposta já foi enviada ou cancelada.")
     if send_at <= timezone.now():
-        raise InboxError("Pick a time in the future.")
+        raise InboxError("Escolha um horário futuro.")
     _cancel_action(reply)
     reply.body = body
     reply.send_at = send_at

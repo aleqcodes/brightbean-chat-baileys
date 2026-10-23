@@ -29,7 +29,7 @@ class UserManager(BaseUserManager):
 
     def create_user(self, email: str, password: str | None = None, **extra_fields: Any) -> "User":
         if not email:
-            raise ValueError("Email is required")
+            raise ValueError("O e-mail é obrigatório")
         # ``self.model`` is typed as the manager's generic parameter; the cast
         # is only for the type checker, which cannot see that this manager is
         # only ever attached to ``User``.
@@ -47,7 +47,7 @@ class UserManager(BaseUserManager):
         if not extra_fields["is_staff"] or not extra_fields["is_superuser"]:
             # Studio lets create_superuser(is_staff=False) through, which
             # produces an account that cannot reach the admin it was created for.
-            raise ValueError("A superuser must have is_staff=True and is_superuser=True.")
+            raise ValueError("Um superusuário deve ter is_staff=True e is_superuser=True.")
         return self.create_user(email, password, **extra_fields)
 
 

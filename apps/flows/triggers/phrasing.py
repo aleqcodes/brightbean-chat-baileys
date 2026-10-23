@@ -1,24 +1,25 @@
-"""Reader-facing sentences for a flow's triggers.
+"""Frases para leitura sobre os gatilhos de um fluxo.
 
-SPEC §10's vocabulary is precise and developer-shaped: ``ref_url``,
-``default_reply``, ``story_mention``. :class:`TriggerType`'s own labels are
-better ("New follower") but still name the *mechanism* rather than the moment —
-and a flow list that says "Keyword · Comment" tells a reader what the product
-calls things, not when their flow runs.
+O vocabulário da SPEC §10 é preciso e voltado a desenvolvedores: ``ref_url``,
+``default_reply``, ``story_mention``. Os rótulos de :class:`TriggerType` são
+melhores ("Novo seguidor"), mas ainda nomeiam o *mecanismo*, não o momento —
+e uma lista de fluxos que diz "Palavra-chave · Comentário" informa como o
+produto chama as coisas, não quando o fluxo é executado.
 
-So this module answers one question in the reader's words: **when does this
-flow start?** "When someone comments on a post." "When a message contains
-'hours' or 'returns'."
+Este módulo responde, nas palavras de quem usa o produto: **quando este fluxo
+começa?** "Quando alguém comenta em uma publicação." "Quando uma mensagem contém
+'horário' ou 'devoluções'."
 
-**Why here and not on TriggerType.** Those labels are the admin's and the
-developer's; they appear in forms, in the API and in error messages, and they
-should stay stable and literal. This is UI copy, revised on the product's
-cadence rather than the schema's, and a second string on the enum would put two
-registers in one place and invite the wrong one being picked.
+**Por que aqui, e não em TriggerType.** Esses rótulos são para administração e
+desenvolvimento; aparecem em formulários, na API e em mensagens de erro, e devem
+permanecer estáveis e literais. Esta é a cópia da interface, revisada no ritmo
+do produto, não do schema. Uma segunda frase no enum misturaria os registros e
+facilitaria escolher a frase errada.
 
-**Why it degrades rather than raises.** A trigger type with no phrase here —
-one a later layer adds — falls back to its enum label. A flow list is not the
-place to discover that a migration landed without copy.
+**Por que há uma alternativa em vez de um erro.** Um tipo de gatilho sem frase
+aqui — incluído por uma camada posterior — usa como alternativa o rótulo do
+enum. A lista de fluxos não é o lugar para descobrir que uma migração chegou
+sem texto de interface.
 """
 
 from typing import Any
@@ -34,16 +35,16 @@ MAX_QUOTED_KEYWORDS = 3
 
 #: One phrase per trigger type, written to follow "This flow runs…".
 _PHRASES: dict[str, str] = {
-    TriggerType.KEYWORD: "when someone sends a keyword",
-    TriggerType.COMMENT: "when someone comments on a post",
-    TriggerType.STORY_MENTION: "when someone mentions you in a story",
-    TriggerType.STORY_REPLY: "when someone replies to your story",
-    TriggerType.FOLLOW: "when someone follows you",
-    TriggerType.REF_URL: "when someone opens your link or scans your QR code",
-    TriggerType.DEFAULT_REPLY: "when nothing else matches",
-    TriggerType.WELCOME: "when someone messages you for the first time",
-    TriggerType.RULE: "when a message matches your rules",
-    TriggerType.API: "when another system asks it to",
+    TriggerType.KEYWORD: "quando alguém envia uma palavra-chave",
+    TriggerType.COMMENT: "quando alguém comenta em uma publicação",
+    TriggerType.STORY_MENTION: "quando alguém menciona você em um story",
+    TriggerType.STORY_REPLY: "quando alguém responde ao seu story",
+    TriggerType.FOLLOW: "quando alguém começa a seguir você",
+    TriggerType.REF_URL: "quando alguém abre seu link ou escaneia seu QR code",
+    TriggerType.DEFAULT_REPLY: "quando nenhuma outra regra corresponde",
+    TriggerType.WELCOME: "quando alguém envia uma mensagem pela primeira vez",
+    TriggerType.RULE: "quando uma mensagem corresponde às suas regras",
+    TriggerType.API: "quando outro sistema solicita a execução",
 }
 
 
@@ -61,18 +62,18 @@ _PHRASES: dict[str, str] = {
 #: afford. This one has to survive a truncated meta line beside "edited 2 hours
 #: ago", and must still stop a reader, because the pill above it says "Live".
 CAVEATS: dict[str, str] = {
-    TriggerType.FOLLOW: "Instagram does not support new-follower triggers yet, so it will not run.",
+    TriggerType.FOLLOW: "O Instagram ainda não oferece gatilhos para novos seguidores, então este fluxo não será executado.",
 }
 
 
 def _quoted_keywords(config: dict[str, Any]) -> str:
-    """The keywords a keyword trigger listens for, as a readable clause.
+    """Palavras monitoradas por um gatilho de palavra-chave, em uma frase legível.
 
-    Two shapes reach this. SPEC §10's keyword trigger stores
-    ``{"keywords": [{"text": ..., "mode": ...}]}``; a comment trigger stores a
-    plain list under ``include_keywords``. Both are read because both are
-    "words that start this flow" to a reader, and neither is worth a branch at
-    the call site.
+    Dois formatos chegam aqui. O gatilho de palavra-chave da SPEC §10 armazena
+    ``{"keywords": [{"text": ..., "mode": ...}]}``; um gatilho de comentário
+    armazena uma lista simples em ``include_keywords``. Ambos são lidos porque
+    representam "palavras que iniciam este fluxo" para quem usa o produto, e não
+    justificam uma ramificação no ponto de chamada.
     """
     words = [
         str(entry.get("text", "")).strip() if isinstance(entry, dict) else str(entry).strip()
@@ -82,65 +83,65 @@ def _quoted_keywords(config: dict[str, Any]) -> str:
     if not words:
         return ""
     if len(words) > MAX_QUOTED_KEYWORDS:
-        return f"“{words[0]}” and {len(words) - 1} more"
+        return f"“{words[0]}” e mais {len(words) - 1}"
     if len(words) == 1:
         return f"“{words[0]}”"
-    return ", ".join(f"“{word}”" for word in words[:-1]) + f" or “{words[-1]}”"
+    return ", ".join(f"“{word}”" for word in words[:-1]) + f" ou “{words[-1]}”"
 
 
 def describe_trigger(trigger: Any) -> str:
-    """One trigger, as a sentence fragment starting with "when".
+    """Um gatilho, como fragmento de frase iniciado por "quando".
 
-    Says when it *would* run and never whether it can: a trigger the platform
-    never delivers is described here exactly like one that fires, and
-    :func:`describe_triggers` adds :data:`CAVEATS` once for the whole flow.
+    Indica quando seria executado, nunca se pode ser executado: um gatilho que
+    a plataforma nunca entrega é descrito aqui como qualquer outro, e
+    :func:`describe_triggers` acrescenta :data:`CAVEATS` uma vez para o fluxo.
     """
     phrase = _PHRASES.get(trigger.type)
     if phrase is None:
         # A type added without copy. Its enum label is wrong in register but
         # right in substance, which beats an empty line on a list page.
-        return f"when a {trigger.get_type_display().lower()} trigger fires"
+        return f"quando um gatilho de {trigger.get_type_display().lower()} é acionado"
 
     config = trigger.config_json if isinstance(trigger.config_json, dict) else {}
     quoted = _quoted_keywords(config)
     if quoted and trigger.type == TriggerType.KEYWORD:
-        phrase = f"when someone sends {quoted}"
+        phrase = f"quando alguém envia {quoted}"
     elif quoted and trigger.type == TriggerType.COMMENT:
-        phrase = f"when someone comments {quoted}"
+        phrase = f"quando alguém comenta {quoted}"
 
     return phrase
 
 
 def sentence_case(phrase: str) -> str:
-    """Upper-case the first letter and touch nothing else.
+    """Coloca em maiúscula a primeira letra sem alterar o restante.
 
-    Not ``str.capitalize()``, which lower-cases the whole remainder: a keyword
-    trigger reading ``when someone sends "Black Friday"`` came out of it as
-    ``"black friday"``, silently rewriting a word the workspace chose, and the
-    same would happen to any brand name a phrase quotes.
+    Não usa ``str.capitalize()``, que converte todo o restante para minúsculas:
+    um gatilho de palavra-chave que exibe "Black Friday" viraria
+    "black friday", alterando silenciosamente um termo escolhido pelo espaço de
+    trabalho; o mesmo aconteceria com qualquer nome de marca citado.
     """
     return phrase[:1].upper() + phrase[1:]
 
-
 def describe_triggers(triggers: list[Any]) -> str:
-    """Every trigger on a flow, as one sentence.
+    """Todos os gatilhos de um fluxo em uma única frase.
 
-    Empty is not "no description" but a warning worth reading: a flow with no
-    trigger is a flow that will never run, and saying so on the list is how
-    somebody notices before they wonder why nothing happened.
+    A ausência de gatilhos não significa "sem descrição", mas é um aviso que
+    vale a pena ler: um fluxo sem gatilho nunca será executado. Informar isso na
+    lista permite perceber o problema antes de se perguntar por que nada ocorreu.
 
-    Beyond two triggers the sentence stops listing and starts counting — three
-    "when…" clauses joined by "or" is a paragraph, not a row.
+    Com mais de dois gatilhos, a frase deixa de listá-los e passa a contá-los —
+    três orações iniciadas por "quando", unidas por "ou", formariam um parágrafo,
+    não uma linha.
     """
     enabled = [t for t in triggers if getattr(t, "enabled", True)]
     if not enabled:
-        return "No trigger yet, so it will not run until you add one"
+        return "Nenhum gatilho foi configurado; adicione um para executar este fluxo"
     if len(enabled) == 1:
         sentence = sentence_case(describe_trigger(enabled[0]))
     elif len(enabled) == 2:
-        sentence = f"{sentence_case(describe_trigger(enabled[0]))}, or {describe_trigger(enabled[1])}"
+        sentence = f"{sentence_case(describe_trigger(enabled[0]))}, ou {describe_trigger(enabled[1])}"
     else:
-        sentence = f"{sentence_case(describe_trigger(enabled[0]))}, and {len(enabled) - 1} other triggers"
+        sentence = f"{sentence_case(describe_trigger(enabled[0]))} e mais {len(enabled) - 1} gatilhos"
 
     # Appended once, however many triggers there are, and de-duplicated: two
     # trigger types blocked for the same reason should say it once.

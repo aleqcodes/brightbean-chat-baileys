@@ -52,11 +52,11 @@ def custom_field_by_name(ctx: "NodeContext", name: Any, *, node_id: str = "") ->
     """
     cleaned = name.strip() if isinstance(name, str) else ""
     if not cleaned:
-        raise ValueError("A custom field target needs a field name.")
+        raise ValueError("O destino do campo personalizado precisa ter um nome de campo.")
     field = CustomField.objects.for_workspace(ctx.workspace_id).filter(name__iexact=cleaned).first()
     if field is None:
         logger.warning(
-            "Execution %s: node %s names custom field %r, which this workspace does not have.",
+            "Execução %s: o nó %s indica o campo personalizado %r, que não existe neste espaço de trabalho.",
             ctx.execution.pk,
             node_id or ctx.node_id,
             cleaned,
@@ -90,7 +90,7 @@ def typed_for(field: CustomField, value: Any) -> Any:
             return True
         if word in FALSE_WORDS:
             return False
-        raise ValueError(f"{field.name} holds true or false; {value!r} is neither.")
+        raise ValueError(f"{field.name} aceita verdadeiro ou falso; {value!r} não corresponde a nenhum dos dois.")
 
     if field.type == CustomFieldType.TEXT and isinstance(value, int | float | Decimal) and not isinstance(value, bool):
         return str(value)

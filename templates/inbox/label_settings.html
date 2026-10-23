@@ -16,27 +16,27 @@ says why this is not that.
 <div class="max-w-[1060px] w-full">
     <div class="page-header">
         <div class="page-header-text">
-            <h1 class="page-title">Labels</h1>
-            <p class="page-lede">Keep conversations organized. Rules can add labels automatically.</p>
+            <h1 class="page-title">Marcadores</h1>
+            <p class="page-lede">Organize as conversas. As regras podem adicionar marcadores automaticamente.</p>
         </div>
-        <button type="button" class="btn-pill-primary flex-shrink-0" @click="$modal('new-label')">{% include "partials/_nav_icon.html" with name="tag" icon_size=16 %} New label</button>
+        <button type="button" class="btn-pill-primary flex-shrink-0" @click="$modal('new-label')">{% include "partials/_nav_icon.html" with name="tag" icon_size=16 %} Novo marcador</button>
     </div>
 
-    {% modal "new-label" title="New label" close_on="inboxLabelsChanged" %}
+    {% modal "new-label" title="Novo marcador" close_on="inboxLabelsChanged" %}
     <form hx-post="{% url 'inbox:label_create' workspace_id=request.workspace.id %}">
         <div class="bb-modal-body">
             <div class="field">
-                <label class="field-label" for="new-label-name">What is the label called?</label>
-                <input class="form-input-styled" id="new-label-name" type="text" name="name" maxlength="60" required autofocus placeholder="Waiting on shipping">
+                <label class="field-label" for="new-label-name">Qual é o nome do marcador?</label>
+                <input class="form-input-styled" id="new-label-name" type="text" name="name" maxlength="60" required autofocus placeholder="Aguardando envio">
             </div>
             <div class="field">
-                <label class="field-label" for="new-label-color">Colour</label>
+                <label class="field-label" for="new-label-color">Cor</label>
                 <input class="field-swatch-well" id="new-label-color" type="color" name="color" value="{{ default_color }}">
             </div>
         </div>
         <div class="bb-modal-actions">
-            <button type="button" class="btn-pill-secondary" @click="close()">Cancel</button>
-            <button type="submit" class="btn-pill-primary">Create label</button>
+            <button type="button" class="btn-pill-secondary" @click="close()">Cancelar</button>
+            <button type="submit" class="btn-pill-primary">Criar marcador</button>
         </div>
     </form>
     {% endmodal %}

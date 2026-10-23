@@ -24,11 +24,11 @@ page is where the live figures are computed, and it writes them back here.
 <table class="data-table">
     <thead>
         <tr>
-            <th scope="col">Broadcast</th>
-            <th scope="col">Status</th>
-            <th scope="col">Delivery</th>
-            <th scope="col" class="is-num">Audience</th>
-            <th scope="col">When</th>
+            <th scope="col">Disparo</th>
+            <th scope="col">Situação</th>
+            <th scope="col">Entrega</th>
+            <th scope="col" class="is-num">Público</th>
+            <th scope="col">Quando</th>
         </tr>
     </thead>
     <tbody>
@@ -51,12 +51,12 @@ page is where the live figures are computed, and it writes them back here.
                 {% widthratio stats.sent stats.queued 100 as sent_pct %}
                 {% widthratio stats.pending stats.queued 100 as pending_pct %}
                 {% widthratio stats.failed stats.queued 100 as failed_pct %}
-                <div class="meter" role="img" aria-label="{{ stats.sent|default:0|intcomma }} sent, {{ stats.pending|default:0|intcomma }} still going out, {{ stats.failed|default:0|intcomma }} failed, of {{ stats.queued|intcomma }}">
+                <div class="meter" role="img" aria-label="{{ stats.sent|default:0|intcomma }} enviados, {{ stats.pending|default:0|intcomma }} ainda em envio, {{ stats.failed|default:0|intcomma }} com falha, de {{ stats.queued|intcomma }}">
                     <div class="meter-fill meter-success" style="width: {{ sent_pct }}%;"></div>
                     <div class="meter-fill meter-info" style="width: {{ pending_pct }}%;"></div>
                     <div class="meter-fill meter-error" style="width: {{ failed_pct }}%;"></div>
                 </div>
-                <p class="meter-label">{{ stats.sent|default:0|intcomma }} of {{ stats.queued|intcomma }}{% if stats.skipped %} · {{ stats.skipped|intcomma }} skipped{% endif %}</p>
+                <p class="meter-label">{{ stats.sent|default:0|intcomma }} de {{ stats.queued|intcomma }}{% if stats.skipped %} · {{ stats.skipped|intcomma }} ignorados{% endif %}</p>
                 {% else %}
                 <div class="meter" aria-hidden="true"></div>
                 <p class="meter-label">—</p>
@@ -64,10 +64,10 @@ page is where the live figures are computed, and it writes them back here.
             </td>
             <td class="is-num font-semibold">{% if stats.queued %}{{ stats.queued|intcomma }}{% else %}—{% endif %}</td>
             <td class="whitespace-nowrap" style="color: var(--text-secondary);">
-                {% if broadcast.status == "sending" %}Now
+                {% if broadcast.status == "sending" %}Agora
                 {% elif broadcast.finished_at %}{{ broadcast.finished_at|naturalday:"j M" }}
                 {% elif broadcast.scheduled_at %}{{ broadcast.scheduled_at|naturalday:"j M"|capfirst }} {{ broadcast.scheduled_at|time:"H:i" }}
-                {% else %}Not sent{% endif %}
+                {% else %}Não enviado{% endif %}
             </td>
         </tr>
         {% endwith %}
@@ -77,9 +77,9 @@ page is where the live figures are computed, and it writes them back here.
 </div>
 </div>
 {% elif q or filters.status or filters.channel %}
-{% include "components/empty_state.html" with icon="search" title="No broadcasts match" body="Try a different word, or clear the filters." action_label="Clear filters" action_click="clearFilters()" %}
+{% include "components/empty_state.html" with icon="search" title="Nenhum disparo encontrado" body="Tente outra palavra ou limpe os filtros." action_label="Limpar filtros" action_click="clearFilters()" %}
 {% else %}
-{% include "components/empty_state.html" with icon="broadcasts" title="No broadcasts yet" body="One message to many contacts. Start one with New broadcast." %}
+{% include "components/empty_state.html" with icon="broadcasts" title="Ainda não há disparos" body="Uma mensagem para muitos contatos. Comece um novo disparo." %}
 {% endif %}
 
 {% if truncated %}
@@ -89,6 +89,6 @@ page is where the live figures are computed, and it writes them back here.
   set rather than this page, so they are the way to reach what is not here.
 {% endcomment %}
 <p class="bc-hint mt-2">
-    Showing the {{ page_size }} most recent. Search or filter by status to find an older one.
+    Exibindo os {{ page_size }} mais recentes. Busque ou filtre por status para encontrar um disparo mais antigo.
 </p>
 {% endif %}

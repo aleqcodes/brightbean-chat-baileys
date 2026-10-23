@@ -556,7 +556,7 @@ def _notes(document: dict[str, Any], resolutions: list[Resolution] | None = None
     notes: list[str] = []
     for flow in document["flows"]:
         for issue in validate_graph(flow["graph"]).graph_errors:
-            notes.append(f"{flow['name']}: {issue.message} It imports as a draft and cannot be published until fixed.")
+            notes.append(f"{flow['name']}: {issue.message} O fluxo é importado como rascunho e não pode ser publicado até que o problema seja corrigido.")
 
     requirements = requirements_for(document)
     derived = {(requirement.kind, requirement.key) for requirement in requirements}
@@ -572,22 +572,21 @@ def _notes(document: dict[str, Any], resolutions: list[Resolution] | None = None
         requirement = resolution.requirement
         if requirement.kind == "platform" and resolution.action == ACTION_BLANK and not resolution.problem:
             notes.append(
-                f"The {_platform_label(requirement.key)} triggers will listen on every account their kind works "
-                f"on, including channels beyond {requirement.key}. "
-                f"Pick an account to keep them where the file had them."
+                f"Os gatilhos de {_platform_label(requirement.key)} serão ativados em todas as contas compatíveis, "
+                f"incluindo canais além de {requirement.key}. "
+                f"Escolha uma conta para mantê-los limitados ao canal indicado no arquivo."
             )
         if requirement.kind == refs.KIND_COMMENT_POSTS and not _post_ids(resolution.literal):
             notes.append(
-                "A comment trigger watches specific posts and none are listed, so it will match nothing "
-                "until you add some post ids."
+                "Um gatilho de comentário monitora publicações específicas, mas nenhuma foi informada; ele não corresponderá "
+                "a nada até que você adicione os IDs das publicações."
             )
 
     stale = declared - derived
     if stale:
         notes.append(
-            f"This file says it needs {len(stale)} thing{'' if len(stale) == 1 else 's'} that nothing in it "
-            f"actually uses. "
-            f"They are ignored: what has to be supplied is worked out from the flows themselves."
+            f"Este arquivo declara {len(stale)} requisito(s) que não são usados. "
+            f"Eles serão ignorados: os requisitos são determinados pelos fluxos."
         )
     return notes
 
@@ -606,14 +605,14 @@ _MODELS: dict[str, tuple[str, str, str]] = {
 
 #: What to call each kind when telling somebody the answer is missing.
 _NOUNS: dict[str, str] = {
-    refs.KIND_TAG: "tag",
-    refs.KIND_CUSTOM_FIELD: "custom field",
-    refs.KIND_SEQUENCE: "sequence",
-    refs.KIND_SEGMENT: "segment",
-    refs.KIND_MEMBER: "member",
-    refs.KIND_FLOW: "flow",
-    refs.KIND_MEDIA: "media asset",
-    "platform": "channel connection",
+    refs.KIND_TAG: "etiqueta",
+    refs.KIND_CUSTOM_FIELD: "campo personalizado",
+    refs.KIND_SEQUENCE: "sequência",
+    refs.KIND_SEGMENT: "segmento",
+    refs.KIND_MEMBER: "contato",
+    refs.KIND_FLOW: "fluxo",
+    refs.KIND_MEDIA: "arquivo de mídia",
+    "platform": "conexão do canal",
 }
 
 
@@ -644,8 +643,8 @@ def _resolve(workspace: Any, requirement: Requirement, answer: dict[str, Any]) -
             resolution.name = str(target[1])
             return resolution
         resolution.problem = (
-            f"Pick the {_platform_label(requirement.key)} account this trigger should watch, "
-            f"or choose to let it watch them all."
+            f"Selecione a conta de {_platform_label(requirement.key)} que este gatilho deve monitorar, "
+            f"ou escolha monitorar todas as contas."
         )
         return resolution
 
@@ -661,19 +660,19 @@ def _resolve(workspace: Any, requirement: Requirement, answer: dict[str, Any]) -
             # the substituted document and fails there — where the trigger it
             # belongs to is dropped, or the graph is stored in a shape the
             # schema refuses and only the next publish finds out.
-            resolution.problem = f"At most {limit} characters."
+            resolution.problem = f"No máximo {limit} caracteres."
         return resolution
 
     if resolution.action == ACTION_BLANK:
         if not requirement.optional:
-            resolution.problem = f"This {noun} is required for the flow to run."
+            resolution.problem = f"Este(a) {noun} é obrigatório(a) para o fluxo funcionar."
             return resolution
         resolution.literal = str(answer.get("value") or "")
         return resolution
 
     if resolution.action == ACTION_CREATE:
         if not requirement.creatable:
-            resolution.problem = f"A {noun} cannot be created from a template; pick an existing one."
+            resolution.problem = f"Não é possível criar {noun} a partir de um modelo; selecione um existente."
             return resolution
         return _resolve_create(workspace, resolution, requirement, answer, noun)
 
@@ -687,13 +686,13 @@ def _resolve(workspace: Any, requirement: Requirement, answer: dict[str, Any]) -
                 # "Every connection of a matching platform" is a real answer
                 # (SPEC §5), and it is what an unfilled channel picker means.
                 return resolution
-            resolution.problem = f"Pick a {noun} in this workspace."
+            resolution.problem = f"Selecione {noun} neste espaço de trabalho."
             return resolution
         resolution.target_id = str(target[0])
         resolution.name = str(target[1])
         return resolution
 
-    resolution.problem = f"Choose what this {noun} should become."
+    resolution.problem = f"Escolha em que este(a) {noun} deve se transformar."
     return resolution
 
 
@@ -731,13 +730,13 @@ def _resolve_create(
     if requirement.kind != refs.KIND_TAG:
         taken = _find_by_name(workspace, Requirement(kind=requirement.kind, key="", name=resolution.name))
         if taken is not None:
-            resolution.problem = f"A {noun} called “{resolution.name}” already exists. Use the existing one instead."
+            resolution.problem = f"Já existe {noun} com o nome “{resolution.name}”. Use o existente."
             return resolution
 
     if requirement.kind == refs.KIND_CUSTOM_FIELD:
         resolution.literal = str(answer.get("field_type") or requirement.detail or "text")
         if resolution.literal not in _field_type_values():
-            resolution.problem = "That is not a field type."
+            resolution.problem = "Esse não é um tipo de campo válido."
     return resolution
 
 
@@ -923,7 +922,7 @@ def apply_import(workspace: Any, document: dict[str, Any], mapping: dict[str, An
         _create_triggers(flow, entry, lookup, flows, kept)
 
     logger.info(
-        "Imported %s flow(s) into workspace %s as drafts, triggers disabled.",
+        "Importados %s fluxo(s) para o espaço de trabalho %s como rascunhos, com os gatilhos desativados.",
         len(flows),
         getattr(workspace, "pk", workspace),
     )
@@ -934,7 +933,7 @@ class ImportNotReadyError(RuntimeError):
     """Confirmation was attempted with questions still unanswered."""
 
     def __init__(self, plan: ImportPlan) -> None:
-        super().__init__("Some requirements have not been answered.")
+        super().__init__("Ainda há requisitos sem resposta.")
         self.plan = plan
 
 
@@ -961,7 +960,7 @@ def _refuse_if_unstorable(flow_name: str, graph: Any) -> None:
 
     issues = validate_graph(graph).document_errors
     if issues:
-        raise ImportRefusedError(f"“{flow_name}” would not be storable after mapping: {issues[0].message}")
+        raise ImportRefusedError(f"“{flow_name}” não poderia ser salvo após o mapeamento: {issues[0].message}")
 
 
 def _create(workspace: Any, resolution: Resolution) -> Any:
@@ -1047,7 +1046,7 @@ def _create_triggers(
             # the worst of the three outcomes. The transaction rolls back, so
             # nothing partial survives.
             raise ImportRefusedError(
-                f"The {trigger['type']} trigger on “{entry['name']}” cannot be created here: "
+                f"O gatilho {trigger['type']} de “{entry['name']}” não pode ser criado aqui: "
                 + "; ".join(issue.message for issue in exc.issues)
             ) from exc
 

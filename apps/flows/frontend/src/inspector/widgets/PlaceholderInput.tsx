@@ -65,7 +65,7 @@ export function PlaceholderInput(props: FieldProps) {
         />
       )}
       {open && !readOnly ? (
-        <div className="fb-subgroup" role="listbox" aria-label="Insert a placeholder">
+        <div className="fb-subgroup" role="listbox" aria-label="Inserir variável">
           {tokens.map((token) => (
             <button key={token} type="button" role="option" className="fb-palette-item" onClick={() => insert(token)}>
               {`{{${token}}}`}
@@ -74,7 +74,7 @@ export function PlaceholderInput(props: FieldProps) {
         </div>
       ) : (
         <p className="fb-field-help">
-          Type <code>{"{{"}</code> to insert a contact field.
+          Digite <code>{"{{"}</code> para inserir um campo do contato.
         </p>
       )}
     </FieldShell>

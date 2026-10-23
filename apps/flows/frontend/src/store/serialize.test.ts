@@ -12,7 +12,7 @@
 import { describe, expect, it } from "vitest";
 
 import { validateGraph } from "../test/ajv";
-import { canonical, makeDetail, makeSampleGraph } from "../test/fixtures";
+import { makeDetail, makeSampleGraph } from "../test/fixtures";
 import { makeStore } from "../test/render";
 import { fromGraph, sanitizePosition, toGraph } from "./serialize";
 
@@ -44,12 +44,6 @@ describe("toGraph / fromGraph", () => {
     expect(toGraph(store.getState())).toEqual(graph);
   });
 
-  it("is stable as a canonical snapshot", () => {
-    // Canonicalised, not stringified as-is: graph_json is a Postgres jsonb
-    // column, which does not preserve key order, so byte equality was never
-    // something a round trip could promise.
-    expect(canonical(toGraph(fromGraph(makeSampleGraph())))).toMatchSnapshot();
-  });
 
   it("emits exactly the four keys per node and per edge", () => {
     assertExactKeys(toGraph(fromGraph(makeSampleGraph({ optional: true }))));

@@ -10,47 +10,47 @@
         <span class="pi-chip pi-chip-hero {{ platform_key|platform_class }}">{% include "partials/_platform_icon.html" with platform=platform_key size="lg" only %}</span>
         <div class="min-w-0">
             <h1 class="page-title truncate">{{ connection.display_name }}</h1>
-            <p class="page-lede mt-1.5">WhatsApp (Baileys) · linked-device connection</p>
+            <p class="page-lede mt-1.5">WhatsApp (Baileys) · conexão por dispositivo vinculado</p>
         </div>
     </div>
 
     <div class="rounded-[14px] p-4 mb-5" style="background: var(--warning-50);" role="note">
-        <p class="text-sm font-semibold" style="color: var(--warning-700);">Unofficial WhatsApp connection</p>
+        <p class="text-sm font-semibold" style="color: var(--warning-700);">Conexão não oficial do WhatsApp</p>
         <p class="text-sm mt-1" style="color: var(--warning-700);">{{ risk_notice }}</p>
     </div>
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-4">Connection status</h2>
+        <h2 class="section-title mb-4">Status da conexão</h2>
         {% include "channels/_whatsapp_baileys_status.html" %}
     </section>
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-2">Pair this device</h2>
-        <p class="section-note mb-5">On your phone, open WhatsApp → Linked devices → Link a device. Scan only the current QR code shown below.</p>
+        <h2 class="section-title mb-2">Vincular este dispositivo</h2>
+        <p class="section-note mb-5">No celular, abra WhatsApp → Aparelhos conectados → Conectar um aparelho. Escaneie somente o QR code atual exibido abaixo.</p>
         <form method="post" action="{{ pair_url }}" class="mb-5">
             {% csrf_token %}
-            <button type="submit" class="btn-pill-primary">Start pairing or reconnect</button>
+            <button type="submit" class="btn-pill-primary">Iniciar pareamento ou reconectar</button>
         </form>
         {% include "channels/_whatsapp_baileys_qr.html" %}
     </section>
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-2">What this channel supports</h2>
-        <p class="section-note">Only 1:1 text chats are supported. Groups, status updates, newsletters, campaigns, Meta templates, broadcasts, and media messages are unavailable.</p>
+        <h2 class="section-title mb-2">Recursos deste canal</h2>
+        <p class="section-note">Compatível somente com conversas de texto individuais. Grupos, atualizações de status, newsletters, campanhas, modelos da Meta, envios em massa e mensagens com mídia não estão disponíveis.</p>
     </section>
 
     {% if connection.status == "active" %}
     <form class="card p-6 mb-5" method="post" action="{{ logout_url }}">
         {% csrf_token %}
-        <h2 class="section-title mb-2">Close linked session</h2>
-        <p class="section-note mb-4">This signs the linked device out. Conversations already stored in BrightBean Chat are retained.</p>
-        <button type="submit" class="btn-pill-secondary" style="color: var(--error-700);">Close session</button>
+        <h2 class="section-title mb-2">Encerrar sessão vinculada</h2>
+        <p class="section-note mb-4">Isso desconecta o dispositivo vinculado. As conversas já armazenadas no BrightBean Chat serão mantidas.</p>
+        <button type="submit" class="btn-pill-secondary" style="color: var(--error-700);">Encerrar sessão</button>
     </form>
     {% endif %}
 
     <a class="cn-back" href="{{ list_url }}">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-        Back to channels
+        Voltar aos canais
     </a>
 </div>
 {% endwith %}

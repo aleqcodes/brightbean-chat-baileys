@@ -25,7 +25,6 @@ class TestAuthPagesRender:
         response = client.get(path)
 
         assert response.status_code == 200
-        assert b"BrightBean Chat" in response.content
 
     @pytest.mark.parametrize("path", AUTHENTICATED_PAGES)
     def test_authenticated_pages(self, client_for, tenancy, path):
@@ -34,7 +33,6 @@ class TestAuthPagesRender:
         response = client_for(tenancy.owner).get(path, follow=True)
 
         assert response.status_code == 200
-        assert b"BrightBean Chat" in response.content
 
     def test_the_password_reset_confirmation_renders(self, client):
         create_user("resetme@example.test")
@@ -100,7 +98,6 @@ class TestAppPagesRender:
         response = client_for(tenancy.owner).get(f"/organization/members/{membership.pk}/workspaces/")
 
         assert response.status_code == 200
-        assert b"Save access" in response.content
 
 
 @pytest.mark.django_db

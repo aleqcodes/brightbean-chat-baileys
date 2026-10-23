@@ -246,7 +246,7 @@ def _credentials(connection: ChannelConnection) -> dict[str, Any]:
     try:
         stored: Any = connection.credentials or {}
     except ValueError:
-        logger.error("Connection %s: credentials could not be decrypted.", connection.pk)
+        logger.error("Conexão %s: não foi possível descriptografar as credenciais.", connection.pk)
         return {}
     return stored if isinstance(stored, dict) else {}
 
@@ -373,7 +373,7 @@ def call(
     sid = account_sid(connection)
     token = auth_token(connection)
     if not sid or not token:
-        raise APIError("This SMS connection has no Twilio credentials stored.")
+        raise APIError("Esta conexão SMS não tem credenciais da Twilio armazenadas.")
     return request_json(
         method,
         url,
@@ -423,7 +423,7 @@ def fetch_number(sid: str, token: str, number: str) -> dict[str, Any]:
     )
     numbers = body.get("incoming_phone_numbers")
     if not isinstance(numbers, list) or not numbers or not isinstance(numbers[0], dict):
-        raise APIError("That Twilio account does not hold that number.")
+        raise APIError("Essa conta da Twilio não possui esse número.")
     return numbers[0]
 
 
@@ -817,7 +817,7 @@ class TwilioAdapter(Adapter):
             # dropping a real customer message over one is the worse failure.
             return self._inbound(connection, params)
 
-        logger.info("SMS callback on connection %s carried no usable status; ignored.", connection.pk)
+        logger.info("O callback SMS na conexão %s não informou um status válido; ignorado.", connection.pk)
         return []
 
     def _inbound(self, connection: ChannelConnection, params: dict[str, str]) -> list[NormalizedEvent]:
@@ -826,7 +826,7 @@ class TwilioAdapter(Adapter):
         if not sender:
             # No one to attribute this to. An identity keyed on the empty string
             # would collide with every other empty one.
-            logger.info("Inbound SMS on connection %s carried no sender; ignored.", connection.pk)
+            logger.info("O SMS recebido na conexão %s não informou remetente; ignorado.", connection.pk)
             return []
 
         body = _text(params.get("Body"))
@@ -910,7 +910,7 @@ class TwilioAdapter(Adapter):
         """
         message_sid = _text(params.get("MessageSid") or params.get("SmsSid"), MAX_PLATFORM_ID_CHARS).strip()
         if not message_sid:
-            logger.info("SMS status callback on connection %s named no message; ignored.", connection.pk)
+            logger.info("O callback de status SMS na conexão %s não informou mensagem; ignorado.", connection.pk)
             return []
 
         error_code = _text(params.get("ErrorCode"), MAX_EXTRA_CHARS).strip()
@@ -966,11 +966,11 @@ class TwilioAdapter(Adapter):
         sid = account_sid(connection)
         token = auth_token(connection)
         if not sid or not token:
-            logger.info("SMS: connection %s has no credentials; media cannot be resolved.", connection.pk)
+            logger.info("SMS: a conexão %s não tem credenciais; não é possível resolver a mídia.", connection.pk)
             return None
         if not _is_account_media_url(media_id):
             logger.warning(
-                "SMS: refusing to attach credentials to a media URL off %s on connection %s.",
+                "SMS: recusando o envio de credenciais para uma URL de mídia fora de %s na conexão %s.",
                 _API_HOST,
                 connection.pk,
             )
@@ -1053,7 +1053,7 @@ class TwilioAdapter(Adapter):
         if exc.code != UNSUBSCRIBED_RECIPIENT_CODE:
             return
         logger.info(
-            "Twilio reports connection %s may no longer message a recipient; recording an opt-out.", connection.pk
+            "A Twilio informou que a conexão %s talvez não possa mais enviar mensagens ao destinatário; registrando a opção de não receber mensagens.",
         )
         now = timezone.now()
         event = NormalizedEvent(
@@ -1070,7 +1070,7 @@ class TwilioAdapter(Adapter):
             channels_ingest.process_events(connection, (event,))
         except Exception:
             # The send failure is the thing the caller is waiting to hear about.
-            logger.exception("SMS: could not record an opt-out on connection %s.", connection.pk)
+            logger.exception("SMS: não foi possível registrar a opção de não receber mensagens na conexão %s.", connection.pk)
 
     # `send_typing` and `mark_seen` stay the base class's no-ops: SMS has
     # neither, and SPEC §6.1 lists both as "no-op where unsupported".
@@ -1101,7 +1101,7 @@ def _post_params(request: "HttpRequest") -> dict[str, str]:
     except Exception:
         # An unparseable body is not a signature we can compute. The caller
         # treats an empty parameter set as a failed verification.
-        logger.info("SMS delivery carried a form body that could not be parsed.")
+        logger.info("O corpo de formulário da entrega SMS não pôde ser analisado.")
         return {}
 
 

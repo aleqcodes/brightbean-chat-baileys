@@ -55,21 +55,21 @@ class WhatsAppConnectForm(forms.Form):
     """
 
     waba_id = forms.CharField(
-        label="WhatsApp Business Account ID",
+        label="ID da conta do WhatsApp Business",
         max_length=64,
-        help_text="From Business Manager → WhatsApp Accounts. Digits only.",
+        help_text="No Business Manager → Contas do WhatsApp. Apenas dígitos.",
     )
     phone_number_id = forms.CharField(
-        label="Phone number ID",
+        label="ID do número de telefone",
         max_length=64,
-        help_text="The API id of the number, not the number itself.",
+        help_text="ID da API do número, não o próprio número.",
     )
     access_token = forms.CharField(
-        label="Permanent access token",
+        label="Token de acesso permanente",
         # A password widget, and autocomplete off: this value is a live
         # credential and must not end up in the browser's saved form data.
         widget=forms.PasswordInput(render_value=False, attrs={"autocomplete": "off", "spellcheck": "false"}),
-        help_text="A system user token with whatsapp_business_messaging and whatsapp_business_management.",
+        help_text="Token de usuário do sistema com whatsapp_business_messaging e whatsapp_business_management.",
     )
 
     def clean_waba_id(self) -> str:
@@ -81,13 +81,13 @@ class WhatsAppConnectForm(forms.Form):
     def _digits(self, field: str) -> str:
         value = (self.cleaned_data.get(field) or "").strip()
         if not value.isdigit():
-            raise forms.ValidationError("This is a numeric id from Business Manager.")
+            raise forms.ValidationError("Este é um ID numérico do Business Manager.")
         return value
 
     def clean_access_token(self) -> str:
         value = (self.cleaned_data.get("access_token") or "").strip()
         if not value:
-            raise forms.ValidationError("Paste the system user token.")
+            raise forms.ValidationError("Cole o token de usuário do sistema.")
         return value
 
 
@@ -102,38 +102,38 @@ class WhatsAppTemplateForm(forms.ModelForm):
     """
 
     header_text = forms.CharField(
-        label="Header",
+        label="Cabeçalho",
         required=False,
         max_length=MAX_HEADER_CHARS,
-        help_text=f"Optional, up to {MAX_HEADER_CHARS} characters. May contain {{{{1}}}}.",
+        help_text=f"Opcional, até {MAX_HEADER_CHARS} caracteres. Pode conter {{{{1}}}}.",
     )
     body_text = forms.CharField(
-        label="Body",
+        label="Corpo",
         widget=forms.Textarea(attrs={"rows": 5}),
         max_length=MAX_BODY_CHARS,
-        help_text=f"Up to {MAX_BODY_CHARS} characters. Use {{{{1}}}}, {{{{2}}}} … for variables.",
+        help_text=f"Até {MAX_BODY_CHARS} caracteres. Use {{{{1}}}}, {{{{2}}}} … para variáveis.",
     )
     footer_text = forms.CharField(
-        label="Footer",
+        label="Rodapé",
         required=False,
         max_length=MAX_FOOTER_CHARS,
-        help_text=f"Optional, up to {MAX_FOOTER_CHARS} characters. No variables allowed here.",
+        help_text=f"Opcional, até {MAX_FOOTER_CHARS} caracteres. Não são permitidas variáveis aqui.",
     )
-    url_button_text = forms.CharField(label="Link button label", required=False, max_length=MAX_BUTTON_TEXT_CHARS)
+    url_button_text = forms.CharField(label="Texto do botão de link", required=False, max_length=MAX_BUTTON_TEXT_CHARS)
     url_button_url = forms.URLField(
-        label="Link button URL",
+        label="URL do botão de link",
         required=False,
         assume_scheme="https",
-        help_text="May end in a variable, e.g. https://example.com/orders/{{1}}.",
+        help_text="Pode terminar com uma variável, por exemplo https://example.com/orders/{{1}}.",
     )
 
     class Meta:
         model = WhatsAppTemplate
         fields = ["channel_connection", "name", "language", "category"]
-        labels = {"channel_connection": "WhatsApp number", "name": "Template name"}
+        labels = {"channel_connection": "Número do WhatsApp", "name": "Nome do modelo"}
         help_texts = {
-            "name": "Lowercase letters, digits and underscores. Meta shows this name in its review queue.",
-            "language": "Meta's language code, e.g. en_US.",
+            "name": "Use letras minúsculas, números e sublinhados. A Meta exibe este nome na fila de revisão.",
+            "language": "Código de idioma da Meta, por exemplo en_US.",
         }
 
     def __init__(self, *args: Any, workspace: Any = None, **kwargs: Any) -> None:
@@ -152,7 +152,7 @@ class WhatsAppTemplateForm(forms.ModelForm):
         )
         for index in range(QUICK_REPLY_SLOTS):
             self.fields[f"quick_reply_{index}"] = forms.CharField(
-                label=f"Quick reply {index + 1}",
+                label=f"Resposta rápida {index + 1}",
                 required=False,
                 max_length=MAX_BUTTON_TEXT_CHARS,
             )
@@ -195,7 +195,7 @@ class WhatsAppTemplateForm(forms.ModelForm):
         """
         value = (self.cleaned_data.get("footer_text") or "").strip()
         if value and _SLOT_RE.search(value):
-            raise forms.ValidationError("A footer cannot contain variables. Move it into the body.")
+            raise forms.ValidationError("O rodapé não pode conter variáveis. Mova-as para o corpo.")
         return value
 
     def clean_name(self) -> str:
@@ -203,7 +203,7 @@ class WhatsAppTemplateForm(forms.ModelForm):
 
         name = (self.cleaned_data.get("name") or "").strip().lower()
         if not re.match(TEMPLATE_NAME_PATTERN, name):
-            raise forms.ValidationError("Use lowercase letters, digits and underscores only.")
+            raise forms.ValidationError("Use apenas letras minúsculas, números e sublinhados.")
         return name
 
     def clean(self) -> dict[str, Any]:
@@ -214,7 +214,7 @@ class WhatsAppTemplateForm(forms.ModelForm):
         text = cleaned.get("url_button_text") or ""
         url = cleaned.get("url_button_url") or ""
         if bool(text) != bool(url):
-            raise forms.ValidationError("A link button needs both a label and a URL.")
+            raise forms.ValidationError("Um botão de link precisa de um texto e uma URL.")
         return cleaned
 
     def body_structure(self) -> dict[str, Any]:
@@ -262,15 +262,15 @@ class WhatsAppCostHintForm(forms.ModelForm):
         model = WhatsAppCostHint
         fields = ["currency", "marketing", "utility", "authentication"]
         labels = {
-            "marketing": "Marketing, per message",
-            "utility": "Utility, per message",
-            "authentication": "Authentication, per message",
+            "marketing": "Marketing, por mensagem",
+            "utility": "Utilidade, por mensagem",
+            "authentication": "Autenticação, por mensagem",
         }
 
     def clean_currency(self) -> str:
         value = (self.cleaned_data.get("currency") or "").strip().upper()
         if len(value) != 3 or not value.isalpha():
-            raise forms.ValidationError("Use a three-letter ISO 4217 code, e.g. USD.")
+            raise forms.ValidationError("Use um código ISO 4217 de três letras, por exemplo USD.")
         return value
 
     def _clean_amount(self, field: str) -> Decimal:
@@ -278,7 +278,7 @@ class WhatsAppCostHintForm(forms.ModelForm):
         if value is None:
             return Decimal("0")
         if value < 0:
-            raise forms.ValidationError("A price cannot be negative.")
+            raise forms.ValidationError("O preço não pode ser negativo.")
         return value
 
     def clean_marketing(self) -> Decimal:

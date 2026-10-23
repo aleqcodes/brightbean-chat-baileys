@@ -137,9 +137,9 @@ def window_notice(connection: Any) -> str:
     if not policy.has_window() or policy.outside_window != "blocked":
         return ""
     return (
-        f"{connection.get_platform_display()} has no way to reopen a messaging window once it closes, so "
-        f"this broadcast can only reach people who messaged in the last {policy.window_hours} hours. "
-        "Everyone else in the audience is left out, and on a large filter that is usually most of it."
+        f"{connection.get_platform_display()} não permite reabrir uma janela de mensagens depois que ela se fecha, então "
+        f"este disparo só pode alcançar pessoas que enviaram mensagens nas últimas {policy.window_hours} horas. "
+        "As demais ficam de fora do público e, em filtros amplos, costumam ser a maioria."
     )
 
 

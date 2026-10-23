@@ -4,4 +4,4 @@ A plain GET of the previous step: nothing is saved by going back, and nothing
 typed on this step is lost that was not already stored.
 {% endcomment %}{% if prev_step %}<button type="button" class="btn-pill-secondary"
         hx-get="{% url 'broadcasts:wizard' workspace_id=request.workspace.id broadcast_id=broadcast.id %}?step={{ prev_step }}"
-        hx-target="#broadcast-wizard" hx-swap="innerHTML">Back</button>{% endif %}
+        hx-target="#broadcast-wizard" hx-swap="innerHTML">Voltar</button>{% endif %}

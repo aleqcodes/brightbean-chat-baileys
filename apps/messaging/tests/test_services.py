@@ -975,7 +975,6 @@ class TestWithdrawSend:
 
         assert withdrawn.status == MessageStatus.FAILED
         assert withdrawn.error == "withdrawn:broadcast_cancelled"
-        assert describe(withdrawn.error) == "The work that queued this message was cancelled before it was sent."
 
     def test_the_pending_retry_goes_with_it(self, tenancy: Any, contact: Any, connection: Any, identity: Any) -> None:
         """The two halves of one cancellation. A retry left armed would wake a
@@ -1080,7 +1079,6 @@ class TestWithdrawSend:
         withdrawn = services.withdraw_send(deferred, reason="x" * 500)
 
         assert withdrawn.error == f"{Failure.WITHDRAWN.value}:{'x' * 64}"
-        assert describe(withdrawn.error) == REASON_COPY[Failure.WITHDRAWN]
 
     def test_a_withdrawal_racing_the_retry_being_armed_is_not_overwritten(
         self, tenancy: Any, contact: Any, connection: Any, identity: Any, monkeypatch: Any

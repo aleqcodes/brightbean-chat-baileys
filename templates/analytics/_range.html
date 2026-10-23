@@ -5,10 +5,10 @@ Plain links: the choice is one query parameter and a full page load is what a
 reader expects from a date range. `days` is already clamped to one of the three
 by the view, so the "current" test can compare directly.
 {% endcomment %}
-<span class="an-range" role="group" aria-label="Date range">
+<span class="an-range" role="group" aria-label="Intervalo de datas">
     {% for choice in range_choices %}
     <a class="an-range-option{% if choice == days %} an-range-current{% endif %}"
        href="?days={{ choice }}"
-       {% if choice == days %}aria-current="true"{% endif %}>{{ choice }} days</a>
+       {% if choice == days %}aria-current="true"{% endif %}>{{ choice }} dias</a>
     {% endfor %}
 </span>

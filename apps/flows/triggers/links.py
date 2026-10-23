@@ -124,10 +124,10 @@ def ref_link(connection: Any, ref: str, *, trigger: Any = None) -> RefLink:
             connection=connection,
             platform=connection.platform,
             url="",
-            unavailable_reason="This channel does not support reference links.",
+            unavailable_reason="Este canal não é compatível com links de referência.",
         )
     if not ref:
-        return RefLink(connection, connection.platform, "", "This trigger has no reference yet.")
+        return RefLink(connection, connection.platform, "", "Este gatilho ainda não tem uma referência.")
 
     handle = handle_for(connection, trigger)
     if not handle:
@@ -136,7 +136,7 @@ def ref_link(connection: Any, ref: str, *, trigger: Any = None) -> RefLink:
             platform=connection.platform,
             url="",
             unavailable_reason=(
-                "This channel has not reported its public username yet. Enter it above, or reconnect the channel."
+                "Este canal ainda não informou o nome de usuário público. Informe-o acima ou reconecte o canal."
             ),
         )
     return RefLink(connection, connection.platform, template.format(handle=handle, ref=ref))

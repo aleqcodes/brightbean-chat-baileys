@@ -56,18 +56,18 @@ from apps.contacts.errors import WorkspaceMismatchError
 
 
 class ContactStatus(models.TextChoices):
-    ACTIVE = "active", "Active"
-    DELETED = "deleted", "Deleted"
+    ACTIVE = "active", "Ativo"
+    DELETED = "deleted", "Excluído"
 
 
 class CustomFieldType(models.TextChoices):
     """The value types a custom field can hold (SPEC §5, SPEC §11.4)."""
 
-    TEXT = "text", "Text"
-    NUMBER = "number", "Number"
-    DATE = "date", "Date"
-    DATETIME = "datetime", "Date and time"
-    BOOLEAN = "boolean", "True or false"
+    TEXT = "text", "Texto"
+    NUMBER = "number", "Número"
+    DATE = "date", "Data"
+    DATETIME = "datetime", "Data e hora"
+    BOOLEAN = "boolean", "Sim ou não"
 
 
 #: Which column on ``CustomFieldValue`` holds a value of each field type.
@@ -160,7 +160,7 @@ class Contact(WorkspaceScopedModel):
     def display_name(self) -> str:
         """A label that is never empty, so a list never renders a blank row."""
         name = f"{self.first_name} {self.last_name}".strip()
-        return name or self.email or self.phone or f"Contact {str(self.pk)[:8]}"
+        return name or self.email or self.phone or f"Contato {str(self.pk)[:8]}"
 
 
 class Tag(WorkspaceScopedModel):
@@ -234,7 +234,7 @@ class ContactScopedModel(WorkspaceScopedModel):
         peer = getattr(self, self.peer_field)
         if peer is not None and peer.workspace_id != self.contact.workspace_id:
             raise WorkspaceMismatchError(
-                f"That {peer._meta.verbose_name} belongs to a different workspace than the contact."
+                f"Esse {peer._meta.verbose_name} pertence a um espaço de trabalho diferente do contato."
             )
         update_fields = kwargs.get("update_fields")
         if update_fields is not None:
@@ -345,11 +345,13 @@ class CustomFieldValue(ContactScopedModel):
         populated = [column for column in ALL_VALUE_COLUMNS if getattr(self, column) is not None]
         if len(populated) != 1:
             raise ValidationError(
-                f"A custom field value populates exactly one column; this row populates {len(populated)}."
+                f"Um valor de campo personalizado preenche exatamente uma coluna; esta linha preenche {len(populated)}."
             )
         expected = self.field.value_column
         if populated[0] != expected:
-            raise ValidationError(f"A {self.field.get_type_display().lower()} field stores its value in {expected}.")
+            raise ValidationError(
+                f"Um campo do tipo {self.field.get_type_display().lower()} armazena seu valor em {expected}."
+            )
 
 
 class Segment(WorkspaceScopedModel):
@@ -397,12 +399,12 @@ class ImportStatus(models.TextChoices):
     interrupting.
     """
 
-    UPLOADED = "uploaded", "Uploaded"
-    VALIDATING = "validating", "Checking"
-    VALIDATED = "validated", "Checked"
-    IMPORTING = "importing", "Importing"
-    DONE = "done", "Finished"
-    FAILED = "failed", "Failed"
+    UPLOADED = "uploaded", "Enviado"
+    VALIDATING = "validating", "Validando"
+    VALIDATED = "validated", "Validado"
+    IMPORTING = "importing", "Importando"
+    DONE = "done", "Concluído"
+    FAILED = "failed", "Falhou"
 
 
 #: Statuses no worker will move on from. Read by the housekeeping prune.
@@ -418,9 +420,9 @@ class ImportDedupe(models.TextChoices):
     contact may genuinely be a second person at a shared inbox.
     """
 
-    UPDATE = "update", "Update the contact that is already there"
-    CREATE = "create", "Create a second contact anyway"
-    SKIP = "skip", "Skip the row"
+    UPDATE = "update", "Atualizar o contato existente"
+    CREATE = "create", "Criar outro contato"
+    SKIP = "skip", "Ignorar a linha"
 
 
 def import_upload_to(instance: "ContactImport", filename: str) -> str:

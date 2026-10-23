@@ -11,7 +11,7 @@ the rule. Give one or the other, not both.
 
 Full setup notes live in docs/channels/sms.md.
 {% endcomment %}
-{% block title %}Connect Twilio · BrightBean Chat{% endblock %}
+{% block title %}Conectar Twilio · BrightBean Chat{% endblock %}
 {% block content_wrap %}{% endblock %}
 
 {% block content %}
@@ -21,12 +21,12 @@ Full setup notes live in docs/channels/sms.md.
     <div class="flex items-start gap-4 mb-7">
         <span class="pi-chip pi-chip-hero {{ platform_key|platform_class }}">{% include "partials/_platform_icon.html" with platform=platform_key size="lg" only %}</span>
         <div class="min-w-0">
-            <h1 class="page-title">Connect a Twilio number</h1>
+            <h1 class="page-title">Conectar um número da Twilio</h1>
             <p class="page-lede mt-1.5">
-                BrightBean Chat sends SMS through your own Twilio account, so the messages, the
-                number and the bill are all yours. The Auth Token is the whole credential: anyone
-                holding it can send as your number and read your messages, so it is stored
-                encrypted and never shown again.
+                O BrightBean Chat envia SMS pela sua própria conta da Twilio; as mensagens, o número
+                e a cobrança ficam por sua conta. O Auth Token é uma credencial completa: quem tiver
+                acesso a ele pode enviar mensagens pelo seu número e ler as recebidas. Por isso, ele é
+                armazenado criptografado e nunca é exibido novamente.
             </p>
         </div>
     </div>
@@ -34,22 +34,22 @@ Full setup notes live in docs/channels/sms.md.
     {% if error %}<div class="alert-error">{{ error }}</div>{% endif %}
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-4">Before you paste</h2>
+        <h2 class="section-title mb-4">Antes de colar as credenciais</h2>
         <ol class="cn-steps" role="list">
-            <li class="cn-step">Open the <a href="https://console.twilio.com/" rel="noopener noreferrer" target="_blank">Twilio console</a> and copy the Account SID and Auth Token from the dashboard.</li>
-            <li class="cn-step">Copy either a phone number you own, in E.164 form (<code>+15551234567</code>), or a Messaging Service SID (<code>MG…</code>) if you send through one.</li>
-            <li class="cn-step">US traffic also needs A2P 10DLC registration, which happens in Twilio and not here. There is a checklist on the SMS settings page.</li>
+            <li class="cn-step">Abra o <a href="https://console.twilio.com/" rel="noopener noreferrer" target="_blank">console da Twilio</a> e copie o Account SID e o Auth Token do painel.</li>
+            <li class="cn-step">Copie um número de telefone seu no formato E.164 (<code>+15551234567</code>) ou o SID de um serviço de mensagens (<code>MG…</code>), caso use um.</li>
+            <li class="cn-step">O tráfego dos EUA também exige o registro A2P 10DLC, feito na Twilio e não aqui. A página de configurações de SMS inclui uma lista de verificação.</li>
         </ol>
     </section>
 
     <form class="card p-6 mb-5" method="post">
         {% csrf_token %}
-        <h2 class="section-title mb-4">Your Twilio account</h2>
+        <h2 class="section-title mb-4">Sua conta da Twilio</h2>
 
         <div class="field">
             <label class="field-label" for="account_sid">Account SID</label>
             <input class="form-input-styled" type="text" id="account_sid" name="account_sid" value="{{ form.account_sid }}" autocomplete="off" spellcheck="false" required>
-            <p class="field-hint">Starts with <code>AC</code>.</p>
+            <p class="field-hint">Começa com <code>AC</code>.</p>
         </div>
         <div class="field">
             <label class="field-label" for="auth_token">Auth Token</label>
@@ -59,18 +59,18 @@ Full setup notes live in docs/channels/sms.md.
             is also never rendered back — a failed submit clears it deliberately.
             {% endcomment %}
             <input class="form-input-styled" type="password" id="auth_token" name="auth_token" autocomplete="off" spellcheck="false" required>
-            <p class="field-hint">Pasted once. We check it with Twilio before saving anything.</p>
+            <p class="field-hint">Informado uma vez. Validaremos com a Twilio antes de salvar.</p>
         </div>
 
         <div class="card-row pt-6 mt-6">
-            <h3 class="section-title mb-1">Where messages are sent from</h3>
-            <p class="section-note mb-4">Give one or the other, not both.</p>
+            <h3 class="section-title mb-1">Origem das mensagens</h3>
+            <p class="section-note mb-4">Informe um dos dois, não ambos.</p>
 
             <div class="field">
-                <label class="field-label" for="from_number">From number</label>
+                <label class="field-label" for="from_number">Número de origem</label>
                 <input class="form-input-styled" type="text" id="from_number" name="from_number" value="{{ form.from_number }}" autocomplete="off" spellcheck="false" placeholder="+15551234567" style="width: 16rem;">
             </div>
-            <div class="divider-text my-5">or</div>
+            <div class="divider-text my-5">ou</div>
             <div class="field">
                 <label class="field-label" for="messaging_service_sid">Messaging Service SID</label>
                 <input class="form-input-styled" type="text" id="messaging_service_sid" name="messaging_service_sid" value="{{ form.messaging_service_sid }}" autocomplete="off" spellcheck="false" placeholder="MG…" style="width: 16rem;">
@@ -78,35 +78,34 @@ Full setup notes live in docs/channels/sms.md.
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn-pill-primary">Connect</button>
+            <button type="submit" class="btn-pill-primary">Conectar</button>
         </div>
     </form>
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-3">What happens next</h2>
+        <h2 class="section-title mb-3">O que acontece depois</h2>
         {% comment %}
           No copy field here: the webhook URL is per connection and does not
           exist until this form succeeds. It lives on the connection's own page,
           which is where somebody pasting it into Twilio is already standing.
         {% endcomment %}
         <p class="section-note">
-            We check the credentials and confirm the sender belongs to the account, then store the
-            connection. Twilio has no way for us to configure your number remotely, so the last step
-            is yours: open the number (or the messaging service) in the Twilio console and paste the
-            webhook URL shown on the connection's page into <em>A message comes in</em>, as a
-            <code>POST</code>.
+            Validamos as credenciais e confirmamos que o remetente pertence à conta; depois, salvamos
+            a conexão. A Twilio não permite configurar seu número remotamente, então a última etapa é sua:
+            abra o número (ou o serviço de mensagens) no console da Twilio e cole a URL do webhook exibida
+            na página da conexão em <em>A message comes in</em>, usando o método <code>POST</code>.
         </p>
         <p class="field-hint">
-            That URL has to match <strong>exactly</strong>, trailing slash included: Twilio signs
-            each delivery with an HMAC computed over the URL itself, so a URL that differs by one
-            character fails verification. It also has to be reachable from the public internet over
-            HTTPS. Full setup notes are in docs/channels/sms.md.
+            A URL precisa corresponder <strong>exatamente</strong>, inclusive a barra final: a Twilio assina
+            cada entrega com um HMAC calculado a partir da própria URL, então qualquer diferença de um
+            caractere faz a validação falhar. Ela também precisa estar acessível pela internet pública via
+            HTTPS. As instruções completas estão em docs/channels/sms.md.
         </p>
     </section>
 
     <a class="cn-back" href="{{ list_url }}">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-        Back to channels
+        Voltar aos canais
     </a>
 </div>
 {% endwith %}

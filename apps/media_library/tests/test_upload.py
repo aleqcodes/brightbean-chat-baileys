@@ -1,5 +1,7 @@
 """The upload chokepoint: sniff, then size, then quota."""
 
+import json
+
 import pytest
 
 from apps.media_library.mimes import UnsupportedMediaError
@@ -378,9 +380,11 @@ class TestHtmxUpload:
             {"files": [f.upload(f.real_png(), name="chart.png")]},
             headers={"HX-Request": "true"},
         )
-        assert "showToast" in response["HX-Trigger"]
-        assert "1 uploaded" in response["HX-Trigger"]
-
+        payload = json.loads(response["HX-Trigger"])
+        toast = payload["showToast"]
+        assert response.status_code == 200
+        assert toast["tone"] == "success"
+        assert MediaAsset.objects.for_workspace(workspace).count() == 1
     def test_the_refreshed_grid_keeps_the_filters_the_form_carried(self, editor_client, workspace):
         """The response reads request.POST, because request.GET is empty on a POST.
 
@@ -413,6 +417,7 @@ class TestHtmxUpload:
             {"files": [f.upload(f.HTML_AS_PNG, name="evil.png")]},
             headers={"HX-Request": "true"},
         )
-        assert response.status_code == 200
-        assert "evil.png" in response["HX-Trigger"]
-        assert "warn" in response["HX-Trigger"]
+        payload = json.loads(response["HX-Trigger"])
+        toast = payload["showToast"]
+        assert toast["tone"] == "warn"
+        assert "evil.png" in toast["body"]

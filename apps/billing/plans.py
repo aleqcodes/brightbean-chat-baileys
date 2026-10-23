@@ -111,20 +111,20 @@ class Price:
 
 
 #: Free. One price, and it never changes.
-FREE_PRICE = Price(amount="$0", cadence="", note="Free forever")
+FREE_PRICE = Price(amount="$0", cadence="", note="Grátis para sempre")
 
 #: Paid, per interval. Yearly is quoted *per month* so the comparison is like
 #: for like — a reader seeing "$144" next to "$15" has to do arithmetic before
 #: they can tell whether it is cheaper.
 PAID_PRICES: dict[str, Price] = {
-    "monthly": Price(amount="$15", cadence="/month", note="Billed monthly"),
-    "yearly": Price(amount="$12", cadence="/month", note="Billed yearly, $144 up front"),
+    "monthly": Price(amount="$15", cadence="/mês", note="Cobrança mensal"),
+    "yearly": Price(amount="$12", cadence="/mês", note="Cobrança anual de $144"),
 }
 
 #: $180 a year against $144. Exact, so it is stated as a number rather than as
 #: "two months free", which would be 2.4 and is the kind of rounding a reader
 #: checks.
-YEARLY_SAVING = "Save 20%"
+YEARLY_SAVING = "Economize 20%"
 
 
 @dataclass(frozen=True)
@@ -173,31 +173,31 @@ class PlanCopy:
 PLAN_COPY: tuple[PlanCopy, ...] = (
     PlanCopy(
         key=PlanKey.FREE,
-        name="Free",
-        tagline="Enough to prove it works.",
+        name="Grátis",
+        tagline="Tudo o que você precisa para começar.",
         price=FREE_PRICE,
         features=(
-            Feature("contacts", "25 contacts a month"),
-            Feature("channels", "2 channels"),
-            Feature("flows", "4 active automations"),
-            Feature("user", "1 user"),
-            Feature("inbox", "Shared inbox, labels and reminders"),
-            Feature("tag", "Contacts, tags and segments"),
+            Feature("contacts", "25 contatos por mês"),
+            Feature("channels", "2 canais"),
+            Feature("flows", "4 automações ativas"),
+            Feature("user", "1 usuário"),
+            Feature("inbox", "Caixa de entrada compartilhada, etiquetas e lembretes"),
+            Feature("tag", "Contatos, tags e segmentos"),
         ),
     ),
     PlanCopy(
         key=PlanKey.PAID,
         name="Pro Chat",
-        tagline="Everything, with nothing counted.",
+        tagline="Todos os recursos, sem limites de uso.",
         features=(
-            Feature("contacts", "Unlimited contacts"),
-            Feature("channels", "Every channel"),
-            Feature("flows", "Unlimited automations"),
-            Feature("sequences", "Unlimited sequences and broadcasts"),
-            Feature("users", "Unlimited users"),
-            Feature("inbox", "Shared inbox, labels and reminders"),
-            Feature("tag", "Contacts, tags and segments"),
-            Feature("key", "Public API and outbound webhooks"),
+            Feature("contacts", "Contatos ilimitados"),
+            Feature("channels", "Todos os canais"),
+            Feature("flows", "Automações ilimitadas"),
+            Feature("sequences", "Sequências e envios em massa ilimitados"),
+            Feature("users", "Usuários ilimitados"),
+            Feature("inbox", "Caixa de entrada compartilhada, etiquetas e lembretes"),
+            Feature("tag", "Contatos, tags e segmentos"),
+            Feature("key", "API pública e webhooks de saída"),
         ),
         show_logo=True,
     ),

@@ -144,7 +144,6 @@ class TestActionVerbsOnContacts:
             execution = start_flow(contact, flow, started_by=StartedBy.API)
 
         assert execution.status == ExecutionStatus.COMPLETED
-        assert "which this workspace does not have" in caplog.text
 
 
 @pytest.mark.django_db
@@ -183,7 +182,6 @@ class TestActionVerbsOnMessagingAndMembers:
             start_flow(contact, flow, started_by=StartedBy.API)
 
         assert facade.named("assign_conversation") == []
-        assert "is not in this workspace" in caplog.text
 
     def test_notify_members_uses_the_registered_copy(self, tenancy):
         editor = tenancy.user_for("editor")
@@ -247,7 +245,6 @@ class TestAVerbWithNoRuntime:
                 register_verb("subscribe_sequence", restore, replace=True)
 
         assert execution.status == ExecutionStatus.COMPLETED
-        assert "has no runtime in this deployment" in caplog.text
         assert _tags(contact) == {"still-ran"}
 
 
@@ -296,7 +293,6 @@ class TestConditionNode:
         execution = start_flow(contact, flow, started_by=StartedBy.API)
 
         assert execution.status == ExecutionStatus.FAILED
-        assert "condition node c" in execution.last_error
 
     def test_an_unregistered_condition_source_fails_the_run(self, tenancy):
         """A source declared with no ``build_q`` validates at publish and fails at runtime.
@@ -450,7 +446,6 @@ class TestStartFlowNode:
             execution = start_flow(contact, source, started_by=StartedBy.API)
 
         assert execution.status == ExecutionStatus.COMPLETED
-        assert "does not exist here" in caplog.text
 
     def test_a_target_in_another_workspace_is_not_reachable(self, tenancy, other_tenancy, caplog):
         theirs = published_flow(
@@ -477,7 +472,6 @@ class TestStartFlowNode:
             execution = start_flow(contact, source, started_by=StartedBy.API)
 
         assert execution.status == ExecutionStatus.COMPLETED
-        assert "could not hand off" in caplog.text
 
 
 @pytest.mark.django_db

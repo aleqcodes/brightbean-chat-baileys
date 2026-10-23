@@ -5,7 +5,7 @@ class InboxConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "apps.inbox"
     label = "inbox"
-    verbose_name = "Inbox"
+    verbose_name = "Caixa de entrada"
 
     def ready(self) -> None:
         """Register the three seams issue #24 fills. All additive, none an edit.

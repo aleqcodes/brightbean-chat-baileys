@@ -28,22 +28,22 @@ for free.
 <div class="crm-filters" x-cloak>
 
   <div class="crm-filters-head">
-    <label for="filter-match" class="sr-only">Match</label>
+    <label for="filter-match" class="sr-only">Correspondência</label>
     <select id="filter-match" class="w-40" x-model="match" @change="touch()">
-      <option value="all">Match all rules</option>
-      <option value="any">Match any rule</option>
+      <option value="all">Corresponder a todas as regras</option>
+      <option value="any">Corresponder a qualquer regra</option>
     </select>
-    <button type="button" @click="addRule()">Add rule</button>
+    <button type="button" @click="addRule()">Adicionar regra</button>
     <template x-if="rules.length">
-      <button type="button" @click="clearRules()">Clear</button>
+      <button type="button" @click="clearRules()">Limpar</button>
     </template>
-    <span class="muted text-xs" x-show="!rules.length">No filter: showing everyone.</span>
+    <span class="muted text-xs" x-show="!rules.length">Sem filtros: exibindo todos.</span>
   </div>
 
   <template x-for="(rule, index) in rules" :key="index">
     <div class="crm-rule">
       {# What kind of thing this rule looks at #}
-      <label class="sr-only" :for="`rule-source-${index}`">Look at</label>
+      <label class="sr-only" :for="`rule-source-${index}`">Analisar</label>
       <select :id="`rule-source-${index}`" class="w-40" x-model="rule.source" @change="onSourceChange(rule)">
         <template x-for="source in config.sources" :key="source.name">
           <option :value="source.name" :disabled="!source.evaluable"
@@ -52,16 +52,16 @@ for free.
       </select>
 
       {# Key: whichever picker this source's key kind calls for #}
-      <label class="sr-only" :for="`rule-key-${index}`">Which one</label>
+      <label class="sr-only" :for="`rule-key-${index}`">Qual item</label>
       <select :id="`rule-key-${index}`" class="w-52" x-model="rule.key" @change="onKeyChange(rule)">
-        <option value="">Choose…</option>
+        <option value="">Escolher…</option>
         <template x-for="option in keyOptions(rule)" :key="option.value">
           <option :value="option.value" x-text="option.label"></option>
         </template>
       </select>
 
       {# How to compare it — "is", "contains", "has a value" #}
-      <label class="sr-only" :for="`rule-op-${index}`">Condition</label>
+      <label class="sr-only" :for="`rule-op-${index}`">Condição</label>
       <select :id="`rule-op-${index}`" class="w-44" x-model="rule.op" @change="touch()">
         <template x-for="op in opOptions(rule)" :key="op">
           <option :value="op" x-text="opLabel(op)"></option>
@@ -75,13 +75,13 @@ for free.
       {% endcomment %}
       <template x-if="takesValue(rule)">
         <div class="crm-rule-value">
-          <label class="sr-only" :for="`rule-value-${index}`">Value</label>
+          <label class="sr-only" :for="`rule-value-${index}`">Valor</label>
 
           <template x-if="valueType(rule) === 'boolean'">
             <select :id="`rule-value-${index}`" class="w-32" x-model="rule.value" @change="touch()">
               {# Not "true"/"false": these sit in a sentence a person reads. #}
-              <option value="true">Yes</option>
-              <option value="false">No</option>
+              <option value="true">Sim</option>
+              <option value="false">Não</option>
             </select>
           </template>
 
@@ -93,8 +93,8 @@ for free.
           <template x-if="isDate(rule)">
             <div class="flex items-center gap-2">
               <select class="w-36" x-model="rule.mode" @change="touch()">
-                <option value="on">on a date</option>
-                <option value="relative">a number of days away</option>
+                <option value="on">em uma data</option>
+                <option value="relative">a alguns dias de distância</option>
               </select>
               <template x-if="rule.mode !== 'relative'">
                 {% comment %}
@@ -102,7 +102,7 @@ for free.
                   own change event, which keeps x-model in step.
                 {% endcomment %}
                 <input :id="`rule-value-${index}`" type="text" class="form-datetime w-40"
-                       placeholder="YYYY-MM-DD" x-model="rule.value"
+                       placeholder="AAAA-MM-DD" x-model="rule.value"
                        x-init="datePicker($el)" @change="touch()">
               </template>
               <template x-if="rule.mode === 'relative'">
@@ -110,7 +110,7 @@ for free.
                        :max="config.vocabulary.limits.maxRelativeOffset"
                        :min="-config.vocabulary.limits.maxRelativeOffset"
                        x-model="rule.offset" @input.debounce.300ms="touch()"
-                       title="Negative is days ago, positive is days from now">
+                       title="Negativo indica dias atrás; positivo indica dias a partir de hoje">
               </template>
             </div>
           </template>
@@ -124,7 +124,7 @@ for free.
       </template>
 
       <button type="button" class="crm-rule-remove" @click="removeRule(index)"
-              :aria-label="`Remove rule ${index + 1}`">&times;</button>
+              :aria-label="`Remover regra ${index + 1}`">&times;</button>
     </div>
   </template>
 
@@ -136,7 +136,7 @@ for free.
       own Save button. The hidden input above is what both surfaces actually
       need; this button belongs only to the page that submits nothing else.
     {% endcomment %}
-    {% if not filter_embedded %}<button type="submit" class="btn-pill-secondary btn-pill-sm">Apply filter</button>{% endif %}
+    {% if not filter_embedded %}<button type="submit" class="btn-pill-secondary btn-pill-sm">Aplicar filtro</button>{% endif %}
 
     {% if can_manage_crm %}
       {% comment %}
@@ -154,19 +154,19 @@ for free.
       <span class="crm-filters-save" x-show="rules.length">
         {% if filter_config.segmentId %}
           <button type="button" class="btn-outline btn-inline"
-                  @click="$refs.updateSegment.requestSubmit()">Update “{{ query.segment.name }}”</button>
+                  @click="$refs.updateSegment.requestSubmit()">Atualizar “{{ query.segment.name }}”</button>
         {% endif %}
         <button type="button" class="btn-outline btn-inline"
-                @click="$modal('save-segment')">Save as segment</button>
+                @click="$modal('save-segment')">Salvar como segmento</button>
       </span>
 
       {% if filter_config.segmentId %}
         <button type="button" class="btn-outline btn-inline btn-danger-soft"
-                @click="$refs.deleteSegment.requestSubmit()">Delete segment</button>
+                @click="$refs.deleteSegment.requestSubmit()">Excluir segmento</button>
       {% endif %}
     {% endif %}
 
     <span class="muted text-xs" x-show="rules.length"
-          x-text="`${rules.length} of ${config.vocabulary.limits.maxRules} rules`"></span>
+          x-text="`${rules.length} de ${config.vocabulary.limits.maxRules} regras`"></span>
   </div>
 </div>

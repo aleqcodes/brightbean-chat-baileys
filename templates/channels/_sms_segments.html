@@ -7,17 +7,17 @@ Everything here is escaped by Django's autoescaping as usual. The only value
 derived from what the author typed is a count.
 {% endcomment %}
 <span class="muted" data-sms-segments>
-  {{ count.characters }} character{{ count.characters|pluralize }} ·
+  {{ count.characters }} caractere{{ count.characters|pluralize }} ·
   {{ count.encoding }} ·
-  <strong>{{ count.segments }} segment{{ count.segments|pluralize }}</strong>
-  ({{ count.remaining }} left in this one)
+  <strong>{{ count.segments }} segmento{{ count.segments|pluralize }}</strong>
+  ({{ count.remaining }} restante{{ count.remaining|pluralize }} neste segmento)
   {% if estimated_cost is not None %}
-    · about {{ estimated_cost|floatformat:4 }} per recipient
+    · cerca de {{ estimated_cost|floatformat:4 }} por destinatário
   {% endif %}
   {% if count.encoding == "UCS-2" %}
     <br />
-    A character outside the GSM-7 alphabet (a curly quote or an emoji, often
-    pasted in) re-encodes the whole message and drops the segment from 160
-    characters to 70.
+    Um caractere fora do alfabeto GSM-7 (como aspas curvas ou emoji, muitas vezes
+    colados no texto) recodifica a mensagem inteira e reduz o limite do segmento de 160
+    para 70 caracteres.
   {% endif %}
 </span>

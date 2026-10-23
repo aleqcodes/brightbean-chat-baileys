@@ -237,7 +237,7 @@ def update_email_preference(request: RBACRequest) -> HttpResponse:
     if _is_htmx(request):
         return toast_response(
             tone="success",
-            title="Preferences saved",
-            body="Notification emails are now " + ("on." if enabled else "off."),
+            title="Preferências salvas",
+            body="Os e-mails de notificação estão " + ("ativados." if enabled else "desativados."),
         )
     return redirect("notifications:list")

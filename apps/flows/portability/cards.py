@@ -25,18 +25,36 @@ __all__ = ["REQUIREMENT_KIND_HELP", "REQUIREMENT_KIND_LABELS", "card_contexts"]
 #: called two different names one page apart.
 REQUIREMENT_KIND_LABELS: dict[str, str] = {
     "tag": "Tags",
-    "custom_field": "Custom fields",
-    "sequence": "Sequences",
-    "segment": "Segments",
-    "member": "Members",
-    "flow": "Other flows",
-    "media": "Media",
-    "platform": "Channels",
-    "request_header": "Request headers",
-    "whatsapp_template": "WhatsApp templates",
-    "link_handle": "Ref link handles",
-    "from_override": "Email sender addresses",
-    "comment_posts": "Comment trigger posts",
+    "custom_field": "Campos personalizados",
+    "sequence": "Sequências",
+    "segment": "Segmentos",
+    "member": "Membros",
+    "flow": "Outros fluxos",
+    "media": "Mídia",
+    "platform": "Canais",
+    "request_header": "Cabeçalhos de requisição",
+    "whatsapp_template": "Modelos do WhatsApp",
+    "link_handle": "Identificadores de links de referência",
+    "from_override": "Endereços de remetente de e-mail",
+    "comment_posts": "Publicações para monitorar nos comentários",
+}
+
+
+#:
+REQUIREMENT_KIND_HELP: dict[str, str] = {
+    "tag": "Crie estas tags ou associe-as às que você já usa.",
+    "custom_field": "Crie estes campos ou associe-os aos existentes. Não é possível alterar os tipos dos campos depois.",
+    "sequence": "As novas sequências chegam vazias. Adicione as mensagens depois da importação.",
+    "segment": "Escolha um filtro de contatos salvo existente.",
+    "member": "Escolha quem será atribuído ou notificado. O padrão é você.",
+    "flow": "Escolha para quais fluxos este fluxo encaminha.",
+    "media": "Escolha uma imagem ou arquivo da sua biblioteca, ou cole um link para usar.",
+    "platform": "Escolha uma conta para cada gatilho. Cada conta pode incluir outros canais compatíveis.",
+    "request_header": "Adicione seus próprios cabeçalhos. Os segredos foram removidos da exportação.",
+    "whatsapp_template": "Verifique se estes modelos aprovados existem na sua conta do WhatsApp.",
+    "link_handle": "O identificador público @ usado para criar o link foi removido ao gerar o arquivo.",
+    "from_override": "O endereço de envio foi removido ao gerar o arquivo.",
+    "comment_posts": "Informe as publicações que deseja monitorar. Se deixar em branco, o gatilho não será executado.",
 }
 
 

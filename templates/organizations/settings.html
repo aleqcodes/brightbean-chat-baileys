@@ -10,50 +10,50 @@ rather than at two different ones.
 Unlike a workspace's, default_timezone is never blank — it is the fallback every
 workspace without its own clock reads — so its select has no blank option.
 {% endcomment %}
-{% block title %}Organization · BrightBean Chat{% endblock %}
+{% block title %}Organização · BrightBean Chat{% endblock %}
 {% block content_wrap %}{% endblock %}
 
 {% block content %}
 <div class="max-w-[1060px] w-full">
-    <h1 class="page-title">Organization</h1>
-    <p class="page-lede mt-1.5 mb-6">The account every workspace in it belongs to.</p>
+    <h1 class="page-title">Organização</h1>
+    <p class="page-lede mt-1.5 mb-6">A conta à qual pertencem todos os espaços de trabalho.</p>
 
     {% if can_manage %}
     <form method="post" action="{% url 'organizations:update_settings' %}">
         {% csrf_token %}
         <section class="card p-6 mb-5">
             <div class="field">
-                <label class="field-label" for="org-name">Name</label>
+                <label class="field-label" for="org-name">Nome</label>
                 <input class="form-input-styled" id="org-name" type="text" name="name" value="{{ request.org.name }}" maxlength="100" required>
             </div>
             <div class="field">
-                <label class="field-label" for="org-tz">Default timezone</label>
+                <label class="field-label" for="org-tz">Fuso horário padrão</label>
                 <select class="form-input-styled bb-select" id="org-tz" name="default_timezone">
                     {% for name in timezone_choices %}<option value="{{ name }}" {% if name == request.org.default_timezone %}selected{% endif %}>{{ name }}</option>{% endfor %}
                 </select>
-                <p class="field-hint">Every workspace that has not set its own clock keeps this one.</p>
+                <p class="field-hint">Este fuso será usado por todos os espaços de trabalho que não definirem um próprio.</p>
             </div>
             <div class="field">
-                <label class="field-label" for="org-logo">Logo URL<span class="field-label-optional">optional</span></label>
+                <label class="field-label" for="org-logo">URL do logotipo<span class="field-label-optional">opcional</span></label>
                 <input class="form-input-styled" id="org-logo" type="url" name="logo_url" value="{{ request.org.logo_url }}" placeholder="https://example.com/logo.png">
             </div>
             <div class="form-actions">
-                <button type="submit" class="btn-pill-primary">Save changes</button>
+                <button type="submit" class="btn-pill-primary">Salvar alterações</button>
             </div>
         </section>
     </form>
     {% else %}
     <div class="card mb-4">
         <div class="card-row flex flex-wrap items-baseline justify-between gap-4 p-5">
-            <span class="text-[13px] font-semibold" style="color: var(--text-secondary);">Name</span>
+            <span class="text-[13px] font-semibold" style="color: var(--text-secondary);">Nome</span>
             <span class="text-sm" style="color: var(--text-primary);">{{ request.org.name }}</span>
         </div>
         <div class="card-row flex flex-wrap items-baseline justify-between gap-4 p-5">
-            <span class="text-[13px] font-semibold" style="color: var(--text-secondary);">Default timezone</span>
+            <span class="text-[13px] font-semibold" style="color: var(--text-secondary);">Fuso horário padrão</span>
             <span class="text-sm" style="color: var(--text-primary);">{{ request.org.default_timezone }}</span>
         </div>
     </div>
-    <p class="text-[13px]" style="color: var(--text-tertiary);">Only organization admins can change these.</p>
+    <p class="text-[13px]" style="color: var(--text-tertiary);">Somente administradores da organização podem alterar estas informações.</p>
     {% endif %}
 </div>
 {% endblock %}

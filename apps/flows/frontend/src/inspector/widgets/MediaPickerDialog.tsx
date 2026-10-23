@@ -20,6 +20,14 @@ import type { MediaAsset, MediaFolder } from "../../schema/types";
 
 const KINDS = ["", "image", "audio", "video", "file"] as const;
 
+const KIND_LABELS: Record<(typeof KINDS)[number], string> = {
+  "": "Qualquer tipo",
+  image: "Imagem",
+  audio: "Áudio",
+  video: "Vídeo",
+  file: "Arquivo",
+};
+
 /** `root` is the picker's value for "assets in no folder"; "" means all. */
 const ROOT_FOLDER = "root";
 
@@ -89,28 +97,28 @@ export function MediaPickerDialog({ env, platform, kind: fixedKind, onPick, onCl
   }, [load]);
 
   return (
-    <div className="fb-subgroup" role="dialog" aria-label="Choose from the media library">
+    <div className="fb-subgroup" role="dialog" aria-label="Escolher na biblioteca de mídia">
       <div className="flex flex-wrap gap-1 mb-2">
         <input
           type="search"
           className="form-input-styled flex-1"
-          placeholder="Search the library"
-          aria-label="Search the library"
+          placeholder="Buscar na biblioteca"
+          aria-label="Buscar na biblioteca"
           value={term}
           onChange={(event) => setTerm(event.target.value)}
         />
         {fixedKind ? null : (
-          <select className="bb-select w-28" aria-label="Kind" value={kind} onChange={(event) => setKind(event.target.value)}>
+          <select className="bb-select w-28" aria-label="Tipo" value={kind} onChange={(event) => setKind(event.target.value)}>
             {KINDS.map((option) => (
               <option key={option} value={option}>
-                {option === "" ? "Any kind" : option}
+                {KIND_LABELS[option]}
               </option>
             ))}
           </select>
         )}
-        <select className="bb-select w-32" aria-label="Folder" value={folder} onChange={(event) => setFolder(event.target.value)}>
-          <option value="">All folders</option>
-          <option value={ROOT_FOLDER}>No folder</option>
+        <select className="bb-select w-32" aria-label="Pasta" value={folder} onChange={(event) => setFolder(event.target.value)}>
+          <option value="">Todas as pastas</option>
+          <option value={ROOT_FOLDER}>Sem pasta</option>
           {folders.map((entry) => (
             <option key={entry.id} value={entry.id}>
               {entry.name}
@@ -118,12 +126,13 @@ export function MediaPickerDialog({ env, platform, kind: fixedKind, onPick, onCl
           ))}
         </select>
         <button type="button" className="btn-link text-xs" onClick={onClose}>
-          Close
+          Fechar
         </button>
       </div>
 
-      {status === "error" ? <p className="fb-field-error">The media library could not be reached.</p> : null}
-      {status !== "loading" && assets.length === 0 ? <p className="fb-empty">Nothing in the library matches.</p> : null}
+      {status === "error" ? <p className="fb-field-error">Não foi possível acessar a biblioteca de mídia.</p> : null}
+      {status === "loading" ? <p className="fb-empty">Carregando…</p> : null}
+      {status !== "loading" && assets.length === 0 ? <p className="fb-empty">Nenhum item corresponde à busca.</p> : null}
 
       <div className="fb-asset-grid">
         {assets.map((asset) => (
@@ -145,7 +154,7 @@ export function MediaPickerDialog({ env, platform, kind: fixedKind, onPick, onCl
 
       {cursor ? (
         <button type="button" className="btn-outline-sm mt-2" onClick={() => void load(true, cursor)}>
-          Load more
+          Carregar mais
         </button>
       ) : null}
     </div>

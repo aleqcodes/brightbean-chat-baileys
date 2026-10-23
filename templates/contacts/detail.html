@@ -26,13 +26,11 @@ apps/contacts/activity.py before it can become a src.
       {% endif %}
       <div class="min-w-0">
         <h1 class="truncate">{{ contact.display_name }}</h1>
-        <p class="muted text-xs">
-          Added {{ contact.created_at }}{% if contact.last_interaction_at %} · last seen {{ contact.last_interaction_at }}{% endif %}
-        </p>
+        <p class="muted text-xs">Adicionado em {{ contact.created_at }}{% if contact.last_interaction_at %} · última atividade {{ contact.last_interaction_at }}{% endif %}</p>
       </div>
     </div>
     <div class="flex items-center gap-2 flex-shrink-0">
-      <a class="media-pill" href="{% url 'contacts:list' workspace_id=request.workspace.id %}">Back to contacts</a>
+      <a class="media-pill" href="{% url 'contacts:list' workspace_id=request.workspace.id %}">Voltar aos contatos</a>
       {% if can_manage_crm %}
         {% comment %}
           SPEC §19's subject access response. A plain link, not htmx: the answer
@@ -40,7 +38,7 @@ apps/contacts/activity.py before it can become a src.
         {% endcomment %}
         <a class="bb-icon-action"
            href="{% url 'contacts:subject_export' workspace_id=request.workspace.id contact_id=contact.id %}"
-           aria-label="Export contact data" title="Export contact data" download>
+           aria-label="Exportar dados do contato" title="Exportar dados do contato" download>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3h16v-3"/></svg>
         </a>
       {% endif %}
@@ -48,9 +46,9 @@ apps/contacts/activity.py before it can become a src.
         <form class="mb-0"
               hx-post="{% url 'contacts:delete' workspace_id=request.workspace.id contact_id=contact.id %}"
               hx-swap="none"
-              hx-confirm="Delete {{ contact.display_name }}? They are hidden everywhere, drop out of every segment, and any running automation stops."
+              hx-confirm="Excluir {{ contact.display_name }}? O contato ficará oculto em todos os lugares, será removido de todos os segmentos e qualquer automação em andamento será interrompida."
               hx-on::after-request="if (event.detail.successful) window.location = '{% url 'contacts:list' workspace_id=request.workspace.id %}'">
-          <button type="submit" class="btn-outline btn-inline btn-danger-soft">Delete contact</button>
+          <button type="submit" class="btn-outline btn-inline btn-danger-soft">Excluir contato</button>
         </form>
       {% endif %}
     </div>
@@ -63,11 +61,11 @@ apps/contacts/activity.py before it can become a src.
   <div class="crm-detail-main">
     {# ── System fields ───────────────────────────────────────────── #}
     <section class="crm-panel">
-      <h2>Details</h2>
+      <h2>Detalhes</h2>
       {% if can_edit_contacts %}
-        <p class="muted text-xs">Each field saves on its own when you leave it.</p>
+        <p class="muted text-xs">Cada campo é salvo individualmente quando você sai dele.</p>
       {% else %}
-        <p class="muted text-xs">You have read-only access to this workspace.</p>
+        <p class="muted text-xs">Você tem acesso somente para leitura a este espaço de trabalho.</p>
       {% endif %}
       {% for row in editable_fields %}
         <div class="crm-inline-field">
@@ -88,7 +86,7 @@ apps/contacts/activity.py before it can become a src.
 
     {# ── Custom fields ───────────────────────────────────────────── #}
     <section class="crm-panel">
-      <h2>Custom fields</h2>
+      <h2>Campos personalizados</h2>
       {% if field_values %}
         {% for row in field_values %}
           <div class="crm-inline-field">
@@ -100,9 +98,9 @@ apps/contacts/activity.py before it can become a src.
                     hx-trigger="change from:find input, change from:find select, submit">
                 {% if row.is_boolean %}
                   <select id="custom-{{ row.field.id }}" name="value" class="w-32">
-                    <option value="" {% if not row.has_value %}selected{% endif %}>Not set</option>
-                    <option value="true" {% if row.form_value == "true" %}selected{% endif %}>true</option>
-                    <option value="false" {% if row.form_value == "false" %}selected{% endif %}>false</option>
+                    <option value="" {% if not row.has_value %}selected{% endif %}>Não definido</option>
+                    <option value="true" {% if row.form_value == "true" %}selected{% endif %}>Sim</option>
+                    <option value="false" {% if row.form_value == "false" %}selected{% endif %}>Não</option>
                   </select>
                 {% elif row.is_number %}
                   <input type="number" step="any" id="custom-{{ row.field.id }}" name="value" value="{{ row.form_value }}">
@@ -115,7 +113,7 @@ apps/contacts/activity.py before it can become a src.
                 {% endif %}
               </form>
             {% else %}
-              <input type="text" id="custom-{{ row.field.id }}" value="{{ row.form_value|default:'Not set' }}" readonly disabled>
+              <input type="text" id="custom-{{ row.field.id }}" value="{{ row.form_value|default:'Não definido' }}" readonly disabled>
             {% endif %}
           </div>
         {% endfor %}
@@ -125,11 +123,11 @@ apps/contacts/activity.py before it can become a src.
           constraint's "exactly one column populated" true and what the condition
           engine's no_value operator means.
         {% endcomment %}
-        <p class="muted text-xs">Emptying a field removes its value entirely.</p>
+        <p class="muted text-xs">Ao esvaziar um campo, o valor é removido por completo.</p>
       {% else %}
         <p class="muted">
-          No custom fields yet.
-          {% if can_manage_crm %}<a href="{% url 'contacts:field_list' workspace_id=request.workspace.id %}">Add one</a>.{% endif %}
+          Ainda não há campos personalizados.
+          {% if can_manage_crm %}<a href="{% url 'contacts:field_list' workspace_id=request.workspace.id %}">Adicionar um</a>.{% endif %}
         </p>
       {% endif %}
     </section>
@@ -149,23 +147,23 @@ apps/contacts/activity.py before it can become a src.
     {% endcomment %}
     {% if can_erase_contacts %}
       <section class="crm-panel crm-danger-zone">
-        <h2>Erase permanently</h2>
+        <h2>Apagar permanentemente</h2>
         <p class="muted text-sm">
-          Removes {{ contact.display_name }} outright: their profile, custom field values, tags, channel
-          identities, consent records, conversations and message bodies. Counters stay, anonymised. A
-          suppressed email address is kept, because that is a fact about a mailbox rather than about this
-          contact. <strong>This cannot be undone.</strong>
+          Remova {{ contact.display_name }} por completo: perfil, valores de campos personalizados, tags, identidades de
+          canais, registros de consentimento, conversas e conteúdo das mensagens. Os contadores permanecem anonimizados. Um
+          endereço de e-mail suprimido é mantido, pois diz respeito a uma caixa de entrada, não a este
+          contato. <strong>Esta ação não pode ser desfeita.</strong>
         </p>
         <form class="crm-danger-form mb-0"
               hx-post="{% url 'contacts:erase' workspace_id=request.workspace.id contact_id=contact.id %}"
               hx-swap="none"
-              hx-confirm="Erase {{ contact.display_name }} permanently? Their messages, identities and consent records are removed for good. This cannot be undone."
+              hx-confirm="Apagar {{ contact.display_name }} permanentemente? As mensagens, identidades e registros de consentimento serão removidos. Esta ação não pode ser desfeita."
               hx-on::after-request="if (event.detail.successful) window.location = '{% url 'contacts:list' workspace_id=request.workspace.id %}'">
           <input type="hidden" name="contact_id" value="{{ contact.id }}">
-          <label class="text-sm" for="erase-confirm">Type <code>{{ erase_confirmation }}</code> to confirm</label>
+          <label class="text-sm" for="erase-confirm">Digite <code>{{ erase_confirmation }}</code> para confirmar</label>
           <input type="text" id="erase-confirm" name="confirm" autocomplete="off" spellcheck="false"
                  placeholder="{{ erase_confirmation }}" required>
-          <button type="submit" class="btn-outline btn-inline btn-danger-soft">Erase contact</button>
+          <button type="submit" class="btn-outline btn-inline btn-danger-soft">Apagar contato</button>
         </form>
       </section>
     {% endif %}

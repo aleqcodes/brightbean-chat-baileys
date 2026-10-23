@@ -10,12 +10,12 @@ apps/contacts/views.py::_selected documents for the bulk endpoints.
 {% endcomment %}
 <section class="rounded-xl border p-3 sm:p-4" style="border-color: var(--border); background: var(--surface-1);">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <h2 class="text-xs font-semibold uppercase tracking-wide" style="color: var(--text-tertiary);">Subscribers</h2>
+        <h2 class="text-xs font-semibold uppercase tracking-wide" style="color: var(--text-tertiary);">Inscritos</h2>
         <form hx-get="{% url 'campaigns:subscribers' workspace_id=request.workspace.id sequence_id=sequence.id %}"
               hx-target="#sequence-subscribers"
               hx-swap="innerHTML"
               hx-trigger="change">
-            <label for="subscriber-status" class="sr-only">Status</label>
+            <label for="subscriber-status" class="sr-only">Situação</label>
             <select id="subscriber-status" name="status" class="form-input-styled" style="width: 10rem;">
                 {% for value, label in status_options %}
                 <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
@@ -32,8 +32,8 @@ apps/contacts/views.py::_selected documents for the bulk endpoints.
       the action.
     {% endcomment %}
     <div class="crm-typeahead mb-3">
-        <label for="subscriber-search" class="sr-only">Find a contact</label>
-        <input type="search" id="subscriber-search" name="q" placeholder="Find a contact to subscribe" maxlength="200"
+        <label for="subscriber-search" class="sr-only">Encontrar um contato</label>
+        <input type="search" id="subscriber-search" name="q" placeholder="Encontrar um contato para inscrever" maxlength="200"
                hx-get="{% url 'campaigns:subscriber_suggest' workspace_id=request.workspace.id sequence_id=sequence.id %}"
                hx-trigger="input changed delay:200ms, focus"
                hx-target="#subscriber-suggestions"
@@ -41,8 +41,8 @@ apps/contacts/views.py::_selected documents for the bulk endpoints.
         <div id="subscriber-suggestions"></div>
     </div>
     <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-        Or subscribe people in bulk from the
-        <a href="{% url 'contacts:list' workspace_id=request.workspace.id %}" class="btn-text-hover-primary">contact list</a>.
+        Ou inscreva contatos em massa pela
+        <a href="{% url 'contacts:list' workspace_id=request.workspace.id %}" class="btn-text-hover-primary">lista de contatos</a>.
     </p>
     {% endif %}
 
@@ -53,13 +53,9 @@ apps/contacts/views.py::_selected documents for the bulk endpoints.
     the Completed tab immediately contradicts. Same branch flows/_list_rows.html
     makes between a filtered miss and a genuinely empty list.
     {% endcomment %}
-    {% if enrolled_total %}
     <p class="text-sm" style="color: var(--text-secondary);">
-      Nobody is {{ status }} right now. {{ enrolled_total }} enrolled in all.
+      {% if status == "active" %}Ainda não há ninguém ativo neste momento.{% elif status == "completed" %}Ninguém concluiu esta sequência ainda.{% elif status == "unsubscribed" %}Ninguém cancelou a inscrição nesta sequência ainda.{% else %}Ainda não há inscritos neste grupo.{% endif %} {{ enrolled_total }} inscrições no total.
     </p>
-    {% else %}
-    <p class="text-sm" style="color: var(--text-secondary);">Nobody here yet.</p>
-    {% endif %}
     {% else %}
     {% comment %}
       The panel says when it has stopped short. A list that silently ends at the
@@ -69,10 +65,10 @@ apps/contacts/views.py::_selected documents for the bulk endpoints.
     {% endcomment %}
     <p class="text-xs mb-2" style="color: var(--text-tertiary);">
         {% if truncated %}
-            Showing the {{ subscriber_cap }} most recent of {{ subscriber_total }}.
-            Filter or export from the contact list to see the rest.
+            Exibindo os {{ subscriber_cap }} inscritos mais recentes, de {{ subscriber_total }}.
+            Filtre ou exporte pela lista de contatos para ver os demais.
         {% else %}
-            {{ subscriber_total }} {% if status == "active" %}active{% else %}{{ status }}{% endif %}.
+            {{ subscriber_total }} {% if status == "active" %}ativos{% elif status == "completed" %}concluíram a sequência{% elif status == "unsubscribed" %}cancelaram a inscrição{% else %}inscritos{% endif %}.
         {% endif %}
     </p>
     <ul class="divide-y" style="border-color: var(--border);">
@@ -91,18 +87,18 @@ apps/contacts/views.py::_selected documents for the bulk endpoints.
                 {% endcomment %}
                 <p class="text-xs" style="color: var(--text-tertiary);">
                     {% if enrollment.status == "completed" %}
-                    Finished {{ enrollment.updated_at|naturaltime }}
+                    Concluído {{ enrollment.updated_at|naturaltime }}
                     {% elif enrollment.status == "unsubscribed" %}
-                    Unsubscribed {{ enrollment.updated_at|naturaltime }}
+                    Cancelou a inscrição {{ enrollment.updated_at|naturaltime }}
                     {% else %}
-                    Step {{ enrollment.current_step }}{% if enrollment.next_run_at %} · next {{ enrollment.next_run_at|naturaltime }}{% endif %}
+                    Etapa {{ enrollment.current_step }}{% if enrollment.next_run_at %} · próxima {{ enrollment.next_run_at|naturaltime }}{% endif %}
                     {% endif %}
                 </p>
             </div>
             {% if can_edit and enrollment.status == "active" %}
             <button type="button" class="btn-outline btn-inline btn-danger-soft"
                     hx-post="{% url 'campaigns:subscriber_remove' workspace_id=request.workspace.id sequence_id=sequence.id enrollment_id=enrollment.id %}"
-                    hx-swap="none">Remove</button>
+                    hx-swap="none">Remover</button>
             {% endif %}
         </li>
         {% endfor %}

@@ -2,8 +2,8 @@
 {% if notification.body %}
 {{ notification.body }}
 {% endif %}
-View it: {{ action_url }}
+Ver notificação: {{ action_url }}
 
 ---
-You are receiving this because notification emails are on for your account.
-Turn them off: {{ settings_url }}
+Você está recebendo este e-mail porque as notificações por e-mail estão ativadas na sua conta.
+Desativar notificações por e-mail: {{ settings_url }}

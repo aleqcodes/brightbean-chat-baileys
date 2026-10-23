@@ -29,12 +29,16 @@ class Workspace(BaseModel):
         related_name="workspaces",
     )
     name = models.CharField(max_length=100)
-    icon = models.CharField(max_length=8, blank=True, default="", help_text="A single emoji, shown in the switcher.")
+    icon = models.CharField(max_length=8, blank=True, default="", help_text="Um único emoji, exibido no seletor de espaços de trabalho.")
     description = models.CharField(max_length=500, blank=True, default="")
     timezone = models.CharField(max_length=63, blank=True, default="")
     primary_color = models.CharField(max_length=7, blank=True, default="", validators=[validate_hex_color])
     secondary_color = models.CharField(max_length=7, blank=True, default="", validators=[validate_hex_color])
     is_archived = models.BooleanField(default=False)
+    ai_agents_enabled = models.BooleanField(
+        default=False,
+        help_text="Kill switch por espaço de trabalho; não habilita execução sem a flag global.",
+    )
 
     objects = OrgScopedManager()
 

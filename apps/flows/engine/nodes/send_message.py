@@ -287,11 +287,12 @@ def _media_url(ctx: NodeContext, block: dict[str, Any]) -> str:
         except MediaNotFoundError:
             # An explicit media_id that does not resolve is a deleted asset,
             # not a URL. The library's own contract: stop the message.
-            raise _UnresolvableMediaError(f"media {media_id!r} is not in this workspace's library") from None
-
+            raise _UnresolvableMediaError(
+                f"a mídia {media_id!r} não está na biblioteca deste espaço de trabalho"
+            ) from None
     url = ctx.render(block.get("url"))
     if not url:
-        raise _UnresolvableMediaError("a media block carries neither a library id nor a URL")
+        raise _UnresolvableMediaError("o bloco de mídia não contém um ID da biblioteca nem uma URL")
     return url
 
 

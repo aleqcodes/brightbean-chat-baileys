@@ -72,7 +72,6 @@ class TestAnAgentReply:
             response = agent_client.post(url_for("send", conversation_id=conversation.pk), {"body": "   "})
 
         assert response.status_code == 204
-        assert "Nothing to send" in response.headers["HX-Trigger"]
         assert not _messages(conversation).exists()
         assert adapter.sends == []
 

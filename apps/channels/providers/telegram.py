@@ -253,7 +253,7 @@ def bot_token(connection: ChannelConnection) -> str:
     try:
         credentials: Any = connection.credentials or {}
     except ValueError:
-        logger.error("Connection %s: credentials could not be decrypted.", connection.pk)
+        logger.error("Conexão %s: não foi possível descriptografar as credenciais.", connection.pk)
         return ""
     if not isinstance(credentials, dict):
         return ""
@@ -296,7 +296,7 @@ def call(
     pass ``BACKGROUND_TIMEOUT``: nobody is waiting on a webhook for those.
     """
     if not token:
-        raise APIError("This Telegram connection has no bot token stored.")
+        raise APIError("Esta conexão do Telegram não tem um token de bot armazenado.")
     body = request_json(
         "POST",
         f"{API_ROOT}/bot{token}/{method}",
@@ -308,7 +308,7 @@ def call(
         # No `description` in the message: Telegram's prose quotes the request
         # that caused it, and these strings reach logs and the inbox
         # (SECURITY-BASELINE §5). The numeric code is what a human looks up.
-        raise APIError(f"Telegram refused {method}", code=str(body.get("error_code") or "")[:64])
+        raise APIError(f"O Telegram recusou {method}", code=str(body.get("error_code") or "")[:64])
     return body.get("result")
 
 
@@ -316,7 +316,7 @@ def get_me(token: str) -> dict[str, Any]:
     """``getMe``: proves the token works and says which bot it belongs to."""
     result = call(token, "getMe", timeout=BACKGROUND_TIMEOUT)
     if not isinstance(result, dict):
-        raise APIError("Telegram returned an unexpected getMe result")
+        raise APIError("O Telegram retornou um resultado inesperado de getMe")
     return result
 
 
@@ -557,7 +557,7 @@ def _pressable(message: OutboundMessage) -> list[Button]:
     extra = [Button(id=item.id, label=item.label) for item in message.quick_replies]
     if extra:
         logger.debug(
-            "Telegram: %s quick repl(ies) sent as inline buttons because the message also has buttons.",
+            "Telegram: %s resposta(s) rápida(s) foram enviadas como botões inline porque a mensagem também tem botões.",
             len(extra),
         )
     return [*message.buttons, *extra]
@@ -609,11 +609,11 @@ def _callback_data(node_id: str, button_id: str) -> str | None:
         return combined
     bare = f":{button_id}"
     if len(bare.encode("utf-8")) <= MAX_CALLBACK_DATA_BYTES:
-        logger.debug("Telegram: callback_data for %r dropped its node prefix to fit 64 bytes.", button_id)
+        logger.debug("Telegram: o prefixo do nó foi removido de callback_data para %r caber em 64 bytes.", button_id)
         return bare
     logger.warning(
-        "Telegram: button id is over %s bytes and cannot be sent as callback_data; "
-        "the button was left out of the keyboard.",
+        "Telegram: o ID do botão excede %s bytes e não pode ser enviado como callback_data; "
+        "o botão foi omitido do teclado.",
         MAX_CALLBACK_DATA_BYTES,
     )
     return None
@@ -871,7 +871,7 @@ class TelegramAdapter(Adapter):
             # Every genuine update has one, and it is the deduplication key
             # (SPEC §7.1 step 2). Without it we would have to synthesise an id
             # from content, and two identical "hi" messages would collide.
-            logger.info("Telegram delivery on connection %s carried no usable update_id.", connection.pk)
+            logger.info("A entrega do Telegram na conexão %s não informou um update_id válido.", connection.pk)
             return []
 
         provider_event_id = f"tg:{update_id}"
@@ -1019,7 +1019,7 @@ class TelegramAdapter(Adapter):
                 max_attempts=2,
             )
         except Exception:
-            logger.warning("Telegram: could not enqueue a callback answer on connection %s.", connection.pk)
+            logger.warning("Telegram: não foi possível adicionar uma resposta de callback à fila na conexão %s.", connection.pk)
 
     # -- outbound -----------------------------------------------------------
 
@@ -1083,7 +1083,7 @@ class TelegramAdapter(Adapter):
         """
         if exc.status_code != 403:
             return
-        logger.info("Telegram: connection %s can no longer reach a chat; recording an opt-out.", connection.pk)
+        logger.info("Telegram: a conexão %s não pode mais alcançar um chat; registrando a opção de não receber mensagens.", connection.pk)
         now = timezone.now()
         event = NormalizedEvent(
             type=EventType.OPT_OUT,
@@ -1099,7 +1099,7 @@ class TelegramAdapter(Adapter):
             channels_ingest.process_events(connection, (event,))
         except Exception:
             # The send failure is the thing the caller is waiting to hear about.
-            logger.exception("Telegram: could not record an opt-out on connection %s.", connection.pk)
+            logger.exception("Telegram: não foi possível registrar a opção de não receber mensagens na conexão %s.", connection.pk)
 
     def send_typing(self, connection: ChannelConnection, identity: Any) -> None:
         """``sendChatAction``. Cosmetic, so a failure is logged and swallowed."""
@@ -1109,7 +1109,7 @@ class TelegramAdapter(Adapter):
         try:
             call(bot_token(connection), "sendChatAction", {"chat_id": chat_id, "action": "typing"})
         except APIError:
-            logger.debug("Telegram: typing indicator failed on connection %s.", connection.pk)
+            logger.debug("Telegram: falha no indicador de digitação na conexão %s.", connection.pk)
 
     # `mark_seen` stays the base class's no-op: bots have no read receipts.
 
@@ -1137,14 +1137,14 @@ class TelegramAdapter(Adapter):
         """
         token = bot_token(connection)
         if not token:
-            logger.info("Telegram: connection %s has no token; media cannot be resolved.", connection.pk)
+            logger.info("Telegram: a conexão %s não tem token; não é possível resolver a mídia.", connection.pk)
             return None
         try:
             path = file_path(token, media_id)
         except APIError as exc:
             # `exc` is the adapter's own sentence plus a numeric code — never
             # Telegram's prose and never the URL (see `call`).
-            logger.info("Telegram: getFile failed on connection %s: %s", connection.pk, exc)
+            logger.info("Telegram: getFile falhou na conexão %s: %s", connection.pk, exc)
             return None
         if not path:
             return None

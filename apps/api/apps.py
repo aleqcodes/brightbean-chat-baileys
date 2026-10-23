@@ -7,7 +7,7 @@ class ApiConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "apps.api"
     label = "api"
-    verbose_name = "Public API"
+    verbose_name = "API pública"
 
     def ready(self) -> None:
         """Run the import side effects that have to happen once per process.

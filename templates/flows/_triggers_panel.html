@@ -24,25 +24,23 @@ inside it would be swapped away mid-request.
      class="p-4">
 
     <div class="flex items-center justify-between gap-2 mb-1">
-        <h2 class="text-sm font-semibold" style="color: var(--text-primary);">Triggers</h2>
+        <h2 class="text-sm font-semibold" style="color: var(--text-primary);">Gatilhos</h2>
         <button type="button" class="btn-link text-xs"
-                @click="triggersOpen = false">Close</button>
+                @click="triggersOpen = false">Fechar</button>
     </div>
     <p class="text-xs mb-4" style="color: var(--text-tertiary);">
-        What starts this flow. Lower numbers run first and the first match wins,
-        across every flow in this workspace, not just this one.
+        A prioridade vale para todos os fluxos deste espaço de trabalho, não apenas para este.
     </p>
 
     {% for label in duplicate_stage_labels %}
     <div class="alert-error text-xs mb-3">
-        More than one “{{ label }}” trigger is enabled on this flow. Only the one with the
-        lowest number will ever run.
+        Há mais de um gatilho “{{ label }}” ativo neste fluxo. Somente o de menor número será executado.
     </div>
     {% endfor %}
 
     {% if not triggers %}
     <div class="mb-4">
-    {% include "components/empty_state.html" with icon="flows" title="No triggers yet" body="A published flow with no trigger never runs. Add one below." %}
+    {% include "components/empty_state.html" with icon="flows" title="Ainda não há gatilhos" body="Um fluxo publicado sem gatilho nunca é executado. Adicione um abaixo." %}
     </div>
     {% else %}
     <div class="card overflow-hidden mb-4">
@@ -63,7 +61,7 @@ inside it would be swapped away mid-request.
     {% endcomment %}
     <details class="mt-2" {% if not triggers %}open{% endif %}>
         <summary class="btn-pill-secondary btn-pill-sm cursor-pointer list-none inline-flex">
-            {% include "partials/_nav_icon.html" with name="plus" icon_size=15 %} Add a trigger
+            {% include "partials/_nav_icon.html" with name="plus" icon_size=15 %} Adicionar gatilho
         </summary>
         <div class="option-cards mt-3">
             {% for spec in trigger_types %}
@@ -73,7 +71,7 @@ inside it would be swapped away mid-request.
                     hx-swap="innerHTML">
                 <span class="option-card-body">
                     <span class="option-card-title">{{ spec.label }}</span>
-                    <span class="option-card-text">{% if spec.unavailable %}Not available yet{% else %}{{ spec.description }}{% endif %}</span>
+                    <span class="option-card-text">{% if spec.unavailable %}Ainda não disponível{% else %}{{ spec.description }}{% endif %}</span>
                 </span>
             </button>
             {% endfor %}

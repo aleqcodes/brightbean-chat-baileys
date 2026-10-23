@@ -89,16 +89,16 @@ PENDING_MAX_AGE = messenger_oauth.STATE_MAX_AGE
 #: them — start again — and a message that distinguished them would tell whoever
 #: sent a forged link which part of the forgery was wrong.
 OAUTH_FAILED = (
-    "Facebook did not complete that connection. Start the setup again from this page, and make sure "
-    "you accept every permission it asks for."
+    "O Facebook não concluiu a conexão. Inicie a configuração novamente nesta página e aceite todas as "
+    "permissões solicitadas."
 )
 
 #: Shown when the deployment has no Meta app configured. Distinct from the above
 #: on purpose: this one is not a failed attempt, it is a missing prerequisite, and
 #: the fix is a different screen.
 NOT_CONFIGURED = (
-    "This deployment has no Facebook app credentials yet. Set "
-    "PLATFORM_MESSENGER_CLIENT_ID and PLATFORM_MESSENGER_CLIENT_SECRET in the environment; see "
+    "Esta implantação ainda não tem credenciais do app do Facebook. Configure "
+    "PLATFORM_MESSENGER_CLIENT_ID e PLATFORM_MESSENGER_CLIENT_SECRET no ambiente; consulte "
     "docs/channels/messenger.md."
 )
 
@@ -106,8 +106,8 @@ NOT_CONFIGURED = (
 #: the fix is genuinely different — almost always a missing permission or an app
 #: still in development mode.
 SUBSCRIBE_FAILED = (
-    "That page connected, but Facebook would not start sending its messages here. The app needs "
-    "pages_messaging and pages_manage_metadata on this page; see docs/channels/messenger.md."
+    "A página foi conectada, mas o Facebook não conseguiu começar a enviar mensagens para cá. O app precisa "
+    "das permissões pages_messaging e pages_manage_metadata nesta página; consulte docs/channels/messenger.md."
 )
 
 
@@ -358,12 +358,13 @@ def _connect_page(request: WorkspaceRequest, page: messenger_oauth.MetaPage) -> 
         logger.info("Messenger connect: the Get Started button could not be set for %s.", connection.pk)
         messages.warning(
             request,
-            f"Connected {connection.display_name}, but the Get Started button could not be configured. "
-            f"the welcome trigger will not fire until it is. See docs/channels/messenger.md.",
+            f"{connection.display_name} conectado, mas não foi possível configurar o botão Começar. "
+            "O gatilho de boas-vindas não será acionado até que isso seja feito. Consulte "
+            "docs/channels/messenger.md.",
         )
         return ""
 
-    messages.success(request, f"Connected {connection.display_name}. Send it a message to check it works.")
+    messages.success(request, f"{connection.display_name} conectado. Envie uma mensagem para conferir se está funcionando.")
     return ""
 
 

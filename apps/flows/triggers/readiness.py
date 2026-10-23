@@ -49,7 +49,7 @@ def readiness_warnings(flow: Any, *, connected: set[str]) -> list[Issue]:
         return [
             Issue(
                 code="flow_has_no_trigger",
-                message="Nothing starts this flow yet, so it will not run. Add a trigger.",
+                message="Este fluxo ainda não tem um gatilho e, por isso, não será executado. Adicione um gatilho.",
                 stage="graph",
             )
         ]
@@ -59,7 +59,7 @@ def readiness_warnings(flow: Any, *, connected: set[str]) -> list[Issue]:
         return [
             Issue(
                 code="flow_triggers_all_disabled",
-                message="Every trigger is switched off, so this flow will not start. Turn one on.",
+                message="Todos os gatilhos estão desativados, então este fluxo não será iniciado. Ative um deles.",
                 stage="graph",
             )
         ]
@@ -88,13 +88,13 @@ def readiness_warnings(flow: Any, *, connected: set[str]) -> list[Issue]:
     # Naming the platforms once. Saying them at both ends read "starts from
     # Instagram or Facebook Messenger, and no Instagram or Facebook Messenger
     # account is connected" — true, and nobody finishes reading it.
-    tail = "and it is not connected" if len(names) == 1 else "and none of those is connected"
+    tail = "e ela não está conectada" if len(names) == 1 else "e nenhuma delas está conectada"
     return [
         Issue(
             code="flow_platform_not_connected",
             message=(
-                f"Nothing can reach this flow: it starts on {joined}, {tail}. "
-                f"Connect an account under Settings, then Channels."
+                f"Nada pode acionar este fluxo: ele começa em {joined}, {tail}. "
+                f"Conecte uma conta em Configurações e, depois, em Canais."
             ),
             stage="graph",
         )

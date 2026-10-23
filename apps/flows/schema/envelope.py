@@ -177,17 +177,17 @@ def check_limits(graph: Any, *, known_size: int | None = None) -> list[Issue]:
     if known_size is None or known_size > MAX_GRAPH_BYTES:
         size = graph_byte_size(graph)
         if size < 0:
-            return [_issue("malformed_graph", "The graph is not a JSON document.")]
+            return [_issue("malformed_graph", "O grafo não é um documento JSON.")]
         if size > MAX_GRAPH_BYTES:
             return [
                 _issue(
                     "graph_too_large",
-                    f"The graph is {size} bytes; the limit is {MAX_GRAPH_BYTES} bytes.",
+                    f"O grafo tem {size} bytes; o limite é {MAX_GRAPH_BYTES} bytes.",
                 )
             ]
     depth, non_finite = _measure(graph, depth_limit=MAX_GRAPH_DEPTH)
     if depth > MAX_GRAPH_DEPTH:
-        return [_issue("graph_too_deep", f"The graph nests deeper than the limit of {MAX_GRAPH_DEPTH} levels.")]
+        return [_issue("graph_too_deep", f"O grafo tem mais níveis de aninhamento que o limite de {MAX_GRAPH_DEPTH}.")]
     if non_finite:
         # Checked on the walk rather than left to the serializer, because the
         # `known_size` fast path skips serializing altogether. Postgres `jsonb`
@@ -195,7 +195,7 @@ def check_limits(graph: Any, *, known_size: int | None = None) -> list[Issue]:
         return [
             _issue(
                 "non_finite_number",
-                "NaN and Infinity are not JSON numbers and cannot be stored.",
+                "NaN e Infinity não são números JSON e não podem ser armazenados.",
             )
         ]
     return []
@@ -208,14 +208,14 @@ def validate_document(graph: Any, *, known_size: int | None = None) -> list[Issu
         return issues
 
     if not isinstance(graph, dict):
-        return [_issue("graph_not_object", "A flow graph must be a JSON object.")]
+        return [_issue("graph_not_object", "O grafo do fluxo deve ser um objeto JSON.")]
 
     for key in graph:
         if key not in GRAPH_KEYS:
             issues.append(
                 _issue(
                     "unknown_top_level_key",
-                    f"{key!r} is not part of the graph envelope. Allowed: {', '.join(GRAPH_KEYS)}.",
+                    f"{key!r} não faz parte do envelope do grafo. Permitidas: {', '.join(GRAPH_KEYS)}.",
                     path=str(key),
                 )
             )
@@ -224,7 +224,7 @@ def validate_document(graph: Any, *, known_size: int | None = None) -> list[Issu
         issues.append(
             _issue(
                 "unsupported_schema_version",
-                f'Expected "schema": {SCHEMA_VERSION}, got {graph.get("schema")!r}.',
+                f'Esperado "schema": {SCHEMA_VERSION}; recebido {graph.get("schema")!r}.',
                 path="schema",
             )
         )
@@ -233,17 +233,17 @@ def validate_document(graph: Any, *, known_size: int | None = None) -> list[Issu
     edges = graph.get("edges")
     if not isinstance(nodes, list) or not isinstance(edges, list):
         if not isinstance(nodes, list):
-            issues.append(_issue("nodes_not_list", '"nodes" must be a list.', path="nodes"))
+            issues.append(_issue("nodes_not_list", '"nodes" deve ser uma lista.', path="nodes"))
         if not isinstance(edges, list):
-            issues.append(_issue("edges_not_list", '"edges" must be a list.', path="edges"))
+            issues.append(_issue("edges_not_list", '"edges" deve ser uma lista.', path="edges"))
         return issues
     if issues:
         return issues
 
     if len(nodes) > MAX_NODES:
-        issues.append(_issue("too_many_nodes", f"{len(nodes)} nodes; the limit is {MAX_NODES}.", path="nodes"))
+        issues.append(_issue("too_many_nodes", f"{len(nodes)} etapas; o limite é {MAX_NODES}.", path="nodes"))
     if len(edges) > MAX_EDGES:
-        issues.append(_issue("too_many_edges", f"{len(edges)} edges; the limit is {MAX_EDGES}.", path="edges"))
+        issues.append(_issue("too_many_edges", f"{len(edges)} conexões; o limite é {MAX_EDGES}.", path="edges"))
     if issues:
         return issues
 
@@ -260,7 +260,7 @@ def _check_nodes(nodes: list[Any]) -> list[Issue]:
     for index, node in enumerate(nodes):
         path = f"nodes[{index}]"
         if not isinstance(node, dict):
-            issues.append(_issue("node_not_object", "A node must be a JSON object.", path=path))
+            issues.append(_issue("node_not_object", "Uma etapa deve ser um objeto JSON.", path=path))
             continue
 
         node_id = node.get("id")
@@ -268,14 +268,14 @@ def _check_nodes(nodes: list[Any]) -> list[Issue]:
             issues.append(
                 _issue(
                     "invalid_node_id",
-                    "A node id must be 1–64 characters of letters, digits, '_' or '-'.",
+                    "O id de uma etapa deve ter de 1 a 64 caracteres: letras, números, '_' ou '-'.",
                     path=f"{path}.id",
                 )
             )
             node_id = None
         elif node_id in seen:
             issues.append(
-                _issue("duplicate_node_id", f"Node id {node_id!r} appears more than once.", node_id=node_id, path=path)
+                _issue("duplicate_node_id", f"O id {node_id!r} aparece mais de uma vez.", node_id=node_id, path=path)
             )
         else:
             seen.add(node_id)
@@ -285,7 +285,7 @@ def _check_nodes(nodes: list[Any]) -> list[Issue]:
                 issues.append(
                     _issue(
                         "unknown_node_key",
-                        f"{key!r} is not part of a node. Allowed: {', '.join(_NODE_KEYS)}.",
+                        f"{key!r} não faz parte de uma etapa. Permitidas: {', '.join(_NODE_KEYS)}.",
                         node_id=node_id,
                         path=f"{path}.{key}",
                     )
@@ -298,7 +298,7 @@ def _check_nodes(nodes: list[Any]) -> list[Issue]:
             issues.append(
                 _issue(
                     "unknown_node_type",
-                    f"{node.get('type')!r} is not a known node type.",
+                    f"{node.get('type')!r} não é um tipo de etapa conhecido.",
                     node_id=node_id,
                     path=f"{path}.type",
                 )
@@ -307,7 +307,7 @@ def _check_nodes(nodes: list[Any]) -> list[Issue]:
 
         if "config" not in node:
             issues.append(
-                _issue("missing_required_config", '"config" is required.', node_id=node_id, path=f"{path}.config")
+                _issue("missing_required_config", '"config" é obrigatório.', node_id=node_id, path=f"{path}.config")
             )
             continue
 
@@ -319,7 +319,7 @@ def _check_nodes(nodes: list[Any]) -> list[Issue]:
 def _check_position(position: Any, path: str, node_id: str | None) -> list[Issue]:
     if not isinstance(position, dict):
         return [
-            _issue("invalid_position", '"position" must be an {x, y} object.', node_id=node_id, path=f"{path}.position")
+            _issue("invalid_position", '"position" deve ser um objeto {x, y}.', node_id=node_id, path=f"{path}.position")
         ]
     issues: list[Issue] = []
     for axis in ("x", "y"):
@@ -328,7 +328,7 @@ def _check_position(position: Any, path: str, node_id: str | None) -> list[Issue
             issues.append(
                 _issue(
                     "invalid_position",
-                    f'"position.{axis}" must be a number.',
+                    f'"position.{axis}" deve ser um número.',
                     node_id=node_id,
                     path=f"{path}.position.{axis}",
                 )
@@ -338,7 +338,7 @@ def _check_position(position: Any, path: str, node_id: str | None) -> list[Issue
             issues.append(
                 _issue(
                     "unknown_node_key",
-                    f"{key!r} is not part of a position.",
+                    f"{key!r} não faz parte de uma posição.",
                     node_id=node_id,
                     path=f"{path}.position.{key}",
                 )
@@ -353,7 +353,7 @@ def _check_edges(edges: list[Any]) -> list[Issue]:
     for index, edge in enumerate(edges):
         path = f"edges[{index}]"
         if not isinstance(edge, dict):
-            issues.append(_issue("edge_not_object", "An edge must be a JSON object.", path=path))
+            issues.append(_issue("edge_not_object", "Uma conexão deve ser um objeto JSON.", path=path))
             continue
 
         edge_id = edge.get("id")
@@ -361,14 +361,14 @@ def _check_edges(edges: list[Any]) -> list[Issue]:
             issues.append(
                 _issue(
                     "invalid_edge_id",
-                    "An edge id must be 1–64 characters of letters, digits, '_' or '-'.",
+                    "O id de uma conexão deve ter de 1 a 64 caracteres: letras, números, '_' ou '-'.",
                     path=f"{path}.id",
                 )
             )
             edge_id = None
         elif edge_id in seen:
             issues.append(
-                _issue("duplicate_edge_id", f"Edge id {edge_id!r} appears more than once.", edge_id=edge_id, path=path)
+                _issue("duplicate_edge_id", f"O id {edge_id!r} aparece mais de uma vez.", edge_id=edge_id, path=path)
             )
         else:
             seen.add(edge_id)
@@ -378,7 +378,7 @@ def _check_edges(edges: list[Any]) -> list[Issue]:
                 issues.append(
                     _issue(
                         "unknown_edge_key",
-                        f"{key!r} is not part of an edge. Allowed: {', '.join(_EDGE_KEYS)}.",
+                        f"{key!r} não faz parte de uma conexão. Permitidas: {', '.join(_EDGE_KEYS)}.",
                         edge_id=edge_id,
                         path=f"{path}.{key}",
                     )
@@ -389,7 +389,7 @@ def _check_edges(edges: list[Any]) -> list[Issue]:
                 issues.append(
                     _issue(
                         "invalid_edge_endpoint",
-                        f'"{key}" must be a non-empty string.',
+                        f'"{key}" deve ser uma string não vazia.',
                         edge_id=edge_id,
                         path=f"{path}.{key}",
                     )

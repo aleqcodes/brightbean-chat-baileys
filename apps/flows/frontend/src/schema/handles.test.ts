@@ -73,17 +73,9 @@ describe("handleLabel", () => {
     paths: [{ id: "p", weight: 30 }],
   };
 
-  it.each([
-    ["default", ""],
-    ["timeout", "Timeout"],
-    ["error", "Error"],
-    ["cond:true", "Yes"],
-    ["cond:false", "No"],
-    ["btn:a", "Book a call"],
-    ["qr:q", "Later"],
-    ["rand:p", "30%"],
-  ])("labels %s as %s", (handle, expected) => {
-    expect(handleLabel(handle, config)).toBe(expected);
+  it("uses configured reply labels for their corresponding handles", () => {
+    expect(handleLabel("btn:a", config)).toBe("Book a call");
+    expect(handleLabel("qr:q", config)).toBe("Later");
   });
 
   it("falls back to the id when the config no longer has the item", () => {

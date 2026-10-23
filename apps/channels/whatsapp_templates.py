@@ -380,13 +380,13 @@ def submit(template: WhatsAppTemplate) -> WhatsAppTemplate:
     that never started.
     """
     if not _NAME_RE.match(template.name):
-        raise APIError("A template name may only contain lowercase letters, digits and underscores.")
+        raise APIError("O nome do modelo pode conter apenas letras minúsculas, números e sublinhados.")
 
     connection = template.channel_connection
     credentials = whatsapp.credentials_of(connection)
     waba_id = credentials.get(whatsapp.WABA_ID_KEY, "")
     if not waba_id:
-        raise APIError("This WhatsApp connection has no WhatsApp Business Account id stored.")
+        raise APIError("Esta conexão do WhatsApp não tem um ID da Conta do WhatsApp Business armazenado.")
 
     body = whatsapp.call(
         credentials.get(whatsapp.ACCESS_TOKEN_KEY, ""),
@@ -405,7 +405,7 @@ def submit(template: WhatsAppTemplate) -> WhatsAppTemplate:
     template.status = WhatsAppTemplateStatus.PENDING
     template.rejected_reason = ""
     template.save(update_fields=["meta_template_id", "status", "rejected_reason", "updated_at"])
-    logger.info("WhatsApp template %s submitted for review.", template.pk)
+    logger.info("Modelo do WhatsApp %s enviado para análise.", template.pk)
     return template
 
 
@@ -452,7 +452,7 @@ def delete_template(template: WhatsAppTemplate) -> None:
                 timeout=BACKGROUND_TIMEOUT,
             )
         except APIError:
-            logger.warning("WhatsApp template %s could not be deleted at Meta; removing it locally.", template.pk)
+            logger.warning("Não foi possível excluir o modelo do WhatsApp %s na Meta; removendo-o localmente.", template.pk)
     template.delete()
 
 
@@ -489,7 +489,7 @@ def refresh_status(template: WhatsAppTemplate) -> bool:
         reason = str(raw_reason) if isinstance(raw_reason, str) and raw_reason.upper() != "NONE" else status
         new_status = WhatsAppTemplateStatus.REJECTED
     else:
-        logger.warning("WhatsApp template %s came back with an unrecognised status; leaving it pending.", template.pk)
+        logger.warning("O modelo do WhatsApp %s retornou um status não reconhecido; mantendo-o pendente.", template.pk)
         return False
 
     template.status = new_status
@@ -533,10 +533,10 @@ def poll_pending() -> str | None:
             moved += 1 if refresh_status(template) else 0
         except APIError:
             failed += 1
-            logger.warning("WhatsApp template %s could not be polled; it will be retried next hour.", template.pk)
+            logger.warning("Não foi possível consultar o modelo do WhatsApp %s; haverá nova tentativa na próxima hora.", template.pk)
         except Exception:
             failed += 1
-            logger.exception("WhatsApp template %s failed to poll.", template.pk)
+            logger.exception("Falha ao consultar o modelo do WhatsApp %s.", template.pk)
 
     if not moved and not failed:
         return None
@@ -568,7 +568,7 @@ def _announce(template: WhatsAppTemplate) -> None:
             },
         )
     except Exception:
-        logger.exception("Could not notify a template review outcome for %s.", template.pk)
+        logger.exception("Não foi possível notificar o resultado da análise do modelo %s.", template.pk)
 
 
 # ---------------------------------------------------------------------------

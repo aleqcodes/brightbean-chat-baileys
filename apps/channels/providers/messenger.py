@@ -379,7 +379,7 @@ def graph_call(
     exchange.
     """
     if not token and not unauthenticated:
-        raise APIError("This connection has no access token stored.")
+        raise APIError("Esta conexão não tem um token de acesso armazenado.")
     headers = {} if unauthenticated else {"Authorization": f"Bearer {token}"}
     return request_json(
         method,
@@ -433,7 +433,7 @@ def mark_needs_reauth(connection: ChannelConnection, *, platform_label: str) -> 
             connection.status = ConnectionStatus.NEEDS_REAUTH
             connection.save(update_fields=["status", "updated_at"])
     except Exception:
-        logger.exception("Could not park connection %s as needing reconnection.", connection.pk)
+        logger.exception("Não foi possível colocar a conexão %s como precisando de reconexão.", connection.pk)
         return
 
     try:
@@ -451,7 +451,7 @@ def mark_needs_reauth(connection: ChannelConnection, *, platform_label: str) -> 
                 },
             )
     except Exception:
-        logger.exception("Could not notify about connection %s needing reconnection.", connection.pk)
+        logger.exception("Não foi possível notificar que a conexão %s precisa de reconexão.", connection.pk)
 
 
 def page_token(connection: ChannelConnection) -> str:
@@ -466,7 +466,7 @@ def page_token(connection: ChannelConnection) -> str:
     try:
         credentials: Any = connection.credentials or {}
     except ValueError:
-        logger.error("Connection %s: credentials could not be decrypted.", connection.pk)
+        logger.error("Conexão %s: não foi possível descriptografar as credenciais.", connection.pk)
         return ""
     if not isinstance(credentials, dict):
         return ""
@@ -797,7 +797,7 @@ def _apply_buttons(calls: list[dict[str, Any]], message: OutboundMessage) -> lis
     room = MAX_QUICK_REPLIES - len(message.quick_replies)
     if room > 0:
         logger.debug(
-            "Messenger: %s button(s) sent as quick replies because the message ends in an attachment.",
+            "Messenger: %s botão(ões) foram enviados como respostas rápidas porque a mensagem termina com um anexo.",
             min(len(buttons), room),
         )
         chips = [chip for chip in (_quick_reply_from_button(item, message.node_id) for item in message.buttons) if chip]
@@ -808,10 +808,10 @@ def _apply_buttons(calls: list[dict[str, Any]], message: OutboundMessage) -> lis
         # chip that does nothing when tapped is worse than no chip, so they are
         # dropped — and the key is not left behind empty, because Meta rejects an
         # empty ``quick_replies`` array.
-        logger.debug("Messenger: URL buttons after an attachment cannot be represented; they were left out.")
+        logger.debug("Messenger: botões com URL após um anexo não podem ser representados e foram omitidos.")
         return calls
 
-    logger.warning("Messenger: %s button(s) could not be represented and were left out.", len(buttons))
+    logger.warning("Messenger: %s botão(ões) não puderam ser representados e foram omitidos.", len(buttons))
     return calls
 
 
@@ -895,9 +895,9 @@ def _payload(node_id: str, button_id: str) -> str | None:
         return combined
     bare = f":{button_id}"
     if len(bare.encode("utf-8")) <= MAX_PAYLOAD_BYTES:
-        logger.debug("Messenger: payload for %r dropped its node prefix to fit %s bytes.", button_id, MAX_PAYLOAD_BYTES)
+        logger.debug("Messenger: o prefixo do nó foi removido do conteúdo de %r para caber em %s bytes.", button_id, MAX_PAYLOAD_BYTES)
         return bare
-    logger.warning("Messenger: a button id is over %s bytes and was left out.", MAX_PAYLOAD_BYTES)
+    logger.warning("Messenger: o ID do botão excede %s bytes e foi omitido.", MAX_PAYLOAD_BYTES)
     return None
 
 
@@ -1144,7 +1144,7 @@ class MessengerAdapter(Adapter):
         """
         payload = security.json_payload(request) or {}
         if payload.get("object") != WEBHOOK_OBJECT:
-            logger.info("A delivery on connection %s was not a page object; ignoring it.", connection.pk)
+            logger.info("A entrega na conexão %s não era um objeto de página; ignorando.", connection.pk)
             return []
 
         # Reset per delivery. The registry hands out a fresh adapter instance per
@@ -1196,7 +1196,7 @@ class MessengerAdapter(Adapter):
             return verified
         owner = owners.get(page_id)
         if owner is None:
-            logger.info("Dropped a Messenger entry for a page this deployment does not hold.")
+            logger.info("Entrada do Messenger descartada: esta implantação não tem a página correspondente.")
         return owner
 
     def _from_entry(self, connection: ChannelConnection, entry: dict[str, Any]) -> list[NormalizedEvent]:
@@ -1219,7 +1219,7 @@ class MessengerAdapter(Adapter):
             # The handover protocol: another app owns the thread right now. Out of
             # scope for v1, and acting on it would mean answering a conversation
             # somebody else is holding.
-            logger.debug("Ignoring a standby batch on connection %s.", connection.pk)
+            logger.debug("Ignorando um lote em espera na conexão %s.", connection.pk)
         return events
 
     def _from_messaging(
@@ -1280,7 +1280,7 @@ class MessengerAdapter(Adapter):
         if not mid:
             # Every genuine message has one, and it is the deduplication key
             # (SPEC §7.1 step 2). Without it a redelivery would be processed again.
-            logger.info("A Messenger message on connection %s carried no usable mid.", connection.pk)
+            logger.info("A mensagem do Messenger na conexão %s não informou um mid válido.", connection.pk)
             return []
 
         text = _text(message.get("text"))
@@ -1438,7 +1438,7 @@ class MessengerAdapter(Adapter):
             # is a message that will sit at ``sent`` forever, because Meta does
             # not resend a delivery receipt.
             logger.warning(
-                "Messenger: a delivery receipt named %s message ids; only the first %s were applied.",
+                "Messenger: um recibo de entrega informou %s IDs de mensagem; somente os primeiros %s foram aplicados.",
                 len(mids),
                 MAX_DELIVERY_MIDS,
             )
@@ -1508,7 +1508,7 @@ class MessengerAdapter(Adapter):
             return []
         if self._read_receipt_budget <= 0:
             logger.info(
-                "Messenger: more read receipts in one delivery than %s; the rest were dropped.",
+                "Messenger: há mais recibos de leitura do que o limite de %s por entrega; os demais foram descartados.",
                 MAX_READ_RECEIPTS_PER_DELIVERY,
             )
             return []
@@ -1679,7 +1679,7 @@ class MessengerAdapter(Adapter):
             # because Meta restricts pages over a message sent under a tag it did
             # not accept, and a send that silently lost its tag would be exactly
             # that message.
-            logger.error("Messenger: refusing a send tagged %r, which this platform does not accept.", tag)
+            logger.error("Messenger: recusando envio com a tag %r, que esta plataforma não aceita.", tag)
             return SendResult(status=SendStatus.FAILED, error="unsupported_tag")
 
         rendered = downgrade(outbound, self.capabilities)
@@ -1713,8 +1713,8 @@ class MessengerAdapter(Adapter):
             # operator can see it in the log and fix the flow, which is not true of
             # a message that silently fails at the platform.
             logger.warning(
-                "Messenger: a comment's private reply rendered to %s calls; only the first was sent. "
-                "Meta permits one message in reply to a comment — make the flow's first node a single message.",
+                "Messenger: a resposta privada a um comentário gerou %s chamadas; somente a primeira foi enviada. "
+                "A Meta permite uma única mensagem como resposta a um comentário — configure a primeira etapa do fluxo como uma única mensagem.",
                 len(calls),
             )
             calls = calls[:1]
@@ -1748,7 +1748,7 @@ class MessengerAdapter(Adapter):
         try:
             return pending_private_reply(connection, psid)
         except Exception:
-            logger.exception("Messenger: could not check for a pending private reply on connection %s.", connection.pk)
+            logger.exception("Messenger: não foi possível verificar se há uma resposta privada pendente na conexão %s.", connection.pk)
             return None
 
     def _settle_private_reply(self, claim: Any, identity: Any, result: dict[str, Any], psid: str) -> None:
@@ -1761,14 +1761,14 @@ class MessengerAdapter(Adapter):
             # operator needs to know rather than find out through a misdelivered
             # conversation.
             logger.warning(
-                "Messenger: a private reply resolved to a different page-scoped id than the comment carried."
+                "Messenger: o ID de usuário associado à página na resposta privada difere daquele informado pelo comentário."
             )
         try:
             from apps.flows.triggers.guards import mark_private_reply_sent
 
             mark_private_reply_sent(claim, contact=getattr(identity, "contact", None))
         except Exception:
-            logger.exception("Messenger: could not record that a private reply was sent.")
+            logger.exception("Messenger: não foi possível registrar o envio da resposta privada.")
 
     def _handle_send_error(self, connection: ChannelConnection, psid: str, exc: APIError) -> None:
         """Park a dead credential, or record an opt-out, then let the error carry on.
@@ -1809,7 +1809,7 @@ class MessengerAdapter(Adapter):
             channels_ingest.process_events(connection, (event,))
         except Exception:
             # The send failure is the thing the caller is waiting to hear about.
-            logger.exception("Messenger: could not record an opt-out on connection %s.", connection.pk)
+            logger.exception("Messenger: não foi possível registrar a opção de não receber mensagens na conexão %s.", connection.pk)
 
     def send_typing(self, connection: ChannelConnection, identity: Any) -> None:
         """``sender_action: typing_on``. Cosmetic, so a failure is swallowed."""
@@ -1826,7 +1826,7 @@ class MessengerAdapter(Adapter):
         try:
             send_body(connection, {"recipient": {"id": psid}, "sender_action": action})
         except APIError:
-            logger.debug("Messenger: %s failed on connection %s.", action, connection.pk)
+            logger.debug("Messenger: falha em %s na conexão %s.", action, connection.pk)
 
     # -- lifecycle ----------------------------------------------------------
 
@@ -2014,7 +2014,7 @@ def respond_to_comment(context: Any, trigger: Any, row: Any) -> None:
                 max_attempts=attempts,
             )
         except Exception:
-            logger.warning("Messenger: could not enqueue %s for %s.", action_type, row.pk)
+            logger.warning("Messenger: não foi possível adicionar %s à fila para %s.", action_type, row.pk)
 
 
 def _claimed_comment(payload: dict[str, Any], *, needs_private_reply: bool) -> tuple[Any, Any] | None:
@@ -2141,7 +2141,7 @@ def _like_comment(connection: ChannelConnection, row: Any, config: dict[str, Any
             timeout=BACKGROUND_TIMEOUT,
         )
     except APIError:
-        logger.debug("Messenger: liking a comment failed on connection %s.", connection.pk)
+        logger.debug("Messenger: falha ao curtir um comentário na conexão %s.", connection.pk)
 
 
 def _start_comment_flow(connection: ChannelConnection, row: Any) -> None:
@@ -2214,7 +2214,7 @@ def _start_comment_flow(connection: ChannelConnection, row: Any) -> None:
     except ClaimedFlowNotRunnableError as exc:
         # A trigger pointing at a flow with no publishable version. A configuration
         # problem retries cannot fix, so it is logged and the claim stands.
-        logger.warning("Messenger: comment trigger %s cannot start its flow: %s", row.trigger_id, exc)
+        logger.warning("Messenger: o gatilho de comentário %s não pode iniciar o fluxo: %s", row.trigger_id, exc)
 
 
 # ---------------------------------------------------------------------------

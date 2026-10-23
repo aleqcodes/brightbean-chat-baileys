@@ -13,8 +13,8 @@ export function ChannelHint() {
   const { picklists } = useField();
 
   if (picklists.connections.length === 0) {
-    return <p className="fb-field-help">Limits depend on the channel this flow runs on; none are connected yet.</p>;
+    return <p className="fb-field-help">Os limites dependem do canal em que este fluxo será executado; nenhum canal está conectado.</p>;
   }
   const names = [...new Set(picklists.connections.map((connection) => connection.platform))].join(", ");
-  return <p className="fb-field-help">Checked against the connected channels: {names}.</p>;
+  return <p className="fb-field-help">Verificado nos canais conectados: {names}.</p>;
 }

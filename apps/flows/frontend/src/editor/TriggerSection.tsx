@@ -50,8 +50,8 @@ export function TriggerSection() {
     } catch (error) {
       showToast({
         tone: "error",
-        title: "Not changed",
-        body: error instanceof ApiError ? error.message : "The trigger could not be switched.",
+        title: "Não foi alterado",
+        body: error instanceof ApiError ? error.message : "Não foi possível alterar o gatilho.",
       });
     } finally {
       setBusy(null);
@@ -66,14 +66,14 @@ export function TriggerSection() {
     // Highlighted when the canvas card is selected, the same way a step's row
     // highlights — so clicking either one shows you which is which.
     <section className={selected ? "fb-trigger-section is-selected" : "fb-trigger-section"}>
-      <h2 className="fb-trigger-heading">When it runs</h2>
+      <h2 className="fb-trigger-heading">Quando é executado</h2>
 
       {triggers.length === 0 ? (
         <>
-          <p className="fb-trigger-empty">Nothing starts this flow yet, so it will not run.</p>
+          <p className="fb-trigger-empty">Nada inicia este fluxo ainda, então ele não será executado.</p>
           {canEdit ? (
             <button type="button" className="btn-pill-secondary btn-pill-sm mt-2.5" onClick={openDrawer}>
-              Choose what starts it
+              Escolher o que inicia o fluxo
             </button>
           ) : null}
         </>
@@ -84,15 +84,15 @@ export function TriggerSection() {
               <li key={trigger.id} className={trigger.enabled ? "fb-trigger-row" : "fb-trigger-row is-off"}>
                 <span className="min-w-0 flex-1">
                   <span className="fb-trigger-name block">{trigger.type_label}</span>
-                  {!trigger.enabled ? <span className="fb-trigger-off">Switched off</span> : null}
+                  {!trigger.enabled ? <span className="fb-trigger-off">Desativado</span> : null}
                   <span className="fb-trigger-detail block">{trigger.summary}</span>
                 </span>
                 {canEdit && env.triggerEnabledUrl ? (
-                  <label className="switch mt-0.5" title={trigger.enabled ? "Switch off" : "Switch on"}>
+                  <label className="switch mt-0.5" title={trigger.enabled ? "Desativar" : "Ativar"}>
                     <input
                       type="checkbox"
                       role="switch"
-                      aria-label={`${trigger.type_label} is on`}
+                      aria-label={`${trigger.type_label} ${trigger.enabled ? "ativado" : "desativado"}`}
                       checked={trigger.enabled}
                       disabled={busy !== null}
                       onChange={(event) => void flip(trigger.id, event.target.checked)}
@@ -107,18 +107,18 @@ export function TriggerSection() {
             // The list above still reads as "this is what starts it", and for
             // an offline flow none of it does — the toolbar pill is easy to miss.
             <p className="fb-trigger-empty mt-2">
-              This flow is offline, so none of these start it. They will again once it is set live.
+              Este fluxo está desativado, então estes gatilhos não o iniciam. Voltarão a funcionar quando o fluxo for ativado.
             </p>
           ) : enabled.length === 0 ? (
             <p className="fb-trigger-empty mt-2">
               {published
-                ? "This flow is published, but every trigger is off. It will not start until one is turned on."
-                : "Every trigger is off, so nothing reaches this flow yet."}
+                ? "Este fluxo está publicado, mas todos os gatilhos estão desativados. Ele só será iniciado quando algum for ativado."
+                : "Todos os gatilhos estão desativados, então nada inicia este fluxo."}
             </p>
           ) : null}
           {canEdit ? (
             <button type="button" className="fb-link-button mt-1" onClick={openDrawer}>
-              Manage triggers
+              Gerenciar gatilhos
             </button>
           ) : null}
         </>

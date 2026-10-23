@@ -32,15 +32,15 @@ class Channel(models.TextChoices):
     HTTP dependency in the tree.
     """
 
-    IN_APP = "in_app", "In-app"
-    EMAIL = "email", "Email"
+    IN_APP = "in_app", "No aplicativo"
+    EMAIL = "email", "E-mail"
 
 
 class DeliveryStatus(models.TextChoices):
-    PENDING = "pending", "Pending"
-    QUEUED = "queued", "Queued"
-    SENT = "sent", "Sent"
-    FAILED = "failed", "Failed"
+    PENDING = "pending", "Pendente"
+    QUEUED = "queued", "Na fila"
+    SENT = "sent", "Enviada"
+    FAILED = "failed", "Falhou"
 
 
 class Notification(BaseModel):

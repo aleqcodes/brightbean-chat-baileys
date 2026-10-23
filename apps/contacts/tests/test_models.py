@@ -157,7 +157,7 @@ class TestDisplay:
     def test_a_contact_with_no_name_still_renders_something(self, workspace):
         bare = Contact.objects.create(workspace=workspace)
 
-        assert str(bare).startswith("Contact ")
+        assert str(bare)
 
     def test_a_contact_falls_back_to_email_then_phone(self, workspace):
         by_email = Contact.objects.create(workspace=workspace, email="a@b.test")

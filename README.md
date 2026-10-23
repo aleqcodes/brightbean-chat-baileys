@@ -54,7 +54,10 @@ If you'd rather not run a server, a hosted version is available at
 | <img src=".github/assets/icons/code-xml.svg" width="18" height="18" alt=""> **Source** | Proprietary | Open source, AGPL-3.0 |
 | <img src=".github/assets/icons/plug.svg" width="18" height="18" alt=""> **Extensibility** | Catalog of native integrations | REST API, signed webhooks, and HTTP calls from any flow |
 | <img src=".github/assets/icons/message-circle.svg" width="18" height="18" alt=""> **Channels** | Instagram, Messenger, WhatsApp, Telegram, SMS, email, TikTok | Everything but TikTok |
-| <img src=".github/assets/icons/sparkles.svg" width="18" height="18" alt=""> **AI features** | Built-in reply generation and intent detection | None, by design |
+| <img src=".github/assets/icons/sparkles.svg" width="18" height="18" alt=""> **AI features** | Built-in reply generation and intent detection | No inference or autonomous replies are available yet. |
+
+
+AI-agent persistence is an inactive foundation only: provider credentials are encrypted, and the global and per-workspace switches default to off. Provider calls, tools, and automated replies are not implemented.
 
 There is no per-contact pricing, so growing your audience never pushes you onto
 a pricier plan, and every contact, flow and conversation stays in a database

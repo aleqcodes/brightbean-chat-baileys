@@ -9,29 +9,27 @@ The endpoint table is generated from the OpenAPI schema (apps/api/views_docs.py)
 so it cannot disagree with the routes.
 {% endcomment %}
 
-{% block title %}API reference · BrightBean Chat{% endblock %}
+{% block title %}Documentação da API · BrightBean Chat{% endblock %}
 
 {% block page_header %}
   <h1 class="text-lg font-semibold" style="color: var(--text-primary);">BrightBean Chat API v1</h1>
   <p class="text-sm mb-6" style="color: var(--text-secondary);">
-    A bearer-authenticated JSON API, plus signed outbound webhooks.
+    API JSON com autenticação por token bearer e webhooks de saída assinados.
   </p>
 {% endblock %}
 
 {% block content %}
-  <h2>Authentication</h2>
-  <p>Every request carries an API key issued from Settings → Organization → API keys:</p>
+  <h2>Autenticação</h2>
+  <p>Toda solicitação deve incluir uma chave de API criada em Configurações → Organização → Chaves de API:</p>
   <p><code>Authorization: Bearer {{ token_prefix }}…</code></p>
   <p class="muted">
-    A key is scoped to exactly one workspace; there is no cross-workspace call and
-    no way to widen a key after issuance. Requests without a valid key get
-    <code>401</code>. Outside development a key sent over plain HTTP is refused,
-    it has already been logged by every hop that saw it.
+    Cada chave é válida para um único espaço de trabalho; não é possível fazer chamadas entre espaços nem ampliar o escopo após a criação. Solicitações sem uma chave válida recebem
+    <code>401</code>. Fora do ambiente de desenvolvimento, chaves enviadas por HTTP simples são recusadas, pois já teriam sido registradas por cada intermediário.
   </p>
 
-  <h3>Scopes</h3>
+  <h3>Escopos</h3>
   <table>
-    <thead><tr><th>Scope</th><th>Grants</th></tr></thead>
+    <thead><tr><th>Escopo</th><th>Permissões</th></tr></thead>
     <tbody>
       {% for row in scope_rows %}
         <tr><td><code>{{ row.scope }}</code></td><td>{{ row.permissions }}</td></tr>
@@ -39,41 +37,39 @@ so it cannot disagree with the routes.
     </tbody>
   </table>
   <p class="muted">
-    <code>write</code> includes everything <code>read</code> does. No scope grants
-    key, channel, member or workspace-settings management: an API key cannot mint
-    another API key.
+    <code>write</code> inclui tudo o que <code>read</code> permite. Nenhum escopo concede gerenciamento de chaves, canais, membros ou configurações do espaço de trabalho: uma chave de API não pode criar outra chave.
   </p>
 
-  <h2>Rate limits</h2>
+  <h2>Limites de requisições</h2>
   <p>
-    {{ rate_limit }} requests per second per key. Over the limit the answer is
-    <code>429</code> with a <code>Retry-After</code> header; the window is one
-    second, so the header is the exact wait. Keys never contend with each other.
+    {{ rate_limit }} solicitações por segundo por chave. Ao ultrapassar o limite, a resposta é
+    <code>429</code> com o cabeçalho <code>Retry-After</code>; o intervalo é de um
+    segundo, portanto o cabeçalho informa o tempo exato de espera. As chaves não competem entre si.
   </p>
 
-  <h2>Requests</h2>
+  <h2>Solicitações</h2>
   <p>
-    JSON in, JSON out. Bodies are capped at {{ max_body_bytes }} bytes, and unknown
-    keys are rejected rather than ignored. A typo in a field name is a
-    <code>422</code>, not a silently dropped value.
+    Envie JSON e receba JSON. O corpo tem limite de {{ max_body_bytes }} bytes, e chaves desconhecidas são rejeitadas em vez de ignoradas. Um erro de digitação no nome de um campo retorna
+    <code>422</code>, sem descartar o valor silenciosamente.
   </p>
 
-  <h2>Pagination</h2>
-  <p>Every list endpoint answers with the same envelope:</p>
+  <h2>Paginação</h2>
+  <p>Todos os endpoints de lista retornam o mesmo formato:</p>
   <pre><code>{
   "data": [ … ],
   "has_more": true,
   "next_cursor": "eyJvIjo1MH0"
 }</code></pre>
   <p class="muted">
-    Pass <code>?limit=</code> (1–{{ max_limit }}, default {{ default_limit }}) and
-    <code>?cursor=</code>. The cursor is opaque: echo back <code>next_cursor</code>
-    and never construct one. Keep paging while <code>has_more</code> is true. There
-    is no total, because counting a workspace's contacts costs more than the page does.
+    Informe <code>?limit=</code> (1–{{ max_limit }}, padrão {{ default_limit }}) e
+    <code>?cursor=</code>. O cursor é opaco: devolva <code>next_cursor</code> sem
+    modificá-lo e nunca o construa manualmente. Continue a paginação enquanto
+    <code>has_more</code> for verdadeiro. Não há total, pois contar os contatos de um
+    espaço de trabalho custa mais do que retornar a página.
   </p>
 
-  <h2>Errors</h2>
-  <p>Every non-2xx answer has the same shape:</p>
+  <h2>Erros</h2>
+  <p>Toda resposta que não seja 2xx tem o mesmo formato:</p>
   <pre><code>{
   "error": {
     "code": "compliance_denied",
@@ -82,7 +78,7 @@ so it cannot disagree with the routes.
   }
 }</code></pre>
   <table>
-    <thead><tr><th>Code</th><th>Status</th><th>Meaning</th></tr></thead>
+    <thead><tr><th>Código</th><th>Status</th><th>Significado</th></tr></thead>
     <tbody>
       {% for code, status, meaning in error_codes %}
         <tr><td><code>{{ code }}</code></td><td>{{ status }}</td><td>{{ meaning }}</td></tr>
@@ -90,14 +86,14 @@ so it cannot disagree with the routes.
     </tbody>
   </table>
   <p class="muted">
-    An object belonging to another workspace answers <code>404</code>, exactly as a
-    non-existent one does. That is deliberate: a <code>403</code> would confirm the
-    id names something real.
+    Um objeto pertencente a outro espaço de trabalho retorna <code>404</code>, assim
+    como um objeto inexistente. Isso é intencional: <code>403</code> confirmaria que
+    o ID corresponde a algo real.
   </p>
 
   <h2>Endpoints</h2>
   <table>
-    <thead><tr><th>Method</th><th>Path</th><th>What it does</th></tr></thead>
+    <thead><tr><th>Método</th><th>Caminho</th><th>Descrição</th></tr></thead>
     <tbody>
       {% for endpoint in endpoints %}
         <tr>
@@ -108,12 +104,12 @@ so it cannot disagree with the routes.
       {% endfor %}
     </tbody>
   </table>
-  <p><a href="{{ openapi_url }}">OpenAPI document (JSON)</a></p>
+  <p><a href="{{ openapi_url }}">Documento OpenAPI (JSON)</a></p>
 
-  <h2>Outbound webhooks</h2>
+  <h2>Webhooks de saída</h2>
   <p>
-    Configure endpoints per workspace under Settings → Workspace → Webhooks. Each
-    delivery is a POST carrying:
+    Configure endpoints por espaço de trabalho em Configurações → Organização → Webhooks. Cada
+    entrega é uma solicitação POST com:
   </p>
   <pre><code>{
   "id": "0192f0c1-…",
@@ -123,14 +119,14 @@ so it cannot disagree with the routes.
   "data": {"contact_id": "0192e8ab-…", "tag_id": "0192e8ac-…"}
 }</code></pre>
   <p class="muted">
-    Ids only, never message bodies. Headers:
+    Apenas IDs, nunca o conteúdo das mensagens. Cabeçalhos:
     <code>{{ signature_header }}</code>, <code>{{ timestamp_header }}</code>,
-    <code>{{ event_header }}</code> and <code>{{ delivery_header }}</code>.
+    <code>{{ event_header }}</code> e <code>{{ delivery_header }}</code>.
   </p>
 
-  <h3>Events</h3>
+  <h3>Eventos</h3>
   <table>
-    <thead><tr><th>Event</th><th>Fires when</th></tr></thead>
+    <thead><tr><th>Evento</th><th>Quando é disparado</th></tr></thead>
     <tbody>
       {% for row in event_rows %}
         <tr><td><code>{{ row.name }}</code></td><td>{{ row.label }}</td></tr>
@@ -138,11 +134,11 @@ so it cannot disagree with the routes.
     </tbody>
   </table>
 
-  <h3>Verifying a delivery</h3>
+  <h3>Como verificar uma entrega</h3>
   <p>
-    The signature is <code>v1=</code> followed by the hex HMAC-SHA256, over the
-    timestamp, a literal dot, and the raw request body, in that order, on the
-    bytes you received, before any JSON parsing.
+    A assinatura consiste em <code>v1=</code> seguido do HMAC-SHA256 hexadecimal,
+    calculado sobre o timestamp, um ponto literal e o corpo bruto da solicitação,
+    nessa ordem, usando os bytes recebidos antes de qualquer análise do JSON.
   </p>
   <pre><code>import hashlib, hmac, time
 
@@ -154,11 +150,11 @@ def verify(secret, headers, raw_body, tolerance={{ timestamp_tolerance }}):
     signed = timestamp.encode() + b"." + raw_body
     expected = "v1=" + hmac.new(secret.encode(), signed, hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected, presented)</code></pre>
-  <p class="muted">
-    Compare in constant time, check the timestamp, and treat
-    <code>{{ delivery_header }}</code> as the deduplication key. Delivery is
-    at-least-once. Answer <code>2xx</code> to acknowledge. A delivery that fails is
-    retried on a backoff; after {{ failure_limit }} consecutive failed deliveries
-    the endpoint is switched off and the workspace admins are notified.
+    Compare em tempo constante, verifique o timestamp e use
+    <code>{{ delivery_header }}</code> como chave de deduplicação. A entrega é feita
+    pelo menos uma vez. Responda com <code>2xx</code> para confirmar. Entregas com falha
+    são repetidas com intervalos progressivos; após {{ failure_limit }} falhas
+    consecutivas, o endpoint é desativado e os administradores do espaço de trabalho
+    são notificados.
   </p>
 {% endblock %}

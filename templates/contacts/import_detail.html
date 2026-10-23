@@ -12,15 +12,15 @@ repeat a heading, and a name-keyed mapping collapses the duplicates into
 whichever one it saw last — importing data from a column nobody chose.
 {% endcomment %}
 
-{% block title %}{{ run.original_filename|default:"Import" }} · Import contacts · BrightBean Chat{% endblock %}
+{% block title %}{{ run.original_filename|default:"Importação" }} · Importar contatos · BrightBean Chat{% endblock %}
 
 {% block page_header %}
   <div class="flex items-start justify-between gap-4 mb-4">
     <div class="min-w-0">
-      <h1 class="page-title truncate">{{ run.original_filename|default:"Import" }}</h1>
-      <p class="muted text-xs">Uploaded {{ run.created_at }}</p>
+      <h1 class="page-title truncate">{{ run.original_filename|default:"Importação" }}</h1>
+      <p class="muted text-xs">Enviado em {{ run.created_at }}</p>
     </div>
-    <a class="media-pill flex-shrink-0" href="{% url 'contacts:import_list' workspace_id=request.workspace.id %}">All imports</a>
+    <a class="media-pill flex-shrink-0" href="{% url 'contacts:import_list' workspace_id=request.workspace.id %}">Todas as importações</a>
   </div>
 {% endblock %}
 
@@ -39,32 +39,30 @@ whichever one it saw last — importing data from a column nobody chose.
 {% endcomment %}
 {% if header and not run.is_writing %}
   <section class="crm-panel">
-    <h2>Map the columns</h2>
+    <h2>Mapear colunas</h2>
     <p class="muted text-xs">
-      Leave a column unmapped to ignore it. Mapping a column to <strong>Tags</strong> splits
-      its cell on <code>;</code> or <code>,</code> and attaches each name, creating tags that
-      do not exist yet.
+      Deixe uma coluna sem mapeamento para ignorá-la. Ao mapear uma coluna para <strong>Etiquetas</strong>, o conteúdo da célula é dividido por <code>;</code> ou <code>,</code> e cada nome é associado; etiquetas inexistentes serão criadas.
     </p>
 
     <form hx-post="{% url 'contacts:import_mapping' workspace_id=request.workspace.id import_id=run.id %}"
           hx-swap="none">
       <table>
-        <thead><tr><th>Column</th><th>Sample</th><th>Import as</th></tr></thead>
+        <thead><tr><th>Coluna</th><th>Exemplo</th><th>Importar como</th></tr></thead>
         <tbody>
           {% for column in columns %}
             <tr>
-              <td>{{ column.name|default:"(unnamed)" }}</td>
+              <td>{{ column.name|default:"(sem nome)" }}</td>
               <td class="muted text-xs">
-                {% for sample in column.samples %}{{ sample|truncatechars:40 }}{% if not forloop.last %} · {% endif %}{% empty %}None{% endfor %}
+                {% for sample in column.samples %}{{ sample|truncatechars:40 }}{% if not forloop.last %} · {% endif %}{% empty %}Nenhum{% endfor %}
               </td>
               <td>
-                <label class="sr-only" for="column-{{ column.index }}">Import column {{ column.name }} as</label>
+                <label class="sr-only" for="column-{{ column.index }}">Importar a coluna {{ column.name }} como</label>
                 <select id="column-{{ column.index }}" name="column-{{ column.index }}" class="w-56">
-                  <option value="" {% if not column.target %}selected{% endif %}>Ignore</option>
+                  <option value="" {% if not column.target %}selected{% endif %}>Ignorar</option>
                   {% for target in system_targets %}
                     <option value="{{ target.value }}" {% if column.target == target.value %}selected{% endif %}>{{ target.label }}</option>
                   {% endfor %}
-                  <option value="{{ tags_target }}" {% if column.target == tags_target %}selected{% endif %}>Tags</option>
+                  <option value="{{ tags_target }}" {% if column.target == tags_target %}selected{% endif %}>Etiquetas</option>
                   {% for target in field_targets %}
                     <option value="{{ target.value }}" {% if column.target == target.value %}selected{% endif %}>{{ target.label }} ({{ target.type }})</option>
                   {% endfor %}
@@ -75,19 +73,19 @@ whichever one it saw last — importing data from a column nobody chose.
         </tbody>
       </table>
 
-      <label for="dedupe">When a row matches an existing contact</label>
+      <label for="dedupe">Quando uma linha corresponder a um contato existente</label>
       <select id="dedupe" name="dedupe" class="w-72">
         {% for value, label in dedupe_choices %}
           <option value="{{ value }}" {% if run.dedupe == value %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
       </select>
       <p class="muted text-xs">
-        Matched on email when you map one, otherwise on phone. Blank cells never clear a
-        stored value. Emptying a field is an edit you make on the contact.
+        A correspondência usa o e-mail, se mapeado; caso contrário, usa o telefone. Células vazias nunca apagam um
+        valor armazenado. Para esvaziar um campo, edite o contato.
       </p>
 
-      <button type="submit" class="btn-pill-primary btn-pill-sm mt-3">Check the file</button>
-      <span class="muted text-xs">Nothing is written until you confirm.</span>
+      <button type="submit" class="btn-pill-primary btn-pill-sm mt-3">Verificar arquivo</button>
+      <span class="muted text-xs">Nada será gravado até você confirmar.</span>
     </form>
   </section>
 {% endif %}

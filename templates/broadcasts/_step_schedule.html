@@ -19,33 +19,32 @@ opinion that could disagree.
       hx-target="#broadcast-wizard"
       hx-swap="innerHTML">
     {% csrf_token %}
-    <h2 class="wizard-title">When should it go out?</h2>
-    <p class="wizard-lede">Times are in {{ request.workspace.effective_timezone }}. Nothing is sent until you confirm on the next step.</p>
+    <h2 class="wizard-title">Quando deve ser enviado?</h2>
+    <p class="wizard-lede">Os horários seguem o fuso de {{ request.workspace.effective_timezone }}. Nada será enviado até você confirmar na próxima etapa.</p>
 
     <fieldset class="option-cards">
-        <legend class="sr-only">When</legend>
+        <legend class="sr-only">Quando</legend>
         <label class="option-card">
             <input type="radio" name="when" value="now" x-model="when">
             <span class="option-card-body">
-                <span class="option-card-title">Send now</span>
-                <span class="option-card-text">As soon as you confirm it</span>
+                <span class="option-card-title">Enviar agora</span>
+                <span class="option-card-text">Assim que você confirmar</span>
             </span>
             <span class="option-card-radio" aria-hidden="true"></span>
         </label>
         <label class="option-card">
             <input type="radio" name="when" value="later" x-model="when">
             <span class="option-card-body">
-                <span class="option-card-title">Schedule for later</span>
-                <span class="option-card-text">Pick a date and time</span>
+                <span class="option-card-title">Agendar para depois</span>
+                <span class="option-card-text">Escolha uma data e um horário</span>
             </span>
             <span class="option-card-radio" aria-hidden="true"></span>
         </label>
     </fieldset>
 
     <div class="field mt-4" x-show="when === 'later'" x-cloak>
-        <label for="scheduled-at" class="field-label">Send at</label>
+        <label for="scheduled-at" class="field-label">Enviar em</label>
         <input id="scheduled-at" type="text" name="scheduled_at" class="form-datetime" style="width: 16rem;"
-               placeholder="YYYY-MM-DD HH:MM" value="{% if broadcast.scheduled_at %}{{ broadcast.scheduled_at|timezone:request.workspace.effective_timezone|date:'Y-m-d H:i' }}{% endif %}"
                x-init="$nextTick(() => {
                    if (!window.flatpickr) return;
                    window.flatpickr($el, { enableTime: true, time_24hr: true, dateFormat: 'Y-m-d H:i', allowInput: true });
@@ -53,11 +52,11 @@ opinion that could disagree.
     </div>
 
     <p class="wizard-hint mt-4">
-        A scheduled broadcast can be cancelled up to the moment it starts, and while it is sending.
+        Um disparo agendado pode ser cancelado até o momento em que começar, inclusive enquanto estiver sendo enviado.
     </p>
 
     <div class="wizard-actions">
         {% include "broadcasts/_step_back.html" %}
-        <button type="submit" class="btn-pill-primary">Continue</button>
+        <button type="submit" class="btn-pill-primary">Continuar</button>
     </div>
 </form>

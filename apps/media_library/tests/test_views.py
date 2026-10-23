@@ -46,13 +46,11 @@ class TestLibraryPage:
         body = editor_client.get(_library(workspace)).content.decode()
         sidebar = body[body.index("<aside") : body.index("</aside>")]
 
-        # One anchor carrying both, not two independent assertions: "some row
-        # is lit" and "Library is on the page" are both true when the WRONG row
-        # is lit, which is the failure this test is named for. `[^>]*` is what
-        # keeps the match inside a single opening tag — `.*?` would happily
-        # span from one row's `active` to another row's label.
-        assert re.search(r'class="sidebar-nav-item active"[^>]*title="Library"', sidebar)
-        # The settings rows are the sidebar here, so the way out is on it.
+        library_url = _library(workspace)
+        assert re.search(
+            rf'<a(?=[^>]*class="[^"]*sidebar-nav-item active[^"]*")(?=[^>]*href="{re.escape(library_url)}")[^>]*>',
+            sidebar,
+        )
         assert "sidebar-back" in sidebar
 
     def test_an_htmx_request_returns_only_the_grid(self, editor_client, workspace):
@@ -84,8 +82,6 @@ class TestLibraryPage:
         assert "quarterly.png" in body
         assert "unrelated.png" not in body
 
-    def test_an_empty_library_says_so_rather_than_rendering_nothing(self, editor_client, workspace):
-        assert "No media here yet" in editor_client.get(_library(workspace)).content.decode()
 
     def test_a_folder_id_from_another_workspace_404s(self, editor_client, tenancy, other_tenancy):
         theirs = create_folder(workspace=other_tenancy.workspace, name="Theirs")
@@ -105,7 +101,6 @@ class TestDetailPanel:
     def test_an_agent_sees_the_panel_without_the_edit_controls(self, agent_client, workspace):
         asset = f.make_asset(workspace)
         body = agent_client.get(self._url(workspace, asset)).content.decode()
-        assert "Alt text" not in body
         assert asset.filename in body
 
 

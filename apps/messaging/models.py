@@ -77,27 +77,28 @@ class OptInSource(models.TextChoices):
     because they messaged us" is.
     """
 
-    MESSAGE_IN = "message_in", "Inbound message"
+    MESSAGE_IN = "message_in", "Mensagem recebida"
     #: They commented on one of the workspace's posts and the platform permits
     #: exactly one private reply to it (SPEC §10). Distinct from ``message_in``
     #: because a public comment is not a message, and an audit that could not
     #: tell the two apart would answer "they wrote to us" for someone who did
     #: not — which is precisely the fact §11.8 exists to record accurately.
-    COMMENT = "comment", "Public comment"
-    DATA_COLLECTION = "data_collection", "Data collection"
-    IMPORT = "import", "Import"
+    COMMENT = "comment", "Comentário público"
+    DATA_COLLECTION = "data_collection", "Coleta de dados"
+    IMPORT = "import", "Importação"
     API = "api", "API"
     MANUAL = "manual", "Manual"
 
 
 class ConversationState(models.TextChoices):
-    OPEN = "open", "Open"
-    DONE = "done", "Done"
-
+    OPEN = "open", "Aberta"
+    DONE = "done", "Concluída"
+    IN = "in", "Recebida"
+    OUT = "out", "Enviada"
 
 class MessageDirection(models.TextChoices):
-    IN = "in", "Inbound"
-    OUT = "out", "Outbound"
+    IN = "in", "Entrada"
+    OUT = "out", "Saída"
 
 
 class MessageSource(models.TextChoices):
@@ -111,11 +112,11 @@ class MessageSource(models.TextChoices):
     ``PlatformPolicy.broadcast_allowed`` gates.
     """
 
-    AUTOMATION = "automation", "Automation"
-    AGENT = "agent", "Agent"
+    AUTOMATION = "automation", "Automação"
+    AGENT = "agent", "Atendente"
     API = "api", "API"
-    BROADCAST = "broadcast", "Broadcast"
-    SEQUENCE = "sequence", "Sequence"
+    BROADCAST = "broadcast", "Transmissão"
+    SEQUENCE = "sequence", "Sequência"
 
 
 class MessageStatus(models.TextChoices):
@@ -130,12 +131,12 @@ class MessageStatus(models.TextChoices):
     can walk a deleted message back onto the ladder.
     """
 
-    QUEUED = "queued", "Queued"
-    SENT = "sent", "Sent"
-    DELIVERED = "delivered", "Delivered"
-    READ = "read", "Read"
-    FAILED = "failed", "Failed"
-    DELETED = "deleted", "Deleted"
+    QUEUED = "queued", "Na fila"
+    SENT = "sent", "Enviada"
+    DELIVERED = "delivered", "Entregue"
+    READ = "read", "Lida"
+    FAILED = "failed", "Falhou"
+    DELETED = "deleted", "Excluída"
 
 
 #: How far along the delivery ladder each status is. Receipts arrive as

@@ -21,7 +21,7 @@ CSP has no 'unsafe-inline' in script-src (config/settings/base.py).
   {% if reason %}
     <p class="text-xs" style="color: var(--text-secondary);">
       {{ reason }}
-      {% if connect_url %}<a href="{{ connect_url }}">Connect a page</a>.{% endif %}
+      {% if connect_url %}<a href="{{ connect_url }}">Conectar uma página</a>.{% endif %}
     </p>
   {% else %}
     <ul class="grid grid-cols-1 gap-2">
@@ -31,12 +31,12 @@ CSP has no 'unsafe-inline' in script-src (config/settings/base.py).
                   data-post-id="{{ post.id }}"
                   @click="pick($el.dataset.postId)">
             <span>
-              <span class="block">{{ post.message|default:"(no text)"|truncatechars:64 }}</span>
+              <span class="block">{{ post.message|default:"(sem texto)"|truncatechars:64 }}</span>
               <span style="color: var(--text-tertiary);">{{ post.created_time }}</span>
             </span>
           </button>
           {% if post.permalink %}
-            <a class="text-xs" href="{{ post.permalink }}" target="_blank" rel="noopener noreferrer">View</a>
+            <a class="text-xs" href="{{ post.permalink }}" target="_blank" rel="noopener noreferrer">Ver</a>
           {% endif %}
         </li>
       {% endfor %}

@@ -53,10 +53,10 @@ are until they are sniffed at fetch time.
     <span class="ib-status-dot" aria-hidden="true"></span>
     <span>
       {% if compliance.allowed %}
-        {% if compliance.window_left %}Window open for {{ compliance.window_left }}
-        {% elif compliance.tag %}Window closed, replies go out with a message tag
-        {% elif compliance.identity.window_expires_at %}You can reply
-        {% else %}You can reply at any time{% endif %}
+        {% if compliance.window_left %}Janela aberta por {{ compliance.window_left }}
+        {% elif compliance.tag %}Janela encerrada; respostas serão enviadas com uma etiqueta de mensagem
+        {% elif compliance.identity.window_expires_at %}Você pode responder
+        {% else %}Você pode responder a qualquer momento{% endif %}
         ·
       {% endif %}
       {% comment %}
@@ -64,13 +64,13 @@ are until they are sniffed at fetch time.
         which is true whether or not one happens to be mid-run — the contact
         panel says which one last ran.
       {% endcomment %}
-      Automation is on
+      A automação está ativa
     </span>
     {% if can_reply %}
       <form class="ml-auto" hx-post="{% url 'inbox:pause' workspace_id=request.workspace.id conversation_id=conversation.id %}" hx-swap="none">
         {% csrf_token %}
         <input type="hidden" name="action" value="pause">
-        <button type="submit" class="ib-banner-action" title="Take over: flows stop replying to this contact while you handle it">Pause automation</button>
+        <button type="submit" class="ib-banner-action" title="Assumir: os fluxos deixarão de responder a este contato enquanto você cuida dele">Pausar automação</button>
       </form>
     {% endif %}
   </div>
@@ -84,12 +84,12 @@ are until they are sniffed at fetch time.
       pause is live (apps/inbox/views.py folds it in), so the bar appears and
       disappears on time; it must not claim a precision the refresh cannot back.
     {% endcomment %}
-    <span>Automation paused until {{ paused_until|time:"H:i" }} · Flows will not reply to this contact</span>
+    <span>Automação pausada até {{ paused_until|time:"H:i" }} · Os fluxos não responderão a este contato</span>
     {% if can_reply %}
       <form class="ml-auto" hx-post="{% url 'inbox:pause' workspace_id=request.workspace.id conversation_id=conversation.id %}" hx-swap="none">
         {% csrf_token %}
         <input type="hidden" name="action" value="resume">
-        <button type="submit" class="ib-banner-action">Resume automation</button>
+        <button type="submit" class="ib-banner-action">Retomar automação</button>
       </form>
     {% endif %}
   </div>
@@ -113,9 +113,9 @@ are until they are sniffed at fetch time.
       <button type="button" class="btn-outline btn-inline"
               hx-get="{% url 'inbox:messages' workspace_id=request.workspace.id conversation_id=conversation.id %}?limit={{ next_limit }}"
               hx-target="#inbox-thread-body"
-              hx-swap="innerHTML">Load earlier messages</button>
+              hx-swap="innerHTML">Carregar mensagens anteriores</button>
     {% else %}
-      <p class="text-xs" style="color: var(--text-tertiary);">Showing the most recent {{ limit }} messages.</p>
+      <p class="text-xs" style="color: var(--text-tertiary);">Exibindo as {{ limit }} mensagens mais recentes.</p>
     {% endif %}
   </div>
 {% endif %}
@@ -190,16 +190,16 @@ are until they are sniffed at fetch time.
         day is the divider above, so the line only needs the time.
       {% endcomment %}
       <div class="ib-bubble-meta">
-        {% if item.is_note %}<span>Internal note: never sent</span>
+        {% if item.is_note %}<span>Nota interna: nunca enviada</span>
         {% elif item.is_inbound %}<span>{{ conversation.contact.display_name }}</span>
-        {% elif item.message.flow_name %}<span>Flow “{{ item.message.flow_name }}”</span>
-        {% elif item.message.source == "broadcast" %}<span>Broadcast</span>
-        {% elif item.message.source == "automation" %}<span>Automation</span>
-        {% elif item.message.source == "agent" %}<span>Team</span>{% endif %}
+        {% elif item.message.flow_name %}<span>Fluxo “{{ item.message.flow_name }}”</span>
+        {% elif item.message.source == "broadcast" %}<span>Disparo em massa</span>
+        {% elif item.message.source == "automation" %}<span>Automação</span>
+        {% elif item.message.source == "agent" %}<span>Equipe</span>{% endif %}
         <span aria-hidden="true">·</span>
         <time datetime="{{ item.message.created_at|date:'c' }}" title="{{ item.message.created_at|date:'j M Y, H:i' }}">{{ item.message.created_at|date:"H:i" }}</time>
-        {% if item.button_id %}<span class="ib-chip">Pressed: {{ item.button_id }}</span>{% endif %}
-        {% if item.ref %}<span class="ib-chip">Ref: {{ item.ref }}</span>{% endif %}
+        {% if item.button_id %}<span class="ib-chip">Acionado: {{ item.button_id }}</span>{% endif %}
+        {% if item.ref %}<span class="ib-chip">Referência: {{ item.ref }}</span>{% endif %}
         {% if not item.is_inbound and not item.is_note %}
           {% comment %}
             Ticks read off the status rather than being computed here.
@@ -207,11 +207,11 @@ are until they are sniffed at fetch time.
             DELIVERY_PROGRESS, so what is stored is already the furthest rung
             reached.
           {% endcomment %}
-          {% if item.message.status == "read" %}<span class="ib-tick ib-tick-read" title="Read">✓✓</span>
-          {% elif item.message.status == "delivered" %}<span class="ib-tick" title="Delivered">✓✓</span>
-          {% elif item.message.status == "sent" %}<span class="ib-tick" title="Sent">✓</span>
-          {% elif item.message.status == "failed" %}<span class="ib-tick ib-tick-failed" title="Failed">!</span>
-          {% else %}<span class="ib-tick" title="Queued">…</span>{% endif %}
+          {% if item.message.status == "read" %}<span class="ib-tick ib-tick-read" title="Lida">✓✓</span>
+          {% elif item.message.status == "delivered" %}<span class="ib-tick" title="Entregue">✓✓</span>
+          {% elif item.message.status == "sent" %}<span class="ib-tick" title="Enviada">✓</span>
+          {% elif item.message.status == "failed" %}<span class="ib-tick ib-tick-failed" title="Falha">!</span>
+          {% else %}<span class="ib-tick" title="Na fila">…</span>{% endif %}
         {% endif %}
       </div>
 
@@ -229,14 +229,14 @@ are until they are sniffed at fetch time.
                 deliberate second attempt possible.
               {% endcomment %}
               <input type="hidden" name="token" value="{{ retry_token }}">
-              <button type="submit" class="btn-link btn-inline">Try again</button>
+              <button type="submit" class="btn-link btn-inline">Tentar novamente</button>
             </form>
           {% endif %}
         </div>
       {% endif %}
     </li>
   {% empty %}
-    <li class="ib-empty">No messages yet.</li>
+    <li class="ib-empty">Nenhuma mensagem ainda.</li>
   {% endfor %}
 </ol>
 </div>

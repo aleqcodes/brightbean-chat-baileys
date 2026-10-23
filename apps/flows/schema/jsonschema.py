@@ -128,17 +128,17 @@ def validate_instance(
     if types is not None:
         expected = types if isinstance(types, list) else [types]
         if not any(_type_matches(str(t), value) for t in expected):
-            add(CODE_INVALID_VALUE, f"Expected {' or '.join(str(t) for t in expected)}.", path)
+            add(CODE_INVALID_VALUE, f"Esperado: {' ou '.join(str(t) for t in expected)}.", path)
             # Every further keyword assumes the type held; stop here so one
             # wrong type does not produce a cascade of unrelated complaints.
             return issues
 
     if "const" in schema and value != schema["const"]:
-        add(CODE_INVALID_VALUE, f"Must be {schema['const']!r}.", path)
+        add(CODE_INVALID_VALUE, f"Deve ser {schema['const']!r}.", path)
 
     enum = schema.get("enum")
     if isinstance(enum, list) and value not in enum:
-        add(CODE_INVALID_VALUE, f"Must be one of: {', '.join(repr(option) for option in enum)}.", path)
+        add(CODE_INVALID_VALUE, f"Deve ser um destes valores: {', '.join(repr(option) for option in enum)}.", path)
 
     if isinstance(value, str):
         issues.extend(_check_string(schema, value, path, node_id))
@@ -171,13 +171,13 @@ def _check_string(schema: dict[str, Any], value: str, path: str, node_id: str | 
     maximum = schema.get("maxLength")
     if isinstance(minimum, int) and len(value) < minimum:
         issues.append(
-            _issue(CODE_INVALID_VALUE, f"Too short: {minimum} character{_s(minimum)} at least.", path, node_id)
+            _issue(CODE_INVALID_VALUE, f"Muito curto: pelo menos {minimum} caractere{_s(minimum)}.", path, node_id)
         )
     if isinstance(maximum, int) and len(value) > maximum:
-        issues.append(_issue(CODE_INVALID_VALUE, f"Too long: {maximum} character{_s(maximum)} at most.", path, node_id))
+        issues.append(_issue(CODE_INVALID_VALUE, f"Muito longo: no máximo {maximum} caractere{_s(maximum)}.", path, node_id))
     expression = schema.get("pattern")
     if isinstance(expression, str) and not _pattern(expression).search(value):
-        issues.append(_issue(CODE_INVALID_VALUE, "Does not match the required format.", path, node_id))
+        issues.append(_issue(CODE_INVALID_VALUE, "O formato não corresponde ao esperado.", path, node_id))
     return issues
 
 
@@ -186,9 +186,9 @@ def _check_number(schema: dict[str, Any], value: float, path: str, node_id: str 
     minimum = schema.get("minimum")
     maximum = schema.get("maximum")
     if isinstance(minimum, int | float) and value < minimum:
-        issues.append(_issue(CODE_INVALID_VALUE, f"Must be at least {minimum}.", path, node_id))
+        issues.append(_issue(CODE_INVALID_VALUE, f"Deve ser no mínimo {minimum}.", path, node_id))
     if isinstance(maximum, int | float) and value > maximum:
-        issues.append(_issue(CODE_INVALID_VALUE, f"Must be at most {maximum}.", path, node_id))
+        issues.append(_issue(CODE_INVALID_VALUE, f"Deve ser no máximo {maximum}.", path, node_id))
     return issues
 
 
@@ -199,9 +199,9 @@ def _check_array(
     minimum = schema.get("minItems")
     maximum = schema.get("maxItems")
     if isinstance(minimum, int) and len(value) < minimum:
-        issues.append(_issue(CODE_INVALID_VALUE, f"Add at least {minimum} more.", path, node_id))
+        issues.append(_issue(CODE_INVALID_VALUE, f"Adicione pelo menos mais {minimum}.", path, node_id))
     if isinstance(maximum, int) and len(value) > maximum:
-        issues.append(_issue(CODE_INVALID_VALUE, f"{maximum} at most.", path, node_id))
+        issues.append(_issue(CODE_INVALID_VALUE, f"No máximo {maximum}.", path, node_id))
     items = schema.get("items")
     if isinstance(items, dict):
         for index, item in enumerate(value):
@@ -223,7 +223,7 @@ def _check_object(
                 issues.append(
                     _issue(
                         CODE_MISSING_REQUIRED,
-                        f"{name!r} is required.",
+                        f"{name!r} é obrigatório.",
                         f"{path}.{name}" if path else str(name),
                         node_id,
                     )
@@ -235,7 +235,7 @@ def _check_object(
                 issues.append(
                     _issue(
                         CODE_UNKNOWN_KEY,
-                        f"{name!r} is not a recognised key here. Allowed: {', '.join(sorted(properties)) or 'none'}.",
+                        f"{name!r} não é uma chave reconhecida aqui. Permitidas: {', '.join(sorted(properties)) or 'nenhuma'}.",
                         f"{path}.{name}" if path else str(name),
                         node_id,
                     )
@@ -282,7 +282,7 @@ def _check_variants(
         return [
             _issue(
                 CODE_INVALID_VALUE,
-                f"Matches {matched} of the allowed alternatives; exactly one may apply.",
+                f"Corresponde a {matched} das alternativas permitidas; exatamente uma pode ser aplicada.",
                 path,
                 node_id,
             )
@@ -305,9 +305,9 @@ def _select_variant(
         return {}
     at = f"{path}.{prop}" if path else prop
     if prop not in value:
-        return [_issue(CODE_MISSING_REQUIRED, f"{prop!r} is required.", at, node_id)]
+        return [_issue(CODE_MISSING_REQUIRED, f"{prop!r} é obrigatório.", at, node_id)]
     key = value[prop]
     if not isinstance(key, str) or key not in mapping:
         allowed = ", ".join(repr(option) for option in sorted(mapping))
-        return [_issue(CODE_INVALID_VALUE, f"Must be one of: {allowed}.", at, node_id)]
+        return [_issue(CODE_INVALID_VALUE, f"Deve ser um destes valores: {allowed}.", at, node_id)]
     return _resolve({"$ref": mapping[key]}, defs)

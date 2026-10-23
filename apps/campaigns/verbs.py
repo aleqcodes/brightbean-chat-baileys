@@ -64,10 +64,10 @@ def _sequence(ctx: Any, step: dict[str, Any]) -> Sequence:
     try:
         pk = UUID(str(raw))
     except (ValueError, AttributeError, TypeError) as exc:
-        raise CampaignsError("That is not a sequence id.") from exc
+        raise CampaignsError("Esse não é um ID de sequência.") from exc
     sequence = Sequence.objects.for_workspace(ctx.workspace_id).filter(pk=pk).first()
     if sequence is None:
-        raise CampaignsError("No such sequence in this workspace.")
+        raise CampaignsError("Sequência não encontrada neste espaço de trabalho.")
     return sequence
 
 

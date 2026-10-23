@@ -64,10 +64,10 @@ class FlowStatus(models.TextChoices):
     as a draft somebody never finished.
     """
 
-    DRAFT = "draft", "Draft"
-    ACTIVE = "active", "Active"
-    OFFLINE = "offline", "Offline"
-    ARCHIVED = "archived", "Archived"
+    DRAFT = "draft", "Rascunho"
+    ACTIVE = "active", "Ativo"
+    OFFLINE = "offline", "Desativado"
+    ARCHIVED = "archived", "Arquivado"
 
 
 class Flow(WorkspaceScopedModel):
@@ -161,12 +161,12 @@ class ExecutionStatus(models.TextChoices):
     housekeeping ever writes them a second time.
     """
 
-    RUNNING = "running", "Running"
-    WAITING_REPLY = "waiting_reply", "Waiting for a reply"
-    WAITING_DELAY = "waiting_delay", "Waiting for a delay"
-    COMPLETED = "completed", "Completed"
-    FAILED = "failed", "Failed"
-    EXPIRED = "expired", "Expired"
+    RUNNING = "running", "Em execução"
+    WAITING_REPLY = "waiting_reply", "Aguardando resposta"
+    WAITING_DELAY = "waiting_delay", "Aguardando tempo"
+    COMPLETED = "completed", "Concluída"
+    FAILED = "failed", "Falhou"
+    EXPIRED = "expired", "Expirada"
 
 
 #: The statuses that mean "this execution still owns the contact".
@@ -625,9 +625,9 @@ class RoutedEvent(WorkspaceScopedModel):
 class FlowImportStatus(models.TextChoices):
     """Where an upload has got to. Only ``applied`` has created anything."""
 
-    PENDING = "pending", "Awaiting confirmation"
-    APPLIED = "applied", "Imported"
-    DISCARDED = "discarded", "Discarded"
+    PENDING = "pending", "Aguardando confirmação"
+    APPLIED = "applied", "Importado"
+    DISCARDED = "discarded", "Descartado"
 
 
 class FlowImport(WorkspaceScopedModel):

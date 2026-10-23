@@ -33,6 +33,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
+from apps.ai_agents.models import AIProviderConnection, ProviderKind
 from apps.api.models import OutboundWebhook
 from apps.api.tests.conftest import bearer, make_key
 from apps.channels.models import ChannelConnection
@@ -48,6 +49,7 @@ pytestmark = pytest.mark.django_db
 #: template could plausibly reproduce for some other reason would make a failure
 #: ambiguous, and these cannot appear by accident.
 CANARIES: dict[str, str] = {
+    "ai_agents.AIProviderConnection.credentials": "kanarie-QPZM-aiprovider-3d02",
     "credentials.PlatformCredential.credentials": "kanarie-QPZM-platformcred-7f21",
     "channels.ChannelConnection.credentials": "kanarie-QPZM-connectioncreds-4b0e",
     "channels.ChannelConnection.webhook_secret": "kanarie-QPZM-webhooksecret-8d55",
@@ -87,6 +89,13 @@ def seeded(tenancy: Any) -> dict[str, Any]:
     """One row per encrypted column, each carrying its canary."""
     workspace = tenancy.workspace
     organization = workspace.organization
+    provider = AIProviderConnection.objects.create(
+        workspace=workspace,
+        name="Canary provider",
+        provider=ProviderKind.OPENAI,
+        model="configured-by-admin",
+        credentials={"api_key": CANARIES["ai_agents.AIProviderConnection.credentials"]},
+    )
     connection = ChannelConnection.objects.create(
         workspace=workspace,
         platform=Platform.TELEGRAM,
@@ -110,6 +119,7 @@ def seeded(tenancy: Any) -> dict[str, Any]:
         "connection": connection,
         "platform_credential": platform_credential,
         "webhook": webhook,
+        "provider": provider,
     }
 
 
@@ -140,6 +150,9 @@ class TestTheSweepIsComplete:
     def test_the_seeded_rows_really_hold_the_canaries(self, seeded: dict[str, Any]) -> None:
         """A sweep over rows that never held a secret would pass vacuously."""
         seeded["connection"].refresh_from_db()
+        seeded["provider"].refresh_from_db()
+
+        assert CANARIES["ai_agents.AIProviderConnection.credentials"] in str(seeded["provider"].credentials)
 
         assert CANARIES["channels.ChannelConnection.webhook_secret"] == seeded["connection"].webhook_secret
         assert CANARIES["channels.ChannelConnection.credentials"] in str(seeded["connection"].credentials)

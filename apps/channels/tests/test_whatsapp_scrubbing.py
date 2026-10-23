@@ -160,5 +160,5 @@ class TestTheScrubberKnowsThisShape:
         assert ACCESS_TOKEN not in emitted(caplog)
 
     def test_the_call_helper_refuses_an_empty_token_rather_than_calling(self) -> None:
-        with pytest.raises(APIError, match="no access token"):
+        with pytest.raises(APIError):
             call("", "1/messages", {})

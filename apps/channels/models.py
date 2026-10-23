@@ -99,18 +99,18 @@ class ConnectionStatus(models.TextChoices):
     the value exists so Layer 4 does not have to migrate for it.
     """
 
-    ACTIVE = "active", "Active"
-    NEEDS_REAUTH = "needs_reauth", "Needs reconnection"
-    DISABLED = "disabled", "Disabled"
+    ACTIVE = "active", "Ativo"
+    NEEDS_REAUTH = "needs_reauth", "Precisa reconectar"
+    DISABLED = "disabled", "Desativado"
 
 
 class WebhookEventStatus(models.TextChoices):
     """SPEC §5's ``webhook_event_log.status``."""
 
-    RECEIVED = "received", "Received"
-    PROCESSED = "processed", "Processed"
-    SKIPPED_DUPLICATE = "skipped_duplicate", "Skipped (duplicate)"
-    FAILED = "failed", "Failed"
+    RECEIVED = "received", "Recebido"
+    PROCESSED = "processed", "Processado"
+    SKIPPED_DUPLICATE = "skipped_duplicate", "Ignorado (duplicado)"
+    FAILED = "failed", "Falhou"
 
 
 class ChannelConnection(WorkspaceScopedModel):
@@ -578,8 +578,8 @@ class WhatsAppTemplateCategory(models.TextChoices):
     """
 
     MARKETING = "marketing", "Marketing"
-    UTILITY = "utility", "Utility"
-    AUTHENTICATION = "authentication", "Authentication"
+    UTILITY = "utility", "Utilidade"
+    AUTHENTICATION = "authentication", "Autenticação"
 
 
 class WhatsAppTemplateStatus(models.TextChoices):
@@ -591,10 +591,10 @@ class WhatsAppTemplateStatus(models.TextChoices):
     (:mod:`apps.channels.whatsapp_templates`).
     """
 
-    DRAFT = "draft", "Draft"
-    PENDING = "pending", "In review"
-    APPROVED = "approved", "Approved"
-    REJECTED = "rejected", "Rejected"
+    DRAFT = "draft", "Rascunho"
+    PENDING = "pending", "Em análise"
+    APPROVED = "approved", "Aprovado"
+    REJECTED = "rejected", "Rejeitado"
 
 
 class WhatsAppTemplate(WorkspaceScopedModel):

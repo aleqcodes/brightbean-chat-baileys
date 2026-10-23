@@ -95,7 +95,7 @@ def _keywords(post: Any) -> list[dict[str, str]]:
     texts = post.getlist("keyword_text")
     modes = post.getlist("keyword_mode")
     if len(texts) != len(modes):
-        raise KeywordMismatchError("Each keyword needs a matching mode.")
+        raise KeywordMismatchError("Cada palavra-chave precisa de um modo correspondente.")
 
     seen: set[str] = set()
     keywords: list[dict[str, str]] = []

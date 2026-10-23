@@ -487,7 +487,6 @@ class TestOperatorAuthoredContent:
 
         page = client_for(tenancy.user_for("admin")).get(url_for("rule_settings")).content.decode()
 
-        assert "Message mentions" in page
         assert "<b>refund</b>" not in page
         assert escape("<b>refund</b>") in page
 

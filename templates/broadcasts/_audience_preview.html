@@ -17,7 +17,7 @@ strings on the team-browser path (SECURITY-BASELINE §2) and are escaped by the
 template like any other value; nothing here is marked safe.
 {% endcomment %}
 {% if window_notice %}
-<p class="bc-hint mt-3" role="note">{{ window_notice }}</p>
+<p class="bc-hint mt-3" role="note">Este canal não permite reabrir a janela de mensagens depois que ela se fecha. {% if composer.window_hours %}O disparo só poderá alcançar pessoas que enviaram mensagens nas últimas {{ composer.window_hours }} horas.{% else %}O disparo só poderá alcançar pessoas que enviaram mensagens dentro da janela permitida.{% endif %} As demais serão excluídas do público e, em filtros amplos, podem representar a maioria.</p>
 {% endif %}
 {% if error %}
 <div class="alert-warning mt-3" role="alert">{{ error }}</div>
@@ -26,20 +26,19 @@ template like any other value; nothing here is marked safe.
   <div class="flex flex-wrap items-baseline gap-6">
     <div>
       <div class="bc-preview-figure">{{ preview.eligible }}</div>
-      <div class="bc-tile-label">will receive it</div>
+      <div class="bc-tile-label">receberão a mensagem</div>
     </div>
     <div>
-      <div class="bc-preview-figure">{{ preview.total }}</div>
-      <div class="bc-tile-label">match the filter</div>
+      <div class="bc-tile-label">correspondem ao filtro</div>
     </div>
     <div>
       <div class="bc-preview-figure">{{ preview.skipped_total }}</div>
-      <div class="bc-tile-label">will be skipped</div>
+      <div class="bc-tile-label">serão ignorados</div>
     </div>
   </div>
 
   {% if preview.total == 0 %}
-  <p class="bc-hint mt-2">Nobody matches these rules yet.</p>
+  <p class="bc-hint mt-2">Ninguém corresponde a estas regras ainda.</p>
   {% endif %}
 
   {% for reason in reasons %}
@@ -47,7 +46,7 @@ template like any other value; nothing here is marked safe.
     <span>
       {{ reason.label }}
       {% if reason.names %}
-      <span class="bc-reason-names block">e.g. {% for name in reason.names %}{{ name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+      <span class="bc-reason-names block">por exemplo: {% for name in reason.names %}{{ name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
       {% endif %}
     </span>
     <span class="bc-reason-count">{{ reason.count }}</span>
@@ -55,5 +54,5 @@ template like any other value; nothing here is marked safe.
   {% endfor %}
 </div>
 {% else %}
-<p class="bc-hint mt-3">Add a rule to see who this reaches.</p>
+<p class="bc-hint mt-3">Adicione uma regra para ver quem será incluído.</p>
 {% endif %}

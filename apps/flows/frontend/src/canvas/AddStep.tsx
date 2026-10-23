@@ -91,7 +91,7 @@ export function AddStep() {
         aria-expanded={open}
         onClick={() => setOpen((was) => !was)}
       >
-        <span aria-hidden="true">+</span> Add a step
+        <span aria-hidden="true">+</span> Adicionar uma etapa
       </button>
     </div>
   );
@@ -127,7 +127,7 @@ export function StepMenu({
   })).filter((drawer) => drawer.types.length > 0);
 
   return (
-    <div className={className} role="menu" aria-label="Kinds of step">
+    <div className={className} role="menu" aria-label="Tipos de etapa">
       {drawers.map((drawer) => (
         <div key={drawer.key}>
           <p className="fb-addstep-group">{drawer.phrase}</p>

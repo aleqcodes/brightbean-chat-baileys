@@ -231,12 +231,12 @@ OPS_BY_SOURCE: dict[str, tuple[str, ...]] = {
 SOURCE_NAMES: tuple[str, ...] = ("tag", "custom_field", "system_field", "segment", "sequence", "window")
 
 SOURCE_LABELS: dict[str, str] = {
-    "tag": "Tag",
-    "custom_field": "Custom field",
-    "system_field": "Contact field",
-    "segment": "Segment",
-    "sequence": "Sequence",
-    "window": "Messaging window",
+    "tag": "Etiqueta",
+    "custom_field": "Campo personalizado",
+    "system_field": "Campo do contato",
+    "segment": "Segmento",
+    "sequence": "Sequência",
+    "window": "Janela de atendimento",
 }
 
 #: Operators that take no ``value`` at all — the rule's ``key`` carries the whole
@@ -264,28 +264,28 @@ NEGATION_PAIRS: tuple[tuple[str, str], ...] = (
 _POSITIVE_OF: dict[str, str] = {negative: positive for positive, negative in NEGATION_PAIRS}
 
 OP_LABELS: dict[str, str] = {
-    "is": "is",
-    "is_not": "is not",
-    "contains": "contains",
-    "has_value": "is set",
-    "no_value": "is not set",
+    "is": "é",
+    "is_not": "não é",
+    "contains": "contém",
+    "has_value": "está preenchido",
+    "no_value": "está vazio",
     "=": "=",
     "!=": "≠",
     ">": ">",
     "<": "<",
     ">=": "≥",
     "<=": "≤",
-    "before": "before",
-    "after": "after",
-    "on": "on",
-    "has": "has tag",
-    "has_not": "does not have tag",
-    "in": "in segment",
-    "not_in": "not in segment",
-    "subscribed": "subscribed to",
-    "not": "not subscribed to",
-    "inside": "inside the messaging window",
-    "outside": "outside the messaging window",
+    "before": "antes de",
+    "after": "depois de",
+    "on": "em",
+    "has": "tem a etiqueta",
+    "has_not": "não tem a etiqueta",
+    "in": "está no segmento",
+    "not_in": "não está no segmento",
+    "subscribed": "está inscrito na sequência",
+    "not": "não está inscrito na sequência",
+    "inside": "dentro da janela de atendimento",
+    "outside": "fora da janela de atendimento",
 }
 
 TYPE_OPS: frozenset[str] = frozenset(chain.from_iterable(OPS_BY_TYPE.values()))
@@ -312,14 +312,14 @@ class SystemField:
 #: contacts, because ``BaseModel`` gives every row one and "created in the last
 #: 7 days" is the filter every onboarding flow wants.
 SYSTEM_FIELDS: dict[str, SystemField] = {
-    "first_name": SystemField("first_name", TYPE_TEXT, "First name"),
-    "last_name": SystemField("last_name", TYPE_TEXT, "Last name"),
-    "email": SystemField("email", TYPE_TEXT, "Email"),
-    "phone": SystemField("phone", TYPE_TEXT, "Phone"),
-    "locale": SystemField("locale", TYPE_TEXT, "Locale"),
-    "timezone": SystemField("timezone", TYPE_TEXT, "Timezone"),
-    "created_at": SystemField("created_at", TYPE_DATETIME, "Created"),
-    "last_interaction_at": SystemField("last_interaction_at", TYPE_DATETIME, "Last interaction", nullable=True),
+    "first_name": SystemField("first_name", TYPE_TEXT, "Nome"),
+    "last_name": SystemField("last_name", TYPE_TEXT, "Sobrenome"),
+    "email": SystemField("email", TYPE_TEXT, "E-mail"),
+    "phone": SystemField("phone", TYPE_TEXT, "Telefone"),
+    "locale": SystemField("locale", TYPE_TEXT, "Idioma"),
+    "timezone": SystemField("timezone", TYPE_TEXT, "Fuso horário"),
+    "created_at": SystemField("created_at", TYPE_DATETIME, "Data de criação"),
+    "last_interaction_at": SystemField("last_interaction_at", TYPE_DATETIME, "Última interação", nullable=True),
 }
 
 RELATIVE_UNITS: tuple[str, ...] = ("days",)
@@ -407,7 +407,7 @@ class _Budget:
         self.rules += count
         if self.rules > MAX_TOTAL_RULES:
             raise ConditionValidationError(
-                f"a filter may expand to at most {MAX_TOTAL_RULES} rules across every segment it references",
+                f"Um filtro pode incluir no máximo {MAX_TOTAL_RULES} regras contando todos os segmentos referenciados",
                 code="budget_exceeded",
             )
 
@@ -646,7 +646,7 @@ def _reject_constant(name: str) -> Any:
     Left alone, ``float("nan")`` reaches psycopg and raises a ``DataError`` — a
     500 from a value a stranger controls.
     """
-    raise ConditionValidationError(f"{name} is not a valid filter value", code="bad_number")
+    raise ConditionValidationError(f"{name} não é um valor de filtro válido", code="bad_number")
 
 
 def _max_bracket_depth(raw: str) -> int:
@@ -701,12 +701,12 @@ def _assert_shape(document: Any) -> None:
         node, depth = stack.pop()
         nodes += 1
         if nodes > MAX_NODES:
-            raise ConditionValidationError("filter document is too large", code="too_large")
+            raise ConditionValidationError("O documento do filtro é grande demais", code="too_large")
         if depth > MAX_JSON_DEPTH:
-            raise ConditionValidationError("filter document is nested too deeply", code="too_deep")
+            raise ConditionValidationError("O documento do filtro está aninhado profundamente demais", code="too_deep")
         size += len(node) + 2 if isinstance(node, str) else _NODE_OVERHEAD_BYTES
         if size > MAX_FILTER_BYTES:
-            raise ConditionValidationError("filter document is too large", code="too_large")
+            raise ConditionValidationError("O documento do filtro é grande demais", code="too_large")
         if isinstance(node, dict):
             stack.extend((child, depth + 1) for child in node.values())
             size += sum(len(str(key)) + 4 for key in node)
@@ -732,13 +732,13 @@ def load_document(filter_json: Any) -> Any:
         try:
             filter_json = bytes(filter_json).decode("utf-8")
         except UnicodeDecodeError as exc:
-            raise ConditionValidationError("filter document is not valid UTF-8", code="bad_encoding") from exc
+            raise ConditionValidationError("O documento do filtro não é UTF-8 válido", code="bad_encoding") from exc
     if isinstance(filter_json, str):
         if len(filter_json.encode("utf-8", "surrogatepass")) > MAX_FILTER_BYTES:
-            raise ConditionValidationError("filter document is too large", code="too_large")
+            raise ConditionValidationError("O documento do filtro é grande demais", code="too_large")
         # Depth is checked BEFORE json.loads, not after.
         if _max_bracket_depth(filter_json) > MAX_JSON_DEPTH:
-            raise ConditionValidationError("filter document is nested too deeply", code="too_deep")
+            raise ConditionValidationError("O documento do filtro está aninhado profundamente demais", code="too_deep")
         try:
             filter_json = json.loads(filter_json, parse_constant=_reject_constant)
         except (ValueError, RecursionError) as exc:
@@ -755,7 +755,7 @@ def load_document(filter_json: Any) -> Any:
             # own error is re-raised unchanged rather than relabelled.
             if isinstance(exc, ConditionValidationError):
                 raise
-            raise ConditionValidationError("filter document is not valid JSON", code="bad_json") from exc
+            raise ConditionValidationError("O documento do filtro não é um JSON válido", code="bad_json") from exc
     _assert_shape(filter_json)
     return filter_json
 
@@ -768,13 +768,13 @@ def _exact_keys(obj: Any, allowed: frozenset[str], required: frozenset[str], pat
     who mistyped a key deserves to hear which one.
     """
     if not isinstance(obj, dict):
-        raise ConditionValidationError("expected an object", path=path, code="not_an_object")
+        raise ConditionValidationError("Era esperado um objeto", path=path, code="not_an_object")
     extra = sorted(str(key) for key in set(obj) - allowed)
     if extra:
-        raise ConditionValidationError(f"unknown key(s): {', '.join(extra)}", path=path, code="unknown_key")
+        raise ConditionValidationError(f"Chaves desconhecidas: {', '.join(extra)}", path=path, code="unknown_key")
     missing = sorted(required - set(obj))
     if missing:
-        raise ConditionValidationError(f"missing key(s): {', '.join(missing)}", path=path, code="missing_key")
+        raise ConditionValidationError(f"Chaves obrigatórias ausentes: {', '.join(missing)}", path=path, code="missing_key")
     return obj
 
 
@@ -783,14 +783,14 @@ def _parse_group(document: Any, path: str = "") -> tuple[str, tuple[dict[str, An
     match = body["match"]
     if match not in MATCH_MODES:
         raise ConditionValidationError(
-            f"match must be one of {', '.join(MATCH_MODES)}", path=f"{path}match", code="bad_match"
+            f"match deve ser um destes valores: {', '.join(MATCH_MODES)}", path=f"{path}match", code="bad_match"
         )
     rules = body["rules"]
     if not isinstance(rules, list):
-        raise ConditionValidationError("rules must be a list", path=f"{path}rules", code="not_a_list")
+        raise ConditionValidationError("rules deve ser uma lista", path=f"{path}rules", code="not_a_list")
     if len(rules) > MAX_RULES:
         raise ConditionValidationError(
-            f"a filter may hold at most {MAX_RULES} rules", path=f"{path}rules", code="too_many_rules"
+            f"Um filtro pode ter no máximo {MAX_RULES} regras", path=f"{path}rules", code="too_many_rules"
         )
     return match, tuple(rules)
 
@@ -805,27 +805,27 @@ def _parse_rule(raw: Any, path: str) -> dict[str, Any]:
 
     source = body["source"]
     if source not in SOURCE_NAMES:
-        raise ConditionValidationError("unknown source", path=f"{path}.source", code="unknown_source")
+        raise ConditionValidationError("origem desconhecida", path=f"{path}.source", code="unknown_source")
 
     key = body["key"]
     if not isinstance(key, str):
-        raise ConditionValidationError("key must be a string", path=f"{path}.key", code="bad_key_type")
+        raise ConditionValidationError("key deve ser uma string", path=f"{path}.key", code="bad_key_type")
     if not key or len(key) > MAX_KEY_CHARS:
-        raise ConditionValidationError("key is empty or too long", path=f"{path}.key", code="bad_key")
+        raise ConditionValidationError("key está vazia ou é longa demais", path=f"{path}.key", code="bad_key")
 
     op = body["op"]
     if not isinstance(op, str) or op not in ALL_OPS:
-        raise ConditionValidationError("unknown operator", path=f"{path}.op", code="unknown_op")
+        raise ConditionValidationError("operador desconhecido", path=f"{path}.op", code="unknown_op")
     if op not in _legal_ops(source):
         raise ConditionValidationError(
-            f"operator is not valid for a {source} rule", path=f"{path}.op", code="op_not_legal_for_source"
+            f"operador inválido para uma regra de {source}", path=f"{path}.op", code="op_not_legal_for_source"
         )
 
     has_value = "value" in body
     if op in VALUELESS_OPS and has_value:
-        raise ConditionValidationError("this operator takes no value", path=f"{path}.value", code="value_not_allowed")
+        raise ConditionValidationError("este operador não aceita valor", path=f"{path}.value", code="value_not_allowed")
     if op not in VALUELESS_OPS and not has_value:
-        raise ConditionValidationError("this operator needs a value", path=f"{path}.value", code="value_required")
+        raise ConditionValidationError("este operador exige um valor", path=f"{path}.value", code="value_required")
     return body
 
 
@@ -834,13 +834,13 @@ def _parse_key(key_kind: str, key: str, path: str) -> Any:
         try:
             return UUID(key)
         except (ValueError, AttributeError, TypeError) as exc:
-            raise ConditionValidationError("key is not a valid id", path=f"{path}.key", code="bad_uuid") from exc
+            raise ConditionValidationError("key não é um ID válido", path=f"{path}.key", code="bad_uuid") from exc
     if key_kind == KEY_SYSTEM_FIELD:
         if key not in SYSTEM_FIELDS:
-            raise ConditionValidationError("no such contact field", path=f"{path}.key", code="unknown_key")
+            raise ConditionValidationError("campo de contato inexistente", path=f"{path}.key", code="unknown_key")
         return key
     if key not in Platform.values:
-        raise ConditionValidationError("no such platform", path=f"{path}.key", code="unknown_key")
+        raise ConditionValidationError("plataforma inexistente", path=f"{path}.key", code="unknown_key")
     return key
 
 
@@ -857,7 +857,7 @@ def _coerce_day(raw: Any, path: str) -> date | RelativeDay:
             return date.fromisoformat(raw)
         except ValueError as exc:
             raise ConditionValidationError(
-                "expected a calendar date like 2026-08-21", path=f"{path}.value", code="bad_date"
+                "Informe uma data no formato ISO, como 2026-08-21", path=f"{path}.value", code="bad_date"
             ) from exc
     body = _exact_keys(raw, frozenset({"relative"}), frozenset({"relative"}), f"{path}.value")
     inner = _exact_keys(
@@ -865,17 +865,17 @@ def _coerce_day(raw: Any, path: str) -> date | RelativeDay:
     )
     if inner["unit"] not in RELATIVE_UNITS:
         raise ConditionValidationError(
-            f"unit must be one of {', '.join(RELATIVE_UNITS)}", path=f"{path}.value.relative.unit", code="bad_unit"
+            f"unit deve ser um destes valores: {', '.join(RELATIVE_UNITS)}", path=f"{path}.value.relative.unit", code="bad_unit"
         )
     offset = inner["offset"]
     # isinstance(True, int) is True, so bool has to be excluded explicitly.
     if isinstance(offset, bool) or not isinstance(offset, int):
         raise ConditionValidationError(
-            "offset must be a whole number of days", path=f"{path}.value.relative.offset", code="bad_value_type"
+            "offset deve ser um número inteiro de dias", path=f"{path}.value.relative.offset", code="bad_value_type"
         )
     if abs(offset) > MAX_RELATIVE_OFFSET:
         raise ConditionValidationError(
-            f"offset must be within {MAX_RELATIVE_OFFSET} days",
+            f"offset deve estar entre -{MAX_RELATIVE_OFFSET} e {MAX_RELATIVE_OFFSET} dias",
             path=f"{path}.value.relative.offset",
             code="offset_out_of_range",
         )
@@ -891,36 +891,36 @@ def _coerce_value(raw: Any, value_type: str, path: str) -> Any:
     """
     if value_type == TYPE_BOOLEAN:
         if not isinstance(raw, bool):
-            raise ConditionValidationError("expected true or false", path=f"{path}.value", code="bad_value_type")
+            raise ConditionValidationError("Era esperado verdadeiro ou falso", path=f"{path}.value", code="bad_value_type")
         return raw
     if value_type == TYPE_NUMBER:
         # isinstance(True, int) again: without this, {"op": ">", "value": true}
         # would silently compile to `value_number > 1`.
         if isinstance(raw, bool) or not isinstance(raw, int | float | str):
-            raise ConditionValidationError("expected a number", path=f"{path}.value", code="bad_value_type")
+            raise ConditionValidationError("Era esperado um número", path=f"{path}.value", code="bad_value_type")
         try:
             number = Decimal(str(raw))
         except (InvalidOperation, ValueError) as exc:
-            raise ConditionValidationError("expected a number", path=f"{path}.value", code="bad_value_type") from exc
+            raise ConditionValidationError("Era esperado um número", path=f"{path}.value", code="bad_value_type") from exc
         if not number.is_finite() or abs(number) > Decimal(MAX_ABS_NUMBER):
-            raise ConditionValidationError("number is out of range", path=f"{path}.value", code="number_out_of_range")
+            raise ConditionValidationError("O número está fora do intervalo permitido", path=f"{path}.value", code="number_out_of_range")
         return number
     if value_type in (TYPE_DATE, TYPE_DATETIME):
         if not isinstance(raw, str | dict):
-            raise ConditionValidationError("expected a date", path=f"{path}.value", code="bad_value_type")
+            raise ConditionValidationError("Era esperada uma data", path=f"{path}.value", code="bad_value_type")
         return _coerce_day(raw, path)
     if not isinstance(raw, str):
-        raise ConditionValidationError("expected text", path=f"{path}.value", code="bad_value_type")
+        raise ConditionValidationError("Era esperado um texto", path=f"{path}.value", code="bad_value_type")
     if len(raw) > MAX_VALUE_CHARS:
-        raise ConditionValidationError("text is too long", path=f"{path}.value", code="value_too_long")
+        raise ConditionValidationError("O texto é longo demais", path=f"{path}.value", code="value_too_long")
     if "\x00" in raw:
         # Postgres text cannot hold a NUL; psycopg raises at execute time, which
         # would be a 500 from a value a stranger controls.
-        raise ConditionValidationError("text contains a null byte", path=f"{path}.value", code="nul_byte")
+        raise ConditionValidationError("O texto contém um byte nulo", path=f"{path}.value", code="nul_byte")
     try:
         raw.encode("utf-8")
     except UnicodeEncodeError as exc:
-        raise ConditionValidationError("text is not valid UTF-8", path=f"{path}.value", code="bad_encoding") from exc
+        raise ConditionValidationError("O texto não é UTF-8 válido", path=f"{path}.value", code="bad_encoding") from exc
     return raw
 
 
@@ -976,32 +976,34 @@ def _resolve_group(
 
         if source == "tag":
             if target not in known_tags:
-                raise ConditionValidationError("no such tag", path=f"{rule_path}.key", code="unknown_tag")
+                raise ConditionValidationError("Etiqueta inexistente", path=f"{rule_path}.key", code="unknown_tag")
         elif source == "custom_field":
             value_type = field_types.get(target, "")
             if not value_type:
-                raise ConditionValidationError("no such custom field", path=f"{rule_path}.key", code="unknown_field")
+                raise ConditionValidationError("Campo personalizado inexistente", path=f"{rule_path}.key", code="unknown_field")
             if op not in OPS_BY_TYPE[value_type]:
                 raise ConditionValidationError(
-                    f"operator is not valid for a {value_type} field", path=f"{rule_path}.op", code="op_type_mismatch"
+                    f"Operador inválido para um campo do tipo {value_type}", path=f"{rule_path}.op", code="op_type_mismatch"
                 )
         elif source == "system_field":
             value_type = SYSTEM_FIELDS[target].type
             if op not in OPS_BY_TYPE[value_type]:
                 raise ConditionValidationError(
-                    f"operator is not valid for {SYSTEM_FIELDS[target].label}",
+                    f"Operador inválido para {SYSTEM_FIELDS[target].label}",
                     path=f"{rule_path}.op",
                     code="op_type_mismatch",
                 )
         elif source == "segment":
             if target not in segment_filters:
-                raise ConditionValidationError("no such segment", path=f"{rule_path}.key", code="unknown_segment")
+                raise ConditionValidationError("Segmento inexistente", path=f"{rule_path}.key", code="unknown_segment")
             if target in seen:
                 chain_text = " -> ".join(str(item) for item in (*seen, target))
-                raise ConditionValidationError(f"segment cycle: {chain_text}", path=rule_path, code="segment_cycle")
+                raise ConditionValidationError(f"Ciclo de segmentos: {chain_text}", path=rule_path, code="segment_cycle")
             if depth >= MAX_SEGMENT_DEPTH:
                 raise ConditionValidationError(
-                    f"segments may nest at most {MAX_SEGMENT_DEPTH} deep", path=rule_path, code="segment_too_deep"
+                    f"Os segmentos podem ter no máximo {MAX_SEGMENT_DEPTH} níveis de profundidade",
+                    path=rule_path,
+                    code="segment_too_deep",
                 )
             group = _resolve_group(
                 workspace,

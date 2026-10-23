@@ -388,7 +388,7 @@ def _samples(broadcast: Any, skipped: dict[str, int], compiled: Any) -> dict[str
         # path (SECURITY-BASELINE §2) and the template escapes them like any
         # other value.
         names = [
-            " ".join(part for part in (first, last) if part) or email or "Unnamed contact"
+            " ".join(part for part in (first, last) if part) or email or "Contato sem nome"
             for first, last, email in rows
         ]
         if names:

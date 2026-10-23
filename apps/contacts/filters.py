@@ -96,7 +96,7 @@ DEFAULT_SORT = "recent"
 #: contact the facet calls "opted out" is one the list shows as opted out. They
 #: are independent — consented on Telegram, opted out on SMS — so a contact can
 #: match both, and picking both means either.
-SUBSCRIPTIONS: dict[str, str] = {"subscribed": "Subscribed", "opted_out": "Opted out"}
+SUBSCRIPTIONS: dict[str, str] = {"subscribed": "Inscrito", "opted_out": "Não recebe mensagens"}
 
 #: Cap on the search box. Longer than any name and short enough that the ILIKE
 #: it becomes cannot be used to hand Postgres a megabyte to compare per row.
@@ -161,10 +161,10 @@ def parse_filter_document(raw: Any) -> dict[str, Any]:
     if not raw:
         return {}
     if not isinstance(raw, str):
-        raise ConditionValidationError("filter must be text", code="bad_json")
+        raise ConditionValidationError("o filtro deve ser um texto", code="bad_json")
     document = conditions.load_document(raw)
     if not isinstance(document, dict):
-        raise ConditionValidationError("filter document must be an object", code="not_an_object")
+        raise ConditionValidationError("o documento do filtro deve ser um objeto", code="not_an_object")
     return document
 
 

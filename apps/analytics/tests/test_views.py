@@ -69,12 +69,12 @@ class TestFlowDetail:
         bump(workspace_id=tenancy.workspace.pk, flow_id=flow.pk, node_id=ENTRY_NODE, sent=10, delivered=8, clicked=2)
 
         response = client_for(tenancy.owner).get(flow_url(tenancy, flow))
-        body = response.content.decode()
-
         assert response.status_code == 200
-        assert ENTRY_NODE in body
-        # CTR beside the click count: 2 of 10.
-        assert "20.0%" in body
+        assert ENTRY_NODE in response.content.decode()
+        node = next(row for row in response.context["node_rows"] if row["node_id"] == ENTRY_NODE)
+        assert node["sent"] == 10
+        assert node["clicked"] == 2
+        assert node["ctr"] == 20.0
 
     def test_the_trend_is_zero_filled_across_the_whole_range(self, tenancy: Any, client_for: Any, flow: Any) -> None:
         """A chart drawn from only the days that have rows draws a line between

@@ -10,12 +10,12 @@ reaches apps.inbox.routing, which is where applying lives.
   {% if error %}
     <p class="alert-error">{{ error }}</p>
   {% elif not sample %}
-    <p class="muted">No inbound messages yet, so there is nothing to test against.</p>
+    <p class="muted">Ainda não há mensagens recebidas para usar no teste.</p>
   {% else %}
     <p class="muted">
-      Matched {{ matches|length }} of the last {{ sample }} inbound message{{ sample|pluralize }}.
-      This scores today's contact details against older messages, so it is a
-      preview rather than a replay of what would have happened at the time.
+      Correspondência em {{ matches|length }} das {{ sample }} últimas mensagens recebidas.
+      Os dados de contato de hoje são comparados com mensagens antigas; portanto, isto é uma
+      prévia, não uma reprodução do que teria acontecido na época.
     </p>
     <ul class="ib-rule-test-results">
       {% for row in matches %}

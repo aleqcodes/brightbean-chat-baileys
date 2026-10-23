@@ -23,7 +23,7 @@ import { selectEntryIds, type CardData } from "../store/selectors";
 import { worstSeverity } from "../validation/normalize";
 import { NodePreview } from "./previews";
 
-const HANDLE_COPY: Record<string, string> = { default: "Next" };
+const HANDLE_COPY: Record<string, string> = { default: "Próxima etapa" };
 
 function FlowNodeCardInner({
   id,
@@ -114,7 +114,7 @@ function FlowNodeCardInner({
           </span>
         ) : null}
         {isEntry && !isNote ? (
-          <span className="fb-entry-flag ml-auto">Starts here</span>
+          <span className="fb-entry-flag ml-auto">Inicia aqui</span>
         ) : null}
       </div>
       <div className="fb-node-title truncate">{spec?.label ?? type}</div>
@@ -127,7 +127,7 @@ function FlowNodeCardInner({
         <div className="fb-node-footer">
           {severity ? (
             <span className={`fb-badge fb-badge-${severity}`}>
-              {issues?.length} {severity === "error" ? "error" : "warning"}
+              {issues?.length} {severity === "error" ? "erro" : "aviso"}
               {(issues?.length ?? 0) === 1 ? "" : "s"}
             </span>
           ) : null}
@@ -142,15 +142,15 @@ function FlowNodeCardInner({
               {chip.failed > 0 ? (
                 <span
                   className="fb-badge fb-badge-error"
-                  title="Sends that failed"
+                  title="Envios com falha"
                 >
-                  {chip.failed} failed
+                  {chip.failed} com falha
                 </span>
               ) : null}
-              <span className="fb-pill" title="Sent · delivered · clicked">
+              <span className="fb-pill" title="Enviados · entregues · clicados">
                 {chip.sent} · {chip.delivered} · {chip.clicked}
                 {chip.ctr === null ? null : (
-                  <span className="fb-pill-rate" title="Clicks per send">
+                  <span className="fb-pill-rate" title="Cliques por envio">
                     {" "}
                     {chip.ctr}%
                   </span>
@@ -158,7 +158,7 @@ function FlowNodeCardInner({
               </span>
             </>
           ) : stats && !stats.available && !isNote ? (
-            <span className="fb-pill">No stats</span>
+            <span className="fb-pill">Sem estatísticas</span>
           ) : null}
         </div>
       ) : null}

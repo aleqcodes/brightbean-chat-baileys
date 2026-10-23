@@ -24,9 +24,9 @@ export function BuilderFailure({ error }: { error: Error }) {
   return (
     <div className="h-full flex items-center justify-center p-8">
       <div className="alert-error max-w-lg">
-        <p className="font-medium">The flow builder stopped working.</p>
+        <p className="font-medium">O construtor de fluxos parou de funcionar.</p>
         <p className="mt-1">
-          Reload the page. If it keeps happening, this message helps whoever looks into it:
+          Recarregue a página. Se o problema continuar, esta mensagem pode ajudar a investigá-lo:
         </p>
         <p className="fb-problem-code mt-1">{error.message}</p>
       </div>
@@ -44,7 +44,7 @@ export class ErrorBoundary extends Component<Props, State> {
   override componentDidCatch(error: Error, info: ErrorInfo): void {
     // Kept for whoever opens the console: the rendered copy is deliberately
     // short, and the component stack is the part that locates the fault.
-    console.error("The flow builder crashed.", error, info.componentStack);
+    console.error("O construtor de fluxos falhou.", error, info.componentStack);
   }
 
   override render(): ReactNode {

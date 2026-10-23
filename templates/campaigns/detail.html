@@ -8,7 +8,7 @@ subscriber list somebody is scrolling, and subscribing a contact changes the
 per-step counts, which is why subscriber mutations fire both events.
 {% endcomment %}
 
-{% block title %}{{ sequence.name }} · Sequences · BrightBean Chat{% endblock %}
+{% block title %}{{ sequence.name }} · Sequências · BrightBean Chat{% endblock %}
 
 {% comment %}
 The editor bar (HANDOFF §2.3): a way back, the sequence's name and state, and
@@ -27,46 +27,46 @@ bar shows the state it is now in.
 <div class="editor-bar mb-2">
     <a class="editor-bar-back" href="{% url 'campaigns:list' workspace_id=request.workspace.id %}">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-        Sequences
+        Sequências
     </a>
     <span class="editor-bar-sep" aria-hidden="true">/</span>
     <h1 class="editor-bar-title truncate">{{ sequence.name }}</h1>
-    {% if sequence.status == "active" %}{% include "components/status_pill.html" with tone="success" label="Active" %}
-    {% elif sequence.status == "archived" %}<span class="status-pill status-pill-archived"><span class="status-pill-dot" aria-hidden="true"></span>Archived</span>
-    {% else %}{% include "components/status_pill.html" with tone="neutral" label="Draft" %}{% endif %}
+    {% if sequence.status == "active" %}{% include "components/status_pill.html" with tone="success" label="Ativa" %}
+    {% elif sequence.status == "archived" %}<span class="status-pill status-pill-archived"><span class="status-pill-dot" aria-hidden="true"></span>Arquivada</span>
+    {% else %}{% include "components/status_pill.html" with tone="neutral" label="Rascunho" %}{% endif %}
     {% if can_edit %}
     <div class="ml-auto flex flex-wrap items-center gap-3" x-data>
         {% if sequence.status == "draft" %}
         <form hx-post="{% url 'campaigns:status' workspace_id=request.workspace.id sequence_id=sequence.id %}" hx-swap="none"
-              hx-confirm="Archive this sequence? It stops accepting new subscribers and leaves the list until you restore it."
+              hx-confirm="Arquivar esta sequência? Ela deixará de aceitar novas inscrições e sairá da lista até ser restaurada."
               @htmx:after-request="if (event.detail.successful) window.location.reload()">
             {% csrf_token %}<input type="hidden" name="status" value="archived">
-            <button type="submit" class="btn-danger-link">Archive</button>
+            <button type="submit" class="btn-danger-link">Arquivar</button>
         </form>
         <form hx-post="{% url 'campaigns:status' workspace_id=request.workspace.id sequence_id=sequence.id %}" hx-swap="none"
               @htmx:after-request="if (event.detail.successful) window.location.reload()">
             {% csrf_token %}<input type="hidden" name="status" value="active">
-            <button type="submit" class="btn-pill-primary btn-pill-sm">Activate sequence</button>
+            <button type="submit" class="btn-pill-primary btn-pill-sm">Ativar sequência</button>
         </form>
         {% elif sequence.status == "active" %}
         <form hx-post="{% url 'campaigns:status' workspace_id=request.workspace.id sequence_id=sequence.id %}" hx-swap="none"
               @htmx:after-request="if (event.detail.successful) window.location.reload()">
             {% csrf_token %}<input type="hidden" name="status" value="draft">
-            <button type="submit" class="btn-pill-secondary btn-pill-sm" title="Stops new subscribers. People already on it carry on.">Move back to draft</button>
+            <button type="submit" class="btn-pill-secondary btn-pill-sm" title="Impede novas inscrições. Quem já está inscrito continua normalmente.">Voltar para rascunho</button>
         </form>
         {% else %}
         <form hx-post="{% url 'campaigns:status' workspace_id=request.workspace.id sequence_id=sequence.id %}" hx-swap="none"
               @htmx:after-request="if (event.detail.successful) window.location.reload()">
             {% csrf_token %}<input type="hidden" name="status" value="draft">
-            <button type="submit" class="btn-pill-secondary btn-pill-sm">Restore to draft</button>
+            <button type="submit" class="btn-pill-secondary btn-pill-sm">Restaurar como rascunho</button>
         </form>
         {% endif %}
     </div>
     {% endif %}
 </div>
 <p class="page-lede mb-6 max-w-[42rem]">
-    Steps run in order. Each waits its delay from the moment the previous step actually ran,
-    then opens inside its send window.
+    As etapas são executadas em ordem. Cada uma aguarda o intervalo definido após a execução da etapa anterior
+    e então inicia dentro do horário de envio configurado.
 </p>
 {% endblock %}
 
@@ -91,7 +91,7 @@ design system owns component properties, utilities own layout.
          hx-trigger="load, sequenceSubscribersChanged from:body"
          hx-target="this"
          hx-swap="innerHTML">
-        <p class="text-sm" style="color: var(--text-tertiary);">Loading subscribers…</p>
+        <p class="text-sm" style="color: var(--text-tertiary);">Carregando inscritos…</p>
     </div>
 </div>
 {% endblock %}

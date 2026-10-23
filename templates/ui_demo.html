@@ -10,12 +10,12 @@ partial each template has to remember to pull in; this page fires toasts with
 nothing but a form posting to a toast_response view.
 {% endcomment %}
 
-{% block title %}Design system · BrightBean Chat{% endblock %}
+{% block title %}Sistema de design · BrightBean Chat{% endblock %}
 
 {% block page_header %}
-<h1 class="page-title">Design system</h1>
+<h1 class="page-title">Sistema de design</h1>
 <p class="text-sm mb-6" style="color: var(--text-secondary);">
-    The tokens, components and helpers every later UI issue renders into.
+    Tokens, componentes e ferramentas usados nas demais interfaces.
 </p>
 {% endblock %}
 
@@ -23,77 +23,77 @@ nothing but a form posting to a toast_response view.
 <div class="space-y-10 max-w-3xl">
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Colour roles</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Papéis das cores</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-            Orange is the primary action and the focus ring, nothing else. Selected and current are ink;
-            state is one of five tones, always a dot and a word. <code>test_colour_roles.py</code> holds the line.
+            Laranja é usado apenas na ação principal e no foco. Selecionado e atual usam a cor da tipografia;
+            os estados têm cinco tons, sempre com um ponto e uma palavra. <code>test_colour_roles.py</code> garante isso.
         </p>
         <div class="flex flex-wrap items-center gap-2">
-            <button type="button" class="btn-pill-primary">Primary action</button>
-            <button type="button" class="btn-pill-secondary">Secondary</button>
-            <button type="button" class="btn-pill-secondary btn-pill-sm">Small</button>
-            <button type="button" class="btn-danger-link">Delete this flow</button>
+            <button type="button" class="btn-pill-primary">Ação principal</button>
+            <button type="button" class="btn-pill-secondary">Secundária</button>
+            <button type="button" class="btn-pill-secondary btn-pill-sm">Pequena</button>
+            <button type="button" class="btn-danger-link">Excluir este fluxo</button>
         </div>
         <div class="flex flex-wrap items-center gap-2 mt-4">
-            {% include "components/status_pill.html" with tone="success" label="Live" %}
-            {% include "components/status_pill.html" with tone="warning" label="Offline" %}
-            {% include "components/status_pill.html" with tone="info" label="Sending" %}
-            {% include "components/status_pill.html" with tone="error" label="Failed" %}
-            {% include "components/status_pill.html" with tone="neutral" label="Draft" %}
+            {% include "components/status_pill.html" with tone="success" label="Ativo" %}
+            {% include "components/status_pill.html" with tone="warning" label="Desconectado" %}
+            {% include "components/status_pill.html" with tone="info" label="Enviando" %}
+            {% include "components/status_pill.html" with tone="error" label="Falhou" %}
+            {% include "components/status_pill.html" with tone="neutral" label="Rascunho" %}
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Tabs</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Abas</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-            <code>.tabs</code> at the top of a page (links, <code>aria-current</code>), <code>.tabs-inline</code>
-            inside a pane (a <code>tablist</code>, <code>aria-selected</code>). Active is ink.
+            <code>.tabs</code> no topo da página (links, <code>aria-current</code>), <code>.tabs-inline</code>
+            dentro de um painel (<code>tablist</code>, <code>aria-selected</code>). A aba ativa usa a cor da tipografia.
         </p>
         <div class="card overflow-hidden">
-            <nav class="tabs" aria-label="Example">
-                <a class="tab" href="#" aria-current="page">Flows</a>
-                <a class="tab" href="#">Sequences</a>
-                <a class="tab" href="#">Templates</a>
+            <nav class="tabs" aria-label="Exemplo">
+                <a class="tab" href="#" aria-current="page">Fluxos</a>
+                <a class="tab" href="#">Sequências</a>
+                <a class="tab" href="#">Modelos</a>
             </nav>
             <div class="px-5 py-3" x-data="{ view: 'all' }">
-                <div class="tabs tabs-inline" role="tablist" aria-label="Views">
-                    <button type="button" role="tab" class="tab" :aria-selected="view === 'all'" @click="view = 'all'">All <span class="tab-count">6</span></button>
-                    <button type="button" role="tab" class="tab" :aria-selected="view === 'mine'" @click="view = 'mine'">Mine <span class="tab-count">2</span></button>
-                    <button type="button" role="tab" class="tab" :aria-selected="view === 'done'" @click="view = 'done'">Done <span class="tab-count">1</span></button>
+                <div class="tabs tabs-inline" role="tablist" aria-label="Visualizações">
+                    <button type="button" role="tab" class="tab" :aria-selected="view === 'all'" @click="view = 'all'">Todos <span class="tab-count">6</span></button>
+                    <button type="button" role="tab" class="tab" :aria-selected="view === 'mine'" @click="view = 'mine'">Meus <span class="tab-count">2</span></button>
+                    <button type="button" role="tab" class="tab" :aria-selected="view === 'done'" @click="view = 'done'">Concluídos <span class="tab-count">1</span></button>
                 </div>
             </div>
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Summary cards</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Cartões de resumo</h2>
         <div class="summary-cards mt-3">
-            <div class="summary-card"><span class="dot dot-success" aria-hidden="true"></span><span class="summary-card-value">3</span><span class="summary-card-label">Live</span></div>
-            <div class="summary-card"><span class="dot dot-warning" aria-hidden="true"></span><span class="summary-card-value">1</span><span class="summary-card-label">Offline</span></div>
-            <div class="summary-card"><span class="dot dot-neutral" aria-hidden="true"></span><span class="summary-card-value">2</span><span class="summary-card-label">Draft</span></div>
+            <div class="summary-card"><span class="dot dot-success" aria-hidden="true"></span><span class="summary-card-value">3</span><span class="summary-card-label">Ativos</span></div>
+            <div class="summary-card"><span class="dot dot-warning" aria-hidden="true"></span><span class="summary-card-value">1</span><span class="summary-card-label">Desconectado</span></div>
+            <div class="summary-card"><span class="dot dot-neutral" aria-hidden="true"></span><span class="summary-card-value">2</span><span class="summary-card-label">Rascunho</span></div>
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Table, meter and step dots</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Tabela, medidor e etapas</h2>
         <div class="card overflow-hidden mt-3">
             <div class="data-table-wrap">
                 <table class="data-table">
-                    <thead><tr><th>Sequence</th><th>Steps</th><th class="is-num">Active</th><th>Completion</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Sequência</th><th>Etapas</th><th class="is-num">Ativos</th><th>Conclusão</th><th>Status</th></tr></thead>
                     <tbody>
                         <tr>
-                            <td><span class="data-table-title">New subscriber welcome</span><p class="data-table-meta">Instagram · over 7 days</p></td>
-                            <td><span class="step-dots" aria-hidden="true"><span></span><span></span><span></span><span></span></span> 4 steps</td>
+                            <td><span class="data-table-title">Boas-vindas a novos inscritos</span><p class="data-table-meta">Instagram · em 7 dias</p></td>
+                            <td><span class="step-dots" aria-hidden="true"><span></span><span></span><span></span><span></span></span> 4 etapas</td>
                             <td class="is-num">182</td>
-                            <td><div class="meter"><div class="meter-fill meter-success" style="width: 64%;"></div></div><p class="meter-label">64% complete</p></td>
-                            <td>{% include "components/status_pill.html" with tone="success" label="Active" %}</td>
+                            <td><div class="meter"><div class="meter-fill meter-success" style="width: 64%;"></div></div><p class="meter-label">64% concluído</p></td>
+                            <td>{% include "components/status_pill.html" with tone="success" label="Ativo" %}</td>
                         </tr>
                         <tr>
-                            <td><span class="data-table-title">October product update</span><p class="data-table-meta">Telegram</p></td>
+                            <td><span class="data-table-title">Atualização de produto de outubro</span><p class="data-table-meta">Telegram</p></td>
                             <td>—</td>
                             <td class="is-num">2,140</td>
-                            <td><div class="meter"><div class="meter-fill meter-success" style="width: 55%;"></div><div class="meter-fill meter-info" style="width: 20%;"></div><div class="meter-fill meter-error" style="width: 5%;"></div></div><p class="meter-label">1,490 of 2,140</p></td>
-                            <td>{% include "components/status_pill.html" with tone="info" label="Sending" %}</td>
+                            <td><div class="meter"><div class="meter-fill meter-success" style="width: 55%;"></div><div class="meter-fill meter-info" style="width: 20%;"></div><div class="meter-fill meter-error" style="width: 5%;"></div></div><p class="meter-label">1,490 de 2,140</p></td>
+                            <td>{% include "components/status_pill.html" with tone="info" label="Enviando" %}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -102,81 +102,81 @@ nothing but a form posting to a toast_response view.
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Option cards</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Cartões de opção</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-            Real radios, visually hidden: arrow keys move between cards. Selected is a 2px ink border.
+            Radios reais, ocultos visualmente: as setas movem o foco entre os cartões. A opção selecionada tem uma borda escura de 2 px.
         </p>
         <fieldset class="option-cards">
-            <legend class="sr-only">Who receives it</legend>
+            <legend class="sr-only">Quem receberá?</legend>
             <label class="option-card">
                 <input type="radio" name="demo-audience" value="all">
-                <span class="option-card-body"><span class="option-card-title">All subscribers</span><span class="option-card-text">Everyone who opted in</span></span>
+                <span class="option-card-body"><span class="option-card-title">Todos os inscritos</span><span class="option-card-text">Todas as pessoas que optaram por receber</span></span>
                 <span class="option-card-meta">3,120</span><span class="option-card-radio" aria-hidden="true"></span>
             </label>
             <label class="option-card">
                 <input type="radio" name="demo-audience" value="leads" checked>
-                <span class="option-card-body"><span class="option-card-title">Leads, last 30 days</span><span class="option-card-text">Tag "lead" and active this month</span></span>
+                <span class="option-card-body"><span class="option-card-title">Leads dos últimos 30 dias</span><span class="option-card-text">Tag "lead" e atividade neste mês</span></span>
                 <span class="option-card-meta">812</span><span class="option-card-radio" aria-hidden="true"></span>
             </label>
         </fieldset>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Stepper</h2>
-        <ol class="stepper mt-3" aria-label="Broadcast steps">
-            <li><span class="stepper-step is-done"><span class="stepper-index">{% include "partials/_nav_icon.html" with name="check" icon_size=13 %}</span><span class="stepper-label">Channel</span></span></li>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Etapas</h2>
+        <ol class="stepper mt-3" aria-label="Etapas do envio em massa">
+            <li><span class="stepper-step is-done"><span class="stepper-index">{% include "partials/_nav_icon.html" with name="check" icon_size=13 %}</span><span class="stepper-label">Canal</span></span></li>
             <li class="stepper-link is-done" aria-hidden="true"></li>
-            <li><span class="stepper-step is-current" aria-current="step"><span class="stepper-index">2</span><span class="stepper-label">Audience</span></span></li>
+            <li><span class="stepper-step is-current" aria-current="step"><span class="stepper-index">2</span><span class="stepper-label">Público</span></span></li>
             <li class="stepper-link" aria-hidden="true"></li>
-            <li><span class="stepper-step"><span class="stepper-index">3</span><span class="stepper-label">Message</span></span></li>
+            <li><span class="stepper-step"><span class="stepper-index">3</span><span class="stepper-label">Mensagem</span></span></li>
         </ol>
-        <ol class="stepper stepper-vertical mt-5 max-w-[220px]" aria-label="Setup steps">
-            <li><span class="stepper-step is-current" aria-current="step"><span class="stepper-index">1</span><span class="stepper-label">Trigger<span class="stepper-sub">When it starts</span></span></span></li>
-            <li><span class="stepper-step"><span class="stepper-index">2</span><span class="stepper-label">Reply<span class="stepper-sub">What it sends</span></span></span></li>
+        <ol class="stepper stepper-vertical mt-5 max-w-[220px]" aria-label="Etapas da configuração">
+            <li><span class="stepper-step is-current" aria-current="step"><span class="stepper-index">1</span><span class="stepper-label">Gatilho<span class="stepper-sub">Quando começa</span></span></span></li>
+            <li><span class="stepper-step"><span class="stepper-index">2</span><span class="stepper-label">Resposta<span class="stepper-sub">O que será enviado</span></span></span></li>
         </ol>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Empty state</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Estado vazio</h2>
         <div class="mt-3" x-data>
-            {% include "components/empty_state.html" with icon="flows" title="No flows match" body="Try a different word, or clear the filters." action_label="Clear filters" action_click="0" %}
+            {% include "components/empty_state.html" with icon="flows" title="Nenhum fluxo encontrado" body="Tente outra palavra ou limpe os filtros." action_label="Limpar filtros" action_click="0" %}
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Toasts</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Notificações</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-            Fired by <code>toast_response(...)</code> over <code>HX-Trigger</code>. The host lives in
-            <code>base.html</code>, so this works on every page with no include.
+            Disparadas por <code>toast_response(...)</code> via <code>HX-Trigger</code>. O host fica em
+            <code>base.html</code>, por isso funciona em todas as páginas sem inclusão adicional.
         </p>
         <div class="flex flex-wrap gap-2">
-            <button type="button" class="btn-outline btn-inline" hx-post="{% url 'ui_demo_toast' %}" hx-vals='{"tone": "success"}' hx-swap="none">Success</button>
-            <button type="button" class="btn-outline btn-inline" hx-post="{% url 'ui_demo_toast' %}" hx-vals='{"tone": "info"}' hx-swap="none">Info</button>
-            <button type="button" class="btn-outline btn-inline" hx-post="{% url 'ui_demo_toast' %}" hx-vals='{"tone": "warn"}' hx-swap="none">Warning</button>
-            <button type="button" class="btn-outline btn-inline" hx-post="{% url 'ui_demo_toast' %}" hx-vals='{"tone": "error"}' hx-swap="none">Error</button>
+            <button type="button" class="btn-outline btn-inline" hx-post="{% url 'ui_demo_toast' %}" hx-vals='{"tone": "success"}' hx-swap="none">Sucesso</button>
+            <button type="button" class="btn-outline btn-inline" hx-post="{% url 'ui_demo_toast' %}" hx-vals='{"tone": "info"}' hx-swap="none">Informação</button>
+            <button type="button" class="btn-outline btn-inline" hx-post="{% url 'ui_demo_toast' %}" hx-vals='{"tone": "warn"}' hx-swap="none">Aviso</button>
+            <button type="button" class="btn-outline btn-inline" hx-post="{% url 'ui_demo_toast' %}" hx-vals='{"tone": "error"}' hx-swap="none">Erro</button>
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Select</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Seletor</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-            <code>{% templatetag openblock %} ui_select {% templatetag closeblock %}</code>: single and multi,
-            with a panel that escapes the toolbar's overflow.
+            <code>{% templatetag openblock %} ui_select {% templatetag closeblock %}</code>: seleção simples e múltipla,
+            com um painel que ultrapassa o espaço reservado à barra de ferramentas.
         </p>
         <div class="bb-filters-scroll flex items-center gap-2 overflow-x-auto pb-1"
              x-data="{ status: '', channels: [] }">
-            {% ui_select model="status" options=ui_demo_statuses placeholder="All statuses" icon="status" %}
-            {% ui_select model="channels" options=ui_demo_channels multiple=True placeholder="Channels" icon="channel" %}
+            {% ui_select model="status" options=ui_demo_statuses placeholder="Todos os status" icon="status" %}
+            {% ui_select model="channels" options=ui_demo_channels multiple=True placeholder="Canais" icon="channel" %}
             <span class="text-xs whitespace-nowrap" style="color: var(--text-tertiary);"
                   x-text="'status=' + (status || 'all') + ' channels=' + (channels.length || 'all')"></span>
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Platform icons</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Ícones das plataformas</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-            One partial, seven platforms, <code>currentColor</code>. The last tile is an unknown key,
-            proving the fallback glyph.
+            Um partial, sete plataformas, <code>currentColor</code>. O último bloco usa uma chave desconhecida
+            para demonstrar o ícone alternativo.
         </p>
         <div class="flex flex-wrap gap-4">
             {% for platform in ui_demo_platforms %}
@@ -188,9 +188,9 @@ nothing but a form posting to a toast_response view.
             {% endfor %}
         </div>
         <p class="text-xs mt-4 mb-2" style="color: var(--text-tertiary);">
-      <code>.pi-chip-hero</code> at <code>size="lg"</code> is the channel connect pages' mark. The
-            radius has to be a class: <code>.pi-chip</code> sets <code>border-radius</code> unlayered,
-            so a <code>rounded-*</code> utility beside it loses silently.
+            <code>.pi-chip-hero</code> com <code>size="lg"</code> é a marca usada nas páginas de conexão de canais. O
+            raio deve ser uma classe: <code>.pi-chip</code> define <code>border-radius</code> fora de camadas,
+            então uma classe utilitária <code>rounded-*</code> ao lado não tem efeito.
         </p>
         <div class="flex flex-wrap gap-3">
             {% for platform in ui_demo_platforms %}
@@ -200,93 +200,92 @@ nothing but a form posting to a toast_response view.
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Buttons</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Botões</h2>
         <div class="flex flex-wrap items-center gap-3 mt-3">
-            <button type="button" class="btn-brand btn-inline">Primary</button>
-            <button type="button" class="btn-outline btn-inline">Outline</button>
+            <button type="button" class="btn-brand btn-inline">Principal</button>
+            <button type="button" class="btn-outline btn-inline">Contorno</button>
             <button type="button" class="btn-link">Link</button>
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">Alerts</h2>
+        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">Alertas</h2>
         <div class="space-y-2">
-            <div class="alert-success">Saved. Every tone has a matching toast.</div>
-            <div class="alert-info">Informational, for context a user did not ask for.</div>
-            <div class="alert-warning">Warning, the fourth tone, which Studio's stylesheet is missing.</div>
-            <div class="alert-error">Something went wrong.</div>
+            <div class="alert-success">Salvo. Cada tom tem uma notificação correspondente.</div>
+            <div class="alert-info">Informação contextual que a pessoa não solicitou.</div>
+            <div class="alert-warning">Aviso: o quarto tom, ausente na folha de estilos do Studio.</div>
+            <div class="alert-error">Algo deu errado.</div>
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">Form controls</h2>
+        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">Controles de formulário</h2>
         <div class="space-y-3 max-w-sm">
-            <input type="text" class="form-input-styled" placeholder="Text input">
-            <input type="text" class="form-input-styled is-error" placeholder="Input with an error">
+            <input type="text" class="form-input-styled" placeholder="Campo de texto">
+            <input type="text" class="form-input-styled is-error" placeholder="Campo com erro">
             <select class="form-input-styled bb-select">
-                <option>Select with a custom chevron</option>
+                <option>Seletor com seta personalizada</option>
             </select>
             <label class="flex items-center gap-2 text-sm" style="color: var(--text-secondary);">
-                <input type="checkbox" class="bb-checkbox" checked> Checkbox, bean green
+                <input type="checkbox" class="bb-checkbox" checked> Caixa de seleção verde
             </label>
             <label class="flex items-center gap-2 text-sm" style="color: var(--text-secondary);">
-                <span class="switch"><input type="checkbox" role="switch" aria-label="Example switch" checked><span class="switch-track"></span></span>
-                Toggle switch
+                <span class="switch"><input type="checkbox" role="switch" aria-label="Exemplo de alternância" checked><span class="switch-track"></span></span>
+                Chave de alternância
             </label>
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Form fields</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Campos de formulário</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-      Label, control, hint, error: the shape every settings page repeats. Spacing between
-            fields is <code>.field</code>'s own margin; the control's width stays a call-site
-            decision, which is why none of these classes sets one.
+            Rótulo, controle, ajuda e erro: a estrutura repetida em todas as páginas de configurações. O espaçamento entre
+            os campos vem da margem de <code>.field</code>; a largura do controle é definida onde ele é usado.
         </p>
         <div class="card p-5 max-w-md">
             <div class="field">
-                <label class="field-label" for="demo-name">Name</label>
-                <input class="form-input-styled" id="demo-name" type="text" value="Marta's shop">
-                <p class="field-hint">What your team sees in the workspace switcher.</p>
+                <label class="field-label" for="demo-name">Nome</label>
+                <input class="form-input-styled" id="demo-name" type="text" value="Loja da Marta">
+                <p class="field-hint">Como sua equipe verá o nome no seletor de espaços de trabalho.</p>
             </div>
             <div class="field">
-                <label class="field-label" for="demo-tz">Timezone<span class="field-label-optional">optional</span></label>
+                <label class="field-label" for="demo-tz">Fuso horário<span class="field-label-optional">opcional</span></label>
                 <select class="form-input-styled bb-select" id="demo-tz"><option>Europe/Berlin</option></select>
             </div>
             <div class="field">
-                <label class="field-label" for="demo-colour">Colour</label>
+                <label class="field-label" for="demo-colour">Cor</label>
                 <div class="field-swatch">
-                    <input class="field-swatch-well" type="color" value="#F97316" aria-label="Pick a colour">
+                    <input class="field-swatch-well" type="color" value="#F97316" aria-label="Escolher uma cor">
                     <input class="form-input-styled is-error" id="demo-colour" type="text" value="octarine" style="width: 9rem;">
                 </div>
-                <p class="field-error">Colours must be a 6-digit hex value like #3B82F6.</p>
+                <p class="field-error">As cores devem usar um valor hexadecimal de 6 dígitos, como #3B82F6.</p>
             </div>
             <label class="field-check" for="demo-check">
                 <input class="bb-checkbox" id="demo-check" type="checkbox" checked>
                 <span class="field-check-body">
-                    <span class="field-label">Rewrite links in email bodies</span>
-                    <span class="field-hint">Every link is replaced with one that records the click.</span>
+                    <span class="field-label">Reescrever links no corpo dos e-mails</span>
+                    <span class="field-hint">Cada link é substituído por um que registra o clique.</span>
                 </span>
             </label>
             <div class="form-actions">
-                <button type="button" class="btn-pill-primary">Save changes</button>
+                <button type="button" class="btn-pill-primary">Salvar alterações</button>
             </div>
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Setup steps, and a copy field</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Etapas de configuração e campo de cópia</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-            The channel connect pages' two pieces. Tailwind's preflight zeroes <code>ol</code> and
-            nothing restored it, so these steps are the first numbered list in the product.
+            Os dois elementos usados nas páginas de conexão de canais. O preflight do Tailwind zera o estilo de <code>ol</code>,
+            e nada o restaura; por isso, estas são as primeiras etapas numeradas do produto.
         </p>
         <div class="card p-5 max-w-lg">
             <ol class="cn-steps mb-5" role="list">
-                <li class="cn-step">Open <code>@BotFather</code> in Telegram and send <code>/newbot</code>.</li>
-                <li class="cn-step">Choose a display name and a username ending in <code>bot</code>.</li>
-                <li class="cn-step">Copy the token it replies with.</li>
+                <li class="cn-step">Abra <code>@BotFather</code> no Telegram e envie <code>/newbot</code>.</li>
+                <li class="cn-step">Escolha um nome de exibição e um nome de usuário terminado em <code>bot</code>.</li>
+                <li class="cn-step">Copie o token recebido.</li>
             </ol>
-            {% include "partials/_copy_field.html" with label="Deliveries arrive at" value="https://example.com/hooks/telegram/" hint="Reachable from the public internet over HTTPS." only %}
+            {% include "partials/_copy_field.html" with label="Os envios chegam em" value="https://example.com/hooks/telegram/" hint="Acessível pela internet pública por HTTPS." only %}
         </div>
     </section>
 
@@ -299,39 +298,38 @@ nothing but a form posting to a toast_response view.
     {% endcomment %}
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Type scale</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Escala tipográfica</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-            <code>--fs-*</code>, not <code>--text-*</code>: that prefix already holds the text
-            <em>colours</em>, and it is Tailwind v4's <code>@theme</code> namespace.
+            <code>--fs-*</code>, não <code>--text-*</code>: esse prefixo já define as
+            <em>cores</em> do texto e é o namespace <code>@theme</code> do Tailwind v4.
         </p>
         <div class="card p-5 space-y-2">
-            <div class="page-title">Page title · 28</div>
-            <div class="section-title">Section heading · 17</div>
-            <div class="page-lede">Lede and body copy · 15</div>
-            <div style="font-size: var(--fs-body); color: var(--text-tertiary);">Meta and table text · 13</div>
-            <div class="section-eyebrow">Eyebrow · 12 uppercase</div>
+            <div class="page-title">Título da página · 28</div>
+            <div class="section-title">Título da seção · 17</div>
+            <div class="page-lede">Introdução e texto principal · 15</div>
+            <div style="font-size: var(--fs-body); color: var(--text-tertiary);">Metadados e texto da tabela · 13</div>
+            <div class="section-eyebrow">Sobretítulo · 12 em maiúsculas</div>
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Surfaces</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Superfícies</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-            <code>.card</code> sets background, border and radius and nothing else: no padding, no
-            display. This file is unlayered, so any property it set would be one no utility at the
-            call site could ever override.
+            <code>.card</code> define apenas plano de fundo, borda e raio: sem preenchimento nem
+            exibição. Este arquivo não usa camadas, então nenhuma classe utilitária no ponto de uso pode sobrescrever essas propriedades.
         </p>
         <div class="grid gap-3 sm:grid-cols-3">
             <div class="card p-4">
-                <div class="section-eyebrow mb-1">Card</div>
-                <p class="text-[13px]" style="color: var(--text-tertiary);">The white surface everything sits on.</p>
+                <div class="section-eyebrow mb-1">Cartão</div>
+                <p class="text-[13px]" style="color: var(--text-tertiary);">A superfície branca onde tudo fica.</p>
             </div>
             <div class="tile p-4">
-                <div class="section-eyebrow mb-1">Tile</div>
-                <p class="text-[13px]" style="color: var(--text-tertiary);">Sunken, for pickers and options.</p>
+                <div class="section-eyebrow mb-1">Bloco</div>
+                <p class="text-[13px]" style="color: var(--text-tertiary);">Rebaixado, para seletores e opções.</p>
             </div>
             <div class="tile tile-selected p-4">
-                <div class="section-eyebrow mb-1">Tile, chosen</div>
-                <p class="text-[13px]" style="color: var(--text-secondary);">The one they picked.</p>
+                <div class="section-eyebrow mb-1">Bloco selecionado</div>
+                <p class="text-[13px]" style="color: var(--text-secondary);">A opção escolhida.</p>
             </div>
         </div>
     </section>
@@ -340,36 +338,34 @@ nothing but a form posting to a toast_response view.
     <section x-data>
         <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Modal</h2>
         <p class="text-[13px] mb-3" style="color: var(--text-tertiary);">
-            Every create form lives in one: the button names the thing, the dialog asks for its name.
-            <code>{% templatetag openblock %} modal "id" title="…" close_on="event" {% templatetag closeblock %}</code>, opened with <code>$modal('id')</code>.
+            Cada formulário de criação fica em um modal: o botão indica o que será criado e o diálogo pede um nome.
         </p>
-        <button type="button" class="btn-pill-primary" @click="$modal('demo-modal')">New tag</button>
-        {% modal "demo-modal" title="New tag" %}
-        <form @submit.prevent="close()">
+        <button type="button" class="btn-pill-primary" @click="$modal('demo-modal')">Nova tag</button>
+        {% modal "demo-modal" title="Nova tag" %}
             <div class="bb-modal-body">
                 <div class="field">
-                    <label class="field-label" for="demo-modal-name">What is the tag called?</label>
+                    <label class="field-label" for="demo-modal-name">Qual é o nome da tag?</label>
                     <input class="form-input-styled" id="demo-modal-name" type="text" name="name" required autofocus placeholder="VIP">
                 </div>
             </div>
             <div class="bb-modal-actions">
-                <button type="button" class="btn-pill-secondary" @click="close()">Cancel</button>
-                <button type="submit" class="btn-pill-primary">Create tag</button>
+                <button type="button" class="btn-pill-secondary" @click="close()">Cancelar</button>
+                <button type="submit" class="btn-pill-primary">Criar tag</button>
             </div>
         </form>
         {% endmodal %}
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">Buttons and chips</h2>
+        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">Botões e chips</h2>
         <div class="card p-5">
             <div class="flex flex-wrap items-center gap-2 mb-4">
-                <button type="button" class="btn-pill-primary">One primary action</button>
-                <button type="button" class="btn-pill-secondary">Secondary</button>
-                <button type="button" class="btn-pill-primary btn-pill-sm">Primary, small</button>
-                <button type="button" class="btn-pill-secondary btn-pill-sm">Secondary, small</button>
-                <button type="button" class="btn-pill-primary" disabled>Disabled</button>
-                <button type="button" class="btn-icon-round" aria-label="More">
+                <button type="button" class="btn-pill-primary">Uma ação principal</button>
+                <button type="button" class="btn-pill-secondary">Secundária</button>
+                <button type="button" class="btn-pill-primary btn-pill-sm">Principal, pequeno</button>
+                <button type="button" class="btn-pill-secondary btn-pill-sm">Secundário, pequeno</button>
+                <button type="button" class="btn-pill-primary" disabled>Desativado</button>
+                <button type="button" class="btn-icon-round" aria-label="Mais ações">
                     <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
                 </button>
             </div>
@@ -377,11 +373,11 @@ nothing but a form posting to a toast_response view.
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">State, in words</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Estados descritos em palavras</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-            The dot carries the colour and the text carries the meaning. Bean green is
-            ~2.8:1 on white, so it is a fill and never a label. <code>--success-700</code> is the
-            readable weight.
+            O ponto carrega a cor e o texto comunica o significado. O verde da BrightBean tem contraste
+            de ~2,8:1 no branco; por isso, serve como preenchimento, nunca como rótulo. <code>--success-700</code> tem
+            contraste legível.
         </p>
         {% comment %}
           Each on its own line: .health is inline-flex, because in a table cell
@@ -390,15 +386,15 @@ nothing but a form posting to a toast_response view.
           break every real call site.
         {% endcomment %}
         <div class="card p-5 space-y-2.5">
-            <div><span class="health health-ok"><span class="health-dot"></span>Healthy · last message 4 minutes ago</span></div>
-            <div><span class="health health-bad"><span class="health-dot"></span>Needs reconnecting · nothing received for 2 days</span></div>
-            <div><span class="health health-warn"><span class="health-dot"></span>Connected, but nothing has arrived yet</span></div>
-            <div><span class="health health-off"><span class="health-dot"></span>Turned off · no messages sent or received</span></div>
+            <div><span class="health health-ok"><span class="health-dot"></span>Saudável · última mensagem há 4 minutos</span></div>
+            <div><span class="health health-bad"><span class="health-dot"></span>Precisa reconectar · nenhuma mensagem recebida há 2 dias</span></div>
+            <div><span class="health health-warn"><span class="health-dot"></span>Conectado, mas ainda não recebeu mensagens</span></div>
+            <div><span class="health health-off"><span class="health-dot"></span>Desativado · nenhuma mensagem enviada ou recebida</span></div>
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">Avatars</h2>
+        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">Avatares</h2>
         <div class="card p-5 flex items-center gap-3">
             <span class="avatar avatar-xs">M</span>
             <span class="avatar avatar-sm">MK</span>
@@ -409,32 +405,32 @@ nothing but a form posting to a toast_response view.
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Empty state</h2>
+        <h2 class="text-sm font-semibold mb-1" style="color: var(--text-primary);">Estado vazio</h2>
         <p class="text-xs mb-3" style="color: var(--text-tertiary);">
-            One, where every list used to hand-roll its own.
+            Um componente compartilhado para todas as listas.
         </p>
         <div class="empty-state">
-            <p class="empty-state-title">No flows here yet</p>
+            <p class="empty-state-title">Ainda não há fluxos</p>
             <p class="empty-state-body">
-                A flow replies for you when something happens: a comment, a keyword, a reply to your story.
+                Um fluxo responde por você quando algo acontece: um comentário, uma palavra-chave ou uma resposta ao seu story.
             </p>
-            <button type="button" class="btn-pill-primary mt-4">New flow</button>
+            <button type="button" class="btn-pill-primary mt-4">Novo fluxo</button>
         </div>
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">List row</h2>
+        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">Linha de lista</h2>
         <div class="card overflow-hidden">
             <div class="list-row">
                 <span class="list-row-icon list-row-icon-live">{% include "partials/_nav_icon.html" with name="flows" icon_size=19 %}</span>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2.5">
-                        <span class="list-row-title">Instagram comment → DM</span>
-                        <span class="status-pill status-pill-active"><span class="status-pill-dot"></span>Live</span>
+                        <span class="list-row-title">Comentário no Instagram → DM</span>
+                        <span class="status-pill status-pill-active"><span class="status-pill-dot"></span>Ativo</span>
                     </div>
-                    <div class="list-row-meta">When someone comments “price” · edited 2 hours ago</div>
+                    <div class="list-row-meta">Quando alguém comenta “preço” · editado há 2 horas</div>
                 </div>
-                <span class="btn-pill-secondary btn-pill-sm">Open</span>
+                <span class="btn-pill-secondary btn-pill-sm">Abrir</span>
                 <span class="btn-icon-round">
                     <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
                 </span>
@@ -443,12 +439,12 @@ nothing but a form posting to a toast_response view.
                 <span class="list-row-icon">{% include "partials/_nav_icon.html" with name="flows" icon_size=19 %}</span>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2.5">
-                        <span class="list-row-title">Lead magnet, PDF delivery</span>
-                        <span class="status-pill status-pill-draft">Draft</span>
+                        <span class="list-row-title">Isca digital, entrega de PDF</span>
+                        <span class="status-pill status-pill-draft">Rascunho</span>
                     </div>
-                    <div class="list-row-meta">No trigger yet, so it will not run until you add one</div>
+                    <div class="list-row-meta">Sem gatilho, não será executado até você adicionar um</div>
                 </div>
-                <span class="btn-pill-secondary btn-pill-sm">Continue</span>
+                <span class="btn-pill-secondary btn-pill-sm">Continuar</span>
                 <span class="btn-icon-round">
                     <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
                 </span>
@@ -457,7 +453,7 @@ nothing but a form posting to a toast_response view.
     </section>
 
     <section>
-        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">Brand ramp</h2>
+        <h2 class="text-sm font-semibold mb-3" style="color: var(--text-primary);">Escala de cores da marca</h2>
         <div class="flex flex-wrap gap-1">
             <div class="w-12 h-10 rounded" style="background: var(--brand-50);"></div>
             <div class="w-12 h-10 rounded" style="background: var(--brand-100);"></div>
@@ -471,7 +467,7 @@ nothing but a form posting to a toast_response view.
             <div class="w-12 h-10 rounded" style="background: var(--brand-900);"></div>
         </div>
         <p class="text-xs mt-3 mb-1" style="color: var(--text-tertiary);">
-            Bean green, the product's "good" colour since the redesign. 500 is a fill, 700 is text.
+            O verde da BrightBean é a cor de sucesso do produto desde a reformulação. O tom 500 é para preenchimento; 700, para texto.
         </p>
         <div class="flex flex-wrap gap-1">
             <div class="w-12 h-10 rounded" style="background: var(--brand-green-50);"></div>

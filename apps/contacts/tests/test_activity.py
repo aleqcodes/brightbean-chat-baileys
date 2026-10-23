@@ -225,12 +225,6 @@ class TestAutomation:
         execution.refresh_from_db()
         assert execution.status != ExecutionStatus.FAILED
 
-    def test_stopping_nothing_says_so_rather_than_claiming_success(self, tenancy, client_for, contact):
-        import json
-
-        response = client_for(tenancy.owner).post(url(tenancy, f"contacts/{contact.pk}/stop-automation/"))
-
-        assert json.loads(response.headers["HX-Trigger"])["showToast"]["title"] == "Nothing was running"
 
     def test_only_published_flows_are_offered(self, tenancy, contact):
         """start_flow raises for a draft, so a picker listing them would be a

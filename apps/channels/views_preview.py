@@ -194,13 +194,13 @@ def _unsupported(wanted: tuple[str, ...]) -> dict[str, Any]:
     property of the channel, not something the reader has configured wrongly.
     """
     labels = dict(Platform.choices)
-    named = ", ".join(str(labels.get(platform, platform)) for platform in wanted) or "this flow's channel"
+    named = ", ".join(str(labels.get(platform, platform)) for platform in wanted) or "canal deste fluxo"
     return {
         "ok": False,
         "reason": "unsupported_platform",
         "message": (
-            f"There is no live test on {named}. Testing works by sending you a link that opens a real "
-            "chat, and only Telegram, Messenger and Instagram carry one back."
+            f"Este canal não oferece um teste direto para {named}. O teste usa um link que abre uma conversa real, "
+            "disponível apenas no Telegram, Messenger e Instagram."
         ),
     }
 
@@ -214,15 +214,15 @@ def _no_connection(workspace_id: str, testable: list[str], problem: str) -> dict
             "ok": False,
             "reason": "no_username",
             "message": (
-                f"That {named} connection has no usable public name, so there is nothing to link to. "
-                "Reconnect it through the guided setup so its name comes from the platform."
+                f"Essa conexão de {named} não tem um nome público válido para criar o link. "
+                "Reconecte-a pelo processo guiado para que o nome seja obtido da plataforma."
             ),
             "settings_url": _connect_url(workspace_id, platform),
         }
     return {
         "ok": False,
         "reason": "no_connection",
-        "message": f"Connect {named} first. Testing runs the draft in a real chat with it.",
+        "message": f"Conecte {named} primeiro. O teste executa o rascunho em uma conversa real nesse canal.",
         "settings_url": _connect_url(workspace_id, platform),
     }
 

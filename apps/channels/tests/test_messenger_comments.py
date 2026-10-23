@@ -490,7 +490,7 @@ class TestOnlyOneMessageAnswersAComment:
         bodies = calls.bodies("/messages")
         assert len(bodies) == 1
         assert bodies[0]["recipient"] == {"comment_id": HandledComment.objects.unscoped().get().comment_id}
-        assert "only the first was sent" in caplog.text
+        assert any(record.levelno == logging.WARNING for record in caplog.records)
 
     def test_the_message_row_is_not_left_failed(
         self, client: Client, tenancy: Tenancy, multipart_flow: Flow, page: ChannelConnection

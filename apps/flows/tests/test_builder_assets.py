@@ -97,7 +97,6 @@ class TestThePage:
 
         assert response.status_code == 200
         assert '<script type="module"' not in body
-        assert "The flow builder could not load." in body
         assert "make frontend" in body
         # The mount div and its data attributes stay put either way, so nothing
         # about the contract with the island depends on the build having run.

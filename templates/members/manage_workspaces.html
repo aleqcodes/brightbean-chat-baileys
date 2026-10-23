@@ -1,6 +1,6 @@
 {% extends "layouts/settings.html" %}
-{% block title %}Workspace access · BrightBean Chat{% endblock %}
-{% block page_header %}<h1 class="page-title">Workspace access for {{ membership.user.display_name }}</h1>{% endblock %}
+{% block title %}Acesso aos espaços de trabalho · BrightBean Chat{% endblock %}
+{% block page_header %}<h1 class="page-title">Acesso aos espaços de trabalho de {{ membership.user.display_name }}</h1>{% endblock %}
 
 {% block content %}
   {% comment %}
@@ -16,17 +16,17 @@
           <input type="checkbox" name="ws_{{ row.workspace.id }}" value="1" {% if row.selected %}checked{% endif %} />
           {{ row.workspace.name }}
         </label>
-        <select name="ws_role_{{ row.workspace.id }}" aria-label="Role in {{ row.workspace.name }}">
+        <select name="ws_role_{{ row.workspace.id }}" aria-label="Função em {{ row.workspace.name }}">
           {% for value, label in workspace_roles %}
             <option value="{{ value }}" {% if row.role == value %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
         </select>
       </p>
     {% empty %}
-      <p class="muted">You cannot manage members in any workspace.</p>
+      <p class="muted">Você não pode gerenciar membros em nenhum espaço de trabalho.</p>
     {% endfor %}
-    <button type="submit" class="btn-pill-primary btn-pill-sm">Save access</button>
+    <button type="submit" class="btn-pill-primary btn-pill-sm">Salvar acesso</button>
   </form>
 
-  <p><a href="{% url 'members:list' %}">Back to team members</a></p>
+  <p><a href="{% url 'members:list' %}">Voltar para os membros da equipe</a></p>
 {% endblock %}

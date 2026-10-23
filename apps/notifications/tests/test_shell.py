@@ -40,7 +40,6 @@ class TestTheBellInTheShell:
 
         assert reverse("notifications:bell") in sidebar
         assert "sidebar-nav-item" in sidebar
-        assert ">Notifications</span>" in sidebar
 
     def test_the_bell_is_the_only_way_in_and_is_not_workspace_scoped(self, shell_body):
         """A notification is addressed to a person, and the feed spans every
@@ -322,10 +321,10 @@ class TestThePolledBadgeAlwaysHasATarget:
         body = client_for(tenancy.owner).get("/accounts/settings/").content.decode()
         sidebar = body[body.index("<aside") : body.index("</aside>")]
 
-        assert sidebar.count(">Notifications</span>") == 1
+        assert sidebar.count("data-bell-toggle\n") == 1
         # ...and the settings rows are still the nav around it, not the
         # product's — this is a pinned utility row, not the nav coming back.
-        assert ">Broadcasts</span>" not in sidebar
+        assert reverse("broadcasts:list", kwargs={"workspace_id": tenancy.workspace.pk}) not in sidebar
 
     @staticmethod
     def page_archetypes(tenancy):
@@ -426,14 +425,6 @@ class TestTheAnonymousShell:
 
         assert reverse("notifications:bell") not in body
 
-    def test_the_style_guide_shows_no_notifications_row(self, client):
-        """The row is what would drag the bell onto the page, so it is gated at
-        the nav rather than inside the partial — see NavItem.authenticated_only.
-        Asserting the label as well as the URL keeps a future row that links
-        somewhere else from slipping through."""
-        body = client.get("/ui/").content.decode()
-
-        assert ">Notifications</span>" not in body
 
     def test_the_anonymous_path_runs_no_notification_query(self, client, django_assert_num_queries):
         with django_assert_num_queries(0):

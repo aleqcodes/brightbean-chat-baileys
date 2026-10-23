@@ -212,5 +212,5 @@ def update_tracking_settings(request: WorkspaceRequest, workspace_id: str) -> Ht
             "open_pixel": bool(request.POST.get("open_pixel")),
         },
     )
-    messages.success(request, "Email tracking settings saved.")
+    messages.success(request, "As configurações de rastreamento de e-mail foram salvas.")
     return redirect(reverse("analytics:tracking_settings", kwargs={"workspace_id": workspace_id}))

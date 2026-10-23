@@ -67,11 +67,11 @@ def _usage_rows(usage: Any) -> list[dict[str, Any]]:
         # vocabulary, rendered by templates/partials/_nav_icon.html. Reusing
         # them rather than inventing five more means a nav icon and a usage icon
         # for the same thing can never drift apart.
-        ("contacts", "Contacts reached this month", usage.active_contacts, usage.active_contacts_limit),
-        ("channels", "Channels connected", usage.channels, usage.channels_limit),
-        ("flows", "Active automations", usage.automations, usage.automations_limit),
-        ("users", "Users", usage.seats, usage.seats_limit),
-        ("grid", "Workspaces", usage.workspaces, usage.workspaces_limit),
+        ("contacts", "Contatos alcançados neste mês", usage.active_contacts, usage.active_contacts_limit),
+        ("channels", "Canais conectados", usage.channels, usage.channels_limit),
+        ("flows", "Automações ativas", usage.automations, usage.automations_limit),
+        ("users", "Usuários", usage.seats, usage.seats_limit),
+        ("grid", "Espaços de trabalho", usage.workspaces, usage.workspaces_limit),
     ]
     return [
         {

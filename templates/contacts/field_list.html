@@ -11,40 +11,38 @@ is a modal, opened by id from the header and from the empty state.
 <div class="max-w-[1060px] w-full">
     <div class="page-header">
         <div class="page-header-text">
-            <h1 class="page-title">Custom fields</h1>
+            <h1 class="page-title">Campos personalizados</h1>
             <p class="page-lede">
-                An extra detail you keep on a contact that is not already built in: a size, a
-                booking date, a plan. Flows fill them in and filters can search on them.
-            </p>
+                Um detalhe extra que você registra sobre um contato, além dos campos padrão: tamanho, data de reserva,
+                plano. Fluxos podem preenchê-los e filtros podem pesquisá-los.
         </div>
-        <button type="button" class="btn-pill-primary flex-shrink-0" @click="$modal('new-field')">{% include "partials/_nav_icon.html" with name="fields" icon_size=16 %} New field</button>
+        <button type="button" class="btn-pill-primary flex-shrink-0" @click="$modal('new-field')">{% include "partials/_nav_icon.html" with name="fields" icon_size=16 %} Novo campo</button>
     </div>
 
-    {% modal "new-field" title="New field" close_on="fieldsChanged" %}
+    {% modal "new-field" title="Novo campo" close_on="fieldsChanged" %}
     <form hx-post="{% url 'contacts:field_create' workspace_id=request.workspace.id %}">
         <div class="bb-modal-body">
             <div class="field">
-                <label class="field-label" for="new-field-name">What is the field called?</label>
-                <input class="form-input-styled" id="new-field-name" type="text" name="name" maxlength="100" required autofocus placeholder="Plan">
+                <label class="field-label" for="new-field-name">Qual é o nome do campo?</label>
+                <input class="form-input-styled" id="new-field-name" type="text" name="name" maxlength="100" required autofocus placeholder="Plano">
             </div>
             <div class="field">
-                <label class="field-label" for="new-field-type">Type</label>
+                <label class="field-label" for="new-field-type">Tipo</label>
                 <select class="form-input-styled bb-select" id="new-field-type" name="field_type" required>
                     {% for value, label in field_types %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
                 </select>
-                <span class="field-hint">Fixed once the field exists. It decides how a filter can compare it.</span>
+                <span class="field-hint">Não pode ser alterado depois que o campo é criado. Define como um filtro pode compará-lo.</span>
             </div>
         </div>
         <div class="bb-modal-actions">
-            <button type="button" class="btn-pill-secondary" @click="close()">Cancel</button>
-            <button type="submit" class="btn-pill-primary">Create field</button>
+            <button type="button" class="btn-pill-secondary" @click="close()">Cancelar</button>
+            <button type="submit" class="btn-pill-primary">Criar campo</button>
         </div>
     </form>
     {% endmodal %}
 
     <p class="section-note mb-5">
-        Pick the type carefully: it is fixed once the field exists, and it decides how a filter can
-        compare it.
+        Escolha o tipo com cuidado: ele é fixo depois que o campo é criado e determina como um filtro pode compará-lo.
     </p>
 
     {% include "contacts/_field_rows.html" %}

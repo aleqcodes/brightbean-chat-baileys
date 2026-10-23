@@ -60,7 +60,7 @@ class TestPartialAuthorityCanStillSave:
     def test_granting_into_an_unmanaged_workspace_is_still_refused(self, tenancy, partial_admin):
         other = Workspace.objects.create(organization=tenancy.organization, name="B")
 
-        with pytest.raises(MembershipError, match="cannot manage members in that workspace"):
+        with pytest.raises(MembershipError):
             update_workspace_assignments(
                 tenancy.organization,
                 tenancy.user_for("agent"),
@@ -87,7 +87,9 @@ class TestPartialAuthorityCanStillSave:
             follow=True,
         )
 
-        assert b"Workspace access updated" in response.content
+        assert response.status_code == 200
+        assert WorkspaceMembership.objects.get(user=target, workspace=tenancy.workspace).workspace_role == "editor"
+        assert WorkspaceMembership.objects.get(user=target, workspace=other).workspace_role == WorkspaceRole.VIEWER
 
 
 @pytest.mark.django_db
@@ -108,13 +110,13 @@ class TestAdminTierIsSymmetric:
     def test_an_admin_cannot_demote_a_peer_admin(self, tenancy, two_admins):
         caller, target = two_admins
 
-        with pytest.raises(MembershipError, match="Only organization owners can change"):
+        with pytest.raises(MembershipError):
             update_member_org_role(tenancy.organization, target, OrgRole.MEMBER, caller=caller)
 
     def test_an_admin_cannot_remove_a_peer_admin(self, tenancy, two_admins):
         caller, target = two_admins
 
-        with pytest.raises(MembershipError, match="Only organization owners can remove"):
+        with pytest.raises(MembershipError):
             remove_member(tenancy.organization, target, caller)
 
     def test_an_owner_can_do_both(self, tenancy, two_admins):

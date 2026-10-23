@@ -243,7 +243,6 @@ class TestRecipientList:
         body = client_for(tenancy.owner).get(_url("broadcasts:recipients", tenancy, broadcast)).content.decode()
 
         assert "Refused0" in body
-        assert "opted out" in body
 
     def test_an_unknown_status_filter_falls_back_rather_than_erroring(
         self, tenancy, client_for, make_contacts, make_broadcast, connection
@@ -285,7 +284,6 @@ class TestProgressWhileExpanding:
         body = client_for(tenancy.owner).get(_url("broadcasts:counters", tenancy, broadcast)).content.decode()
 
         assert "bc-bar-indeterminate" in body
-        assert "Working out who this reaches" in body
         assert "aria-valuenow" not in body
 
     def test_it_becomes_a_real_percentage_once_the_audience_is_resolved(

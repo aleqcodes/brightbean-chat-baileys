@@ -14,19 +14,19 @@ truncated list — see apps/flows/triggers/forms.py.
 {{ config.keywords|default_if_none:""|json_script:"trigger-keyword-rows" }}
 <div x-data="{
         rows: JSON.parse(document.getElementById('trigger-keyword-rows').textContent) || [],
-        modes: [['exact', 'Exact'], ['contains', 'Contains'], ['any_word', 'Whole word']],
+        modes: [['exact', 'Exata'], ['contains', 'Contém'], ['any_word', 'Palavra inteira']],
         add() { this.rows.push({ text: '', mode: 'contains' }) },
         remove(index) { this.rows.splice(index, 1) }
      }"
      x-init="if (!rows.length) add()">
 
-    <label class="block text-xs font-medium mb-1" style="color: var(--text-primary);">Keywords</label>
+    <label class="block text-xs font-medium mb-1" style="color: var(--text-primary);">Palavras-chave</label>
 
     <template x-for="(row, index) in rows" :key="index">
         <div class="flex items-center gap-1.5 mb-1.5">
             <input type="text" name="keyword_text" x-model="row.text" maxlength="200"
-                   class="form-input-styled" style="flex: 1 1 auto;" placeholder="help"
-                   aria-label="Keyword">
+                   class="form-input-styled" style="flex: 1 1 auto;" placeholder="ajuda"
+                   aria-label="Palavra-chave">
             <input type="hidden" name="keyword_mode" :value="row.mode">
             <template x-for="mode in modes" :key="mode[0]">
                 <button type="button"
@@ -36,13 +36,13 @@ truncated list — see apps/flows/triggers/forms.py.
                         x-text="mode[1]"></button>
             </template>
             <button type="button" class="btn-icon-round btn-danger-soft"
-                    @click="remove(index)" aria-label="Remove keyword">×</button>
+                    @click="remove(index)" aria-label="Remover palavra-chave">×</button>
         </div>
     </template>
 
-    <button type="button" class="btn-link text-xs" @click="add()">+ Add keyword</button>
+    <button type="button" class="btn-link text-xs" @click="add()">+ Adicionar palavra-chave</button>
     <p class="text-xs mt-1" style="color: var(--text-tertiary);">
-        Matching ignores case and surrounding spaces. “Contains” matches inside a word,
-        “whole word” does not.
+        A correspondência ignora maiúsculas, minúsculas e espaços ao redor. “Contém” encontra o termo dentro de uma palavra;
+        “palavra inteira” não.
     </p>
 </div>

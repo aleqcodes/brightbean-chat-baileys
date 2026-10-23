@@ -92,8 +92,6 @@ class TestAViewer:
             url_for("thread", conversation_id=conversation.pk), headers={"HX-Request": "true"}
         ).content.decode()
 
-        assert "Read only" in pane
-        assert "Mark done" not in pane
         assert 'name="body"' not in pane
 
 

@@ -56,7 +56,7 @@ __all__ = [
 require_workspace_member = require_workspace_role(WorkspaceRole.VIEWER)
 
 #: What the "no folder" group is called on screen.
-UNFILED_LABEL = "Unfiled"
+UNFILED_LABEL = "Sem pasta"
 
 #: The query-string value that selects it. Deliberately *not* the label: folder
 #: names are free user text, so filtering on "Unfiled" made a folder actually
@@ -118,10 +118,10 @@ def _visible_flows(request: WorkspaceRequest) -> Any:
 #: finished. Archived only appears when the status filter asks for it. The tone
 #: is the status-pill tone the section's dot and rows wear.
 SECTIONS: tuple[tuple[str, str, str], ...] = (
-    (FlowStatus.ACTIVE, "Live", "success"),
-    (FlowStatus.OFFLINE, "Offline", "warning"),
-    (FlowStatus.DRAFT, "Draft", "neutral"),
-    (FlowStatus.ARCHIVED, "Archived", "neutral"),
+    (FlowStatus.ACTIVE, "Ativo", "success"),
+    (FlowStatus.OFFLINE, "Desativado", "warning"),
+    (FlowStatus.DRAFT, "Rascunho", "neutral"),
+    (FlowStatus.ARCHIVED, "Arquivado", "neutral"),
 )
 
 #: The window the row's run count covers.
@@ -269,10 +269,10 @@ def _list_context(request: WorkspaceRequest) -> dict[str, Any]:
                 "options": [
                     {"value": value, "label": label, "count": status_counts.get(str(value), 0)}
                     for value, label in (
-                        (FlowStatus.ACTIVE, "Live"),
-                        (FlowStatus.OFFLINE, "Offline"),
-                        (FlowStatus.DRAFT, "Draft"),
-                        (FlowStatus.ARCHIVED, "Archived"),
+                        (FlowStatus.ACTIVE, "Ativo"),
+                        (FlowStatus.OFFLINE, "Desativado"),
+                        (FlowStatus.DRAFT, "Rascunho"),
+                        (FlowStatus.ARCHIVED, "Arquivado"),
                     )
                 ],
             },
@@ -382,7 +382,7 @@ def _name_from(request: WorkspaceRequest, fallback: str = "") -> str:
 def flow_create(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
     name = _name_from(request)
     if not name:
-        return toast_response(tone="error", title="Name required", body="Give the flow a name to create it.")
+        return toast_response(tone="error", title="Nome obrigatório", body="Informe um nome para criar o fluxo.")
     folder = (request.POST.get("folder") or "").strip()[:_MAX_NAME]
     # The one caller that asks for a starter graph. Everything else that creates
     # a flow — the importer, the broadcast composer — writes its own version 1
@@ -396,8 +396,8 @@ def flow_create(request: WorkspaceRequest, workspace_id: str) -> HttpResponse:
     )
     return toast_response(
         tone="success",
-        title="Flow created",
-        body=f"{flow.name} starts with a first message. Open it to edit.",
+        title="Fluxo criado",
+        body=f"{flow.name} começa com uma primeira mensagem. Abra-o para editar.",
         events={"flowsChanged": True},
     )
 
@@ -409,11 +409,11 @@ def flow_rename(request: WorkspaceRequest, workspace_id: str, flow_id: str) -> H
     flow = get_scoped_object_or_404(Flow, request.workspace, pk=flow_id)
     name = _name_from(request)
     if not name:
-        return toast_response(tone="error", title="Name required", body="A flow needs a name.")
+        return toast_response(tone="error", title="Nome obrigatório", body="Um fluxo precisa de um nome.")
     services.rename_flow(flow, name)
     if "folder" in request.POST:
         services.set_folder(flow, (request.POST.get("folder") or "").strip()[:_MAX_NAME])
-    return toast_response(tone="success", title="Flow renamed", events={"flowsChanged": True})
+    return toast_response(tone="success", title="Fluxo renomeado", events={"flowsChanged": True})
 
 
 @login_required
@@ -424,8 +424,8 @@ def flow_duplicate(request: WorkspaceRequest, workspace_id: str, flow_id: str) -
     copy = services.duplicate_flow(flow, user=request.user)
     return toast_response(
         tone="success",
-        title="Flow duplicated",
-        body=f"{copy.name} was created as a draft.",
+        title="Fluxo duplicado",
+        body=f"{copy.name} foi criado como rascunho.",
         events={"flowsChanged": True},
     )
 
@@ -438,8 +438,8 @@ def flow_archive(request: WorkspaceRequest, workspace_id: str, flow_id: str) -> 
     services.archive_flow(flow)
     return toast_response(
         tone="info",
-        title="Flow archived",
-        body="Find it again with the Archived status filter.",
+        title="Fluxo arquivado",
+        body="Encontre-o novamente pelo filtro de status Arquivado.",
         events={"flowsChanged": True},
     )
 
@@ -468,18 +468,18 @@ def flow_set_live(request: WorkspaceRequest, workspace_id: str, flow_id: str) ->
         try:
             stopped = services.take_offline(flow)
         except services.FlowNotLiveError as exc:
-            return toast_response(tone="error", title="Not set offline", body=str(exc), events={"flowsChanged": True})
-        body = "It stopped replying straight away."
+            return toast_response(tone="error", title="Não foi possível desativar", body=str(exc), events={"flowsChanged": True})
+        body = "O fluxo parou de responder imediatamente."
         if stopped:
-            body = f"It stopped replying straight away, including to {stopped} {'person' if stopped == 1 else 'people'} partway through it."
-        return toast_response(tone="success", title="Flow is offline", body=body, events={"flowsChanged": True})
+            body = f"O fluxo parou de responder imediatamente, inclusive para {stopped} {'contato' if stopped == 1 else 'contatos'} que estavam no meio da conversa."
+        return toast_response(tone="success", title="Fluxo desativado", body=body, events={"flowsChanged": True})
 
     latest = services.latest_version(flow)
     if flow.status != FlowStatus.OFFLINE or latest is None or latest.published_at is None:
         return toast_response(
             tone="error",
-            title="Not set live",
-            body="It has changes that have not been live yet. Open it to review them, then set it live there.",
+            title="Não foi possível ativar",
+            body="Há alterações que ainda não foram publicadas. Abra o fluxo para revisá-las e ativá-lo pelo editor.",
             events={"flowsChanged": True},
         )
     try:
@@ -487,13 +487,13 @@ def flow_set_live(request: WorkspaceRequest, workspace_id: str, flow_id: str) ->
     except services.FlowValidationError:
         return toast_response(
             tone="error",
-            title="Not set live",
-            body="It has problems to fix first. Open it to see them.",
+            title="Não foi possível ativar",
+            body="Há problemas para corrigir antes. Abra o fluxo para ver quais são.",
             events={"flowsChanged": True},
         )
     except services.FlowPlanLimitError as exc:
-        return toast_response(tone="error", title="Not set live", body=str(exc), events={"flowsChanged": True})
-    return toast_response(tone="success", title="Flow is live", events={"flowsChanged": True})
+        return toast_response(tone="error", title="Não foi possível ativar", body=str(exc), events={"flowsChanged": True})
+    return toast_response(tone="success", title="Fluxo ativado", events={"flowsChanged": True})
 
 
 @login_required
@@ -506,5 +506,5 @@ def flow_restore(request: WorkspaceRequest, workspace_id: str, flow_id: str) -> 
     except services.FlowPlanLimitError as exc:
         # Restoring a flow with a published version puts it back live, which
         # takes the same plan check as publishing — and uncaught it was a 500.
-        return toast_response(tone="error", title="Not restored", body=str(exc))
-    return toast_response(tone="success", title="Flow restored", events={"flowsChanged": True})
+        return toast_response(tone="error", title="Não foi possível restaurar", body=str(exc))
+    return toast_response(tone="success", title="Fluxo restaurado", events={"flowsChanged": True})

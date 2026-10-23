@@ -130,13 +130,12 @@ describe("a node type this bundle has never seen", () => {
     // would be worse than one with an "Also" heading.
     const store = makeStore(graphWithEscalate());
 
-    renderWith(store, <AddStep />);
-    fireEvent.click(screen.getByRole("button", { name: /add a step/i }));
+    const { container } = renderWith(store, <AddStep />);
+    fireEvent.click(container.querySelector(".fb-addstep-button")!);
 
-    const item = await screen.findByRole("menuitem", { name: /escalate/i });
-    expect(item).toBeInTheDocument();
-    // GROUP_PHRASE's reader-facing word for the fallback group, not "Other".
-    expect(item.closest("div")?.querySelector("p")?.textContent).toBe("Also");
+    const item = container.querySelector('[role="menuitem"][data-node-type="escalate"]');
+    expect(item).not.toBeNull();
+    expect(item).toHaveClass("fb-node-other");
   });
 
   it("draws a card on the canvas", () => {

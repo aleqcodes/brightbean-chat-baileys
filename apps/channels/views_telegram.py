@@ -53,8 +53,8 @@ __all__ = ["telegram_connect"]
 #: try again), and a message that distinguished them would be an oracle for
 #: whether a given token string is a real bot.
 REJECTED_MESSAGE = (
-    "Telegram did not accept that token. Copy it again from BotFather (it looks like "
-    "123456789:AA...) and check that the bot is active."
+    "O Telegram não aceitou esse token. Copie-o novamente do BotFather (ele se parece com "
+    "123456789:AA...) e confira se o bot está ativo."
 )
 
 #: Telegram usernames: 5-32 characters of ``[A-Za-z0-9_]``. Checked before a
@@ -68,8 +68,8 @@ BOT_USERNAME = re.compile(r"^[A-Za-z0-9_]{5,32}$")
 #: above because the fix is genuinely different: this one is almost always a
 #: deployment that is not reachable over public HTTPS.
 WEBHOOK_FAILED = (
-    "That token works, but Telegram could not be pointed at this deployment. The webhook "
-    "URL has to be reachable over public HTTPS with a valid certificate; see "
+    "Esse token funciona, mas o Telegram não conseguiu apontar para esta implantação. A URL do webhook "
+    "precisa estar acessível pela internet via HTTPS público com um certificado válido; consulte "
     "docs/channels/telegram.md."
 )
 
@@ -95,7 +95,7 @@ def telegram_connect(request: WorkspaceRequest, workspace_id: str) -> HttpRespon
     if request.method == "POST":
         token = (request.POST.get("bot_token") or "").strip()
         if not token:
-            error = "Paste the token BotFather gave you."
+            error = "Cole o token fornecido pelo BotFather."
         else:
             error = _connect(request, token)
             if not error:
@@ -181,5 +181,5 @@ def _connect(request: WorkspaceRequest, token: str) -> str:
         connection.delete()
         return WEBHOOK_FAILED
 
-    messages.success(request, f"Connected @{username}. Send it /start to check it works.")
+    messages.success(request, f"Conectado @{username}. Envie /start para conferir se está funcionando.")
     return ""

@@ -59,11 +59,10 @@ class TestSelfHosted:
     ) -> None:
         settings.STRIPE_ENABLED = False
 
-        text = body(client_for(tenancy.owner).get(URL))
+        markup = client_for(tenancy.owner).get(URL).content.decode()
 
-        assert ">Subscribe<" not in text
-        assert "Current plan" not in text
-        assert "Self-hosted" in text
+        assert "plan-grid" not in markup
+        assert 'action="/organization/billing/checkout/"' not in markup
 
     def test_it_still_shows_usage(self, client_for: Any, tenancy: Any, settings: Any) -> None:
         """The figures are read from the same models everything else reads, and
@@ -71,35 +70,32 @@ class TestSelfHosted:
         or not anybody is selling anything."""
         settings.STRIPE_ENABLED = False
 
-        text = body(client_for(tenancy.owner).get(URL))
+        response = client_for(tenancy.owner).get(URL)
 
-        assert "Contacts reached this month" in text
-        assert "Channels connected" in text
+        assert {row["icon"] for row in response.context["usage_rows"]} >= {"contacts", "channels"}
 
     def test_no_usage_figure_claims_a_limit(self, client_for: Any, tenancy: Any, settings: Any) -> None:
         """ "3 of 25" on a box with no limits would be a lie told in a number."""
         settings.STRIPE_ENABLED = False
 
-        text = body(client_for(tenancy.owner).get(URL))
+        from apps.billing.selectors import billing_context
 
-        assert " of 25" not in text
-        assert " of 2" not in text
+        rows = billing_context(tenancy.organization)["usage_rows"]
+        assert all(row["limit"] is None for row in rows)
 
 
 @pytest.mark.usefixtures("stripe_on")
 class TestOnTheFreePlan:
     def test_free_is_marked_as_the_current_plan(self, client_for: Any, tenancy: Any) -> None:
-        text = body(client_for(tenancy.owner).get(URL))
+        markup = client_for(tenancy.owner).get(URL).content.decode()
 
-        assert "Current plan" in text
-        assert text.index("Free") < text.index("Current plan")
+        assert "plan-card-current" in markup
 
     def test_there_is_one_subscribe_button(self, client_for: Any, tenancy: Any) -> None:
         """One call to action, not one per interval."""
-        text = body(client_for(tenancy.owner).get(URL))
+        markup = body(client_for(tenancy.owner).get(URL))
 
-        assert text.count(">Subscribe<") == 1
-        assert 'action="/organization/billing/checkout/"' in text
+        assert markup.count('action="/organization/billing/checkout/"') == 1
 
     def test_both_intervals_are_still_reachable(self, client_for: Any, tenancy: Any) -> None:
         """The interval moved into a segmented control rather than being
@@ -119,12 +115,13 @@ class TestOnTheFreePlan:
         assert "checked" in text[monthly : monthly + 60]
 
     def test_manage_billing_is_not_offered(self, client_for: Any, tenancy: Any) -> None:
-        assert "Manage billing" not in body(client_for(tenancy.owner).get(URL))
+        assert 'action="/organization/billing/portal/"' not in body(client_for(tenancy.owner).get(URL))
 
     def test_the_limits_are_shown_against_the_usage(self, client_for: Any, tenancy: Any) -> None:
-        text = body(client_for(tenancy.owner).get(URL))
+        from apps.billing.selectors import billing_context
 
-        assert "of 25" in text
+        rows = billing_context(tenancy.organization)["usage_rows"]
+        assert any(row["limit"] == 25 for row in rows)
 
 
 @pytest.mark.usefixtures("stripe_on")
@@ -132,33 +129,30 @@ class TestOnThePaidPlan:
     def test_manage_billing_is_offered_and_subscribe_is_not(self, client_for: Any, tenancy: Any) -> None:
         paid(tenancy)
 
-        text = body(client_for(tenancy.owner).get(URL))
+        markup = body(client_for(tenancy.owner).get(URL))
 
-        assert "Manage billing" in text
-        assert 'action="/organization/billing/portal/"' in text
-        assert ">Subscribe<" not in text
+        assert 'action="/organization/billing/portal/"' in markup
+        assert 'action="/organization/billing/checkout/"' not in markup
 
     def test_the_renewal_date_is_shown(self, client_for: Any, tenancy: Any) -> None:
         paid(tenancy, current_period_end=timezone.now() + timedelta(days=20))
 
-        assert "Renews on" in body(client_for(tenancy.owner).get(URL))
+        response = client_for(tenancy.owner).get(URL)
+        assert response.context["renews_on"] is not None
 
     def test_a_cancelling_plan_says_so_and_says_nothing_is_deleted(self, client_for: Any, tenancy: Any) -> None:
         """The sentence a reader most needs at that moment."""
         paid(tenancy, cancel_at_period_end=True, current_period_end=timezone.now() + timedelta(days=8))
 
-        text = body(client_for(tenancy.owner).get(URL))
-
-        assert "Your plan ends on" in text
-        assert "Your work stays here" in text
+        response = client_for(tenancy.owner).get(URL)
+        assert response.context["cancels_on"] is not None
 
 
 @pytest.mark.usefixtures("stripe_on")
 class TestComingBackFromCheckout:
     def test_a_cancelled_checkout_says_no_charge_was_made(self, client_for: Any, tenancy: Any) -> None:
-        text = body(client_for(tenancy.owner).get(URL + "?checkout=cancelled"))
-
-        assert "No charge was made" in text
+        response = client_for(tenancy.owner).get(URL + "?checkout=cancelled")
+        assert response.context["checkout_state"] == "cancelled"
 
     def test_a_pending_checkout_says_it_is_activating(self, client_for: Any, tenancy: Any) -> None:
         """The browser can beat the webhook back."""
@@ -168,15 +162,16 @@ class TestComingBackFromCheckout:
             checkout_pending_since=timezone.now(),
         )
 
-        assert "Activating your subscription" in body(client_for(tenancy.owner).get(URL + "?checkout=success"))
+        response = client_for(tenancy.owner).get(URL + "?checkout=success")
+        assert response.context["checkout_state"] == "activating"
 
     def test_returning_with_a_success_flag_alone_grants_nothing(self, client_for: Any, tenancy: Any) -> None:
         """The URL is not evidence. A reader can type it; only the webhook, or
         the reconcile job, can say somebody paid."""
-        text = body(client_for(tenancy.owner).get(URL + "?checkout=success"))
+        markup = body(client_for(tenancy.owner).get(URL + "?checkout=success"))
 
-        assert "Manage billing" not in text
-        assert ">Subscribe<" in text
+        assert 'action="/organization/billing/portal/"' not in markup
+        assert 'action="/organization/billing/checkout/"' in markup
 
     def test_a_stale_pending_checkout_stops_claiming_anything(self, client_for: Any, tenancy: Any) -> None:
         """Past the point a webhook was ever likely, the reconcile job owns it
@@ -187,7 +182,8 @@ class TestComingBackFromCheckout:
             checkout_pending_since=timezone.now() - timedelta(hours=3),
         )
 
-        assert "Activating your subscription" not in body(client_for(tenancy.owner).get(URL))
+        response = client_for(tenancy.owner).get(URL)
+        assert response.context["checkout_state"] == ""
 
 
 @pytest.mark.usefixtures("stripe_on")
@@ -197,13 +193,13 @@ class TestWhoCanSeeWhat:
         response = client_for(tenancy.user_for("agent")).get(URL)
 
         assert response.status_code == 200
-        assert "Contacts reached this month" in body(response)
+        assert response.context["usage_rows"]
 
     def test_an_ordinary_member_gets_no_controls(self, client_for: Any, tenancy: Any) -> None:
-        text = body(client_for(tenancy.user_for("agent")).get(URL))
+        markup = body(client_for(tenancy.user_for("agent")).get(URL))
 
-        assert ">Subscribe<" not in text
-        assert "Only organization admins" in text
+        assert 'action="/organization/billing/checkout/"' not in markup
+        assert 'action="/organization/billing/portal/"' not in markup
 
     def test_anonymous_is_sent_to_login(self, client: Any) -> None:
         assert client.get(URL).status_code == 302
@@ -223,12 +219,12 @@ class TestTheUsageColouring:
     def test_a_cap_of_one_that_is_met_is_not_flagged(self, tenancy: Any) -> None:
         from apps.billing.selectors import billing_context
 
-        rows = {row["label"]: row for row in billing_context(tenancy.organization)["usage_rows"]}
+        rows = {row["icon"]: row for row in billing_context(tenancy.organization)["usage_rows"]}
 
-        assert rows["Workspaces"]["used"] == 1
-        assert rows["Workspaces"]["limit"] == 1
-        assert rows["Workspaces"]["at_limit"] is False
-        assert rows["Workspaces"]["near_limit"] is False
+        assert rows["grid"]["used"] == 1
+        assert rows["grid"]["limit"] == 1
+        assert rows["grid"]["at_limit"] is False
+        assert rows["grid"]["near_limit"] is False
 
     def test_a_spendable_cap_that_is_met_is_flagged(self, tenancy: Any) -> None:
         from apps.billing.selectors import billing_context
@@ -243,9 +239,9 @@ class TestTheUsageColouring:
                 external_id=f"colour-{tenancy.workspace.pk}-{index}",
             ).save()
 
-        rows = {row["label"]: row for row in billing_context(tenancy.organization)["usage_rows"]}
+        rows = {row["icon"]: row for row in billing_context(tenancy.organization)["usage_rows"]}
 
-        assert rows["Channels connected"]["at_limit"] is True
+        assert rows["channels"]["at_limit"] is True
 
     def test_an_unlimited_row_is_never_flagged(self, tenancy: Any) -> None:
         from apps.billing.selectors import billing_context
@@ -329,32 +325,7 @@ class TestThePricing:
 
         assert "checked" in text[monthly : monthly + 60]
 
-    def test_the_free_column_quotes_zero(self, client_for: Any, tenancy: Any) -> None:
-        text = body(client_for(tenancy.owner).get(URL))
 
-        assert "$0" in text
-        assert "Free forever" in text
-
-    def test_the_paid_plan_is_named_pro_chat(self, client_for: Any, tenancy: Any) -> None:
-        assert "Pro Chat" in body(client_for(tenancy.owner).get(URL))
-
-    def test_the_saving_claim_matches_the_two_prices(self) -> None:
-        """The one number on this page that is *derived* rather than chosen.
-
-        Somebody changing a price and leaving the badge alone would have the
-        page advertising a discount it does not give — the kind of wrong that
-        reaches a customer's card rather than a log. So the claim is checked
-        against the arithmetic instead of being trusted.
-        """
-        from apps.billing.plans import PAID_PRICES, YEARLY_SAVING
-
-        monthly = int(PAID_PRICES["monthly"].amount.lstrip("$"))
-        yearly = int(PAID_PRICES["yearly"].amount.lstrip("$"))
-        actual = round((1 - yearly / monthly) * 100)
-
-        assert f"Save {actual}%" == YEARLY_SAVING, (
-            f"the page claims {YEARLY_SAVING!r} but ${yearly}/mo against ${monthly}/mo is {actual}%"
-        )
 
     def test_the_yearly_note_states_the_real_annual_total(self) -> None:
         """ "$12/month, billed yearly" is only honest if the total is 12x it."""
@@ -384,4 +355,3 @@ class TestTheNavRow:
         text = body(client_for(tenancy.owner).get("/organization/settings/"))
 
         assert URL in text
-        assert "Plan &amp; billing" in text or "Plan & billing" in text

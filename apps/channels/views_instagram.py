@@ -59,9 +59,9 @@ __all__ = ["instagram_callback", "instagram_connect", "instagram_posts"]
 #: Shown when this deployment has no Meta app credentials to start an OAuth flow
 #: with. Names where they go and never a value.
 NO_CREDENTIALS = (
-    "This deployment has no Instagram app credentials yet. Set "
-    "PLATFORM_INSTAGRAM_CLIENT_ID and PLATFORM_INSTAGRAM_CLIENT_SECRET in the "
-    "environment. See docs/channels/instagram.md."
+    "Esta implantação ainda não tem credenciais do app do Instagram. Configure "
+    "PLATFORM_INSTAGRAM_CLIENT_ID e PLATFORM_INSTAGRAM_CLIENT_SECRET no ambiente. Consulte "
+    "docs/channels/instagram.md."
 )
 
 #: Shown when Meta refuses the code, the token exchange fails, or the profile
@@ -69,8 +69,8 @@ NO_CREDENTIALS = (
 #: next step is the same in all of them (start again), and distinguishing them
 #: would be an oracle for which app ids and codes are real.
 REJECTED_MESSAGE = (
-    "Instagram did not complete the connection. Start again from Settings -> Channels, "
-    "and check that this deployment's callback URL is listed in your Meta app."
+    "O Instagram não concluiu a conexão. Inicie novamente em Configurações -> Canais e confira se a URL de "
+    "retorno desta implantação está cadastrada no app da Meta."
 )
 
 #: Shown when the ``state`` does not verify. Its own message because the fix is
@@ -157,7 +157,7 @@ def instagram_callback(request: Any) -> HttpResponse:
     if error:
         # The operator pressed Cancel on Meta's screen, or Meta refused. Neither
         # is our failure and neither needs a scary page.
-        messages.info(request, "Instagram was not connected.")
+        messages.info(request, "A conexão com o Instagram não foi concluída.")
         return redirect(settings_url)
 
     code = (request.GET.get("code") or "").strip()
@@ -252,7 +252,7 @@ def _complete(request: Any, workspace: Any, code: str) -> str:
     except IntegrityError:
         existing = _reconnect(workspace, profile, token, expires_at)
         if existing is not None:
-            messages.success(request, f"Reconnected {connection.display_name}.")
+            messages.success(request, f"{connection.display_name} foi reconectado.")
             return ""
         # SPEC §5's unique (platform, external_id) is deployment-wide, so this
         # can be another workspace's row. The wording never says which
@@ -261,8 +261,8 @@ def _complete(request: Any, workspace: Any, code: str) -> str:
 
     messages.success(
         request,
-        f"Connected {connection.display_name}. Subscribe your Meta app to this account's "
-        f"webhook fields to start receiving messages. See docs/channels/instagram.md.",
+        f"{connection.display_name} conectado. Inscreva seu app da Meta nos campos de webhook desta conta "
+        f"para começar a receber mensagens. Consulte docs/channels/instagram.md.",
     )
     return ""
 

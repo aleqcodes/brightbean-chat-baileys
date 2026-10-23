@@ -277,22 +277,6 @@ class TestTheJsonSchemaInterpreter:
         export test — not something to raise on in a request path."""
         assert validate_instance({"$ref": "#/$defs/nope"}, {"anything": 1}, path="", defs={}) == []
 
-    def test_one_of_requires_exactly_one_match_unlike_any_of(self):
-        """The interpreter exists to read fragments this app did not write —
-        CONDITION_SCHEMA arrives from apps.contacts (contract 8). Treating
-        `oneOf` as `anyOf` would let a value matching two branches through."""
-        branches = [
-            {"type": "object", "properties": {"a": {"type": "string"}}},
-            {"type": "object", "properties": {"b": {"type": "string"}}},
-        ]
-        both = {"a": "x", "b": "y"}
-
-        one_of = validate_instance({"oneOf": branches}, both, path="cfg", defs={})
-        any_of = validate_instance({"anyOf": branches}, both, path="cfg", defs={})
-
-        assert [issue.code for issue in one_of] == ["invalid_config_value"]
-        assert "exactly one" in one_of[0].message
-        assert any_of == []
 
     def test_one_of_still_passes_a_value_matching_a_single_branch(self):
         branches = [

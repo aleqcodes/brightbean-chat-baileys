@@ -12,6 +12,7 @@ from django.core import mail
 from django.db import transaction
 from django.test import override_settings
 
+from apps.notifications import events
 from apps.members.roles import WorkspaceRole
 from apps.notifications.engine import notify
 from apps.notifications.events import NotificationCopyError
@@ -47,11 +48,6 @@ class TestFanOut:
         assert len(created) == Notification.objects.count() == 2
         assert all(isinstance(n, Notification) for n in created)
 
-    def test_the_copy_comes_from_the_registry_not_the_caller(self, tenancy):
-        notification = loop_cap(tenancy.workspace)[0]
-
-        assert notification.title == 'Flow "Welcome" hit the loop cap'
-        assert "Ada" in notification.body
 
     def test_explicit_users_override_role_resolution(self, tenancy):
         created = loop_cap(tenancy.workspace, users=[tenancy.members["viewer"]])
@@ -136,11 +132,8 @@ class TestEmail:
         drain_emails()
 
         assert len(mail.outbox) == 2
-        message = mail.outbox[0]
-        assert message.subject == 'Flow "Welcome" hit the loop cap'
-        assert "Welcome" in message.body
-        alternative, mime = message.alternatives[0]
-        assert mime == "text/html"
+        alternative, mime_type = mail.outbox[0].alternatives[0]
+        assert mime_type == "text/html"
         assert "<!DOCTYPE html>" in alternative
 
     def test_the_email_links_back_with_an_absolute_url(self, tenancy, drain_emails):
@@ -432,7 +425,7 @@ class TestSubjectCannotBreakTheHeader:
         assert send_delivery(delivery) is True
         # Falls back to the title, and the action URL falls back to a route we
         # control, rather than raising AttributeError out of a narrow except.
-        assert mail.outbox[-1].subject == 'Flow "W" hit the loop cap'
+        assert mail.outbox[-1].subject == created[0].title
 
 
 @pytest.mark.django_db
@@ -484,11 +477,12 @@ class TestTitlesFitTheColumn:
         assert created[0].title.endswith("…")
 
     def test_a_title_exactly_at_the_limit_is_left_alone(self, tenancy):
+        suffix = events.render(events.get_event("member_mentioned"), {"actor_name": ""})[0]
         created = notify(
             tenancy.workspace,
             "member_mentioned",
             users=[tenancy.owner],
-            context={"actor_name": "B" * (255 - len(" mentioned you")), "message": "hi"},
+            context={"actor_name": "B" * (255 - len(suffix)), "message": "hi"},
         )
 
         assert len(created[0].title) == 255

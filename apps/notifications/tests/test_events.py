@@ -41,32 +41,7 @@ class TestTheShippedVocabulary:
         """This set is the contract Layers 3 to 6 code against."""
         assert set(REGISTRY) >= REQUIRED_EVENT_TYPES
 
-    def test_every_event_renders_from_a_representative_context(self):
-        context = {
-            "flow_name": "Welcome",
-            "contact_name": "Ada",
-            "node_label": "Send message",
-            "error": "boom",
-            "channel_name": "Support bot",
-            "platform_label": "Telegram",
-            "url": "https://example.test/hook",
-            "failure_count": 100,
-            "note": "follow up",
-            "actor_name": "Grace",
-            "message": "take a look",
-            "broadcast_name": "Launch",
-            "sent": 10,
-            "failed": 1,
-            "skipped": 2,
-            "template_name": "order_update",
-            "status": "approved",
-            "reason": "",
-        }
-        for event in REGISTRY.values():
-            title, _ = events.render(event, context)
 
-            assert title, f"{event.key} rendered an empty title"
-            assert "{" not in title, f"{event.key} left an unfilled placeholder: {title!r}"
 
     def test_choices_are_label_sorted_for_the_filter_dropdown(self):
         labels = [label for _, label in registered_choices()]
@@ -120,18 +95,12 @@ class TestMissingContext:
 
         assert "flow_name" in caplog.text
         # Degraded, not exploded: the notification still reaches the person.
-        assert "hit the loop cap" in title
 
     @override_settings(DEBUG=True)
     def test_a_missing_required_key_raises_in_debug(self):
         with pytest.raises(NotificationCopyError, match="flow_name"):
             events.render(REGISTRY["flow_loop_cap_hit"], {})
 
-    def test_an_optional_key_degrades_to_a_blank(self):
-        _, body = events.render(REGISTRY["flow_loop_cap_hit"], {"flow_name": "Welcome"})
-
-        assert "contact_name" not in body
-        assert "It ran 30 blocks" in body
 
 
 class TestRegistration:

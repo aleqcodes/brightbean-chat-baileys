@@ -12,65 +12,64 @@ sitting in every row. A dropdown that silently posts on change, on a control tha
 can demote the person reading it, is not a thing to leave lying in a list.
 {% endcomment %}
 {% load common_extras %}
-{% block title %}Team members · BrightBean Chat{% endblock %}
+{% block title %}Membros da equipe · BrightBean Chat{% endblock %}
 {% block content_wrap %}{% endblock %}
 
 {% block content %}
 <div class="max-w-[1060px] w-full">
     <div class="page-header">
         <div class="page-header-text">
-            <h1 class="page-title">Team members</h1>
+            <h1 class="page-title">Membros da equipe</h1>
             <p class="page-lede">
-                Everybody in this organization, what they can do across it, and which workspaces they
-                can reach.
+                Todas as pessoas da organização, suas permissões e os espaços de trabalho que podem acessar.
             </p>
         </div>
         {% if can_invite %}
-        <button type="button" class="btn-pill-primary flex-shrink-0" @click="$modal('invite-member')">{% include "partials/_nav_icon.html" with name="users" icon_size=16 %} Invite someone</button>
+        <button type="button" class="btn-pill-primary flex-shrink-0" @click="$modal('invite-member')">{% include "partials/_nav_icon.html" with name="users" icon_size=16 %} Convidar alguém</button>
         {% endif %}
     </div>
 
     {% if can_invite %}
-    {% modal "invite-member" title="Invite someone" size="lg" %}
+    {% modal "invite-member" title="Convidar alguém" size="lg" %}
     <form method="post" action="{% url 'members:invite' %}">
         {% csrf_token %}
         <div class="bb-modal-body">
         <div class="field">
-            <label class="field-label" for="invite-email">Email</label>
-            <input class="form-input-styled" id="invite-email" type="email" name="email" required autofocus placeholder="name@company.com">
+            <label class="field-label" for="invite-email">E-mail</label>
+            <input class="form-input-styled" id="invite-email" type="email" name="email" required autofocus placeholder="nome@empresa.com">
         </div>
         <div class="field">
-            <label class="field-label" for="invite-role">Organization role</label>
+            <label class="field-label" for="invite-role">Função na organização</label>
             <select class="form-input-styled bb-select" id="invite-role" name="org_role">
                 {% for value, label in org_role_choices %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
             </select>
         </div>
         <div class="field">
-            <span class="field-label">Workspace access</span>
+            <span class="field-label">Acesso aos espaços de trabalho</span>
             {% for workspace in workspaces %}
             <div class="flex flex-wrap items-center justify-between gap-3 py-2">
                 <label class="field-check field-check-inline" for="ws-{{ workspace.id }}">
                     <input class="bb-checkbox" id="ws-{{ workspace.id }}" type="checkbox" name="ws_{{ workspace.id }}" value="1">
                     <span class="field-check-body"><span class="field-label">{{ workspace.name }}</span></span>
                 </label>
-                <select class="form-input-styled bb-select" name="ws_role_{{ workspace.id }}" aria-label="Role in {{ workspace.name }}" style="width: 12rem;">
+                <select class="form-input-styled bb-select" name="ws_role_{{ workspace.id }}" aria-label="Função em {{ workspace.name }}" style="width: 12rem;">
                     {% for value, label in workspace_roles %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
                 </select>
             </div>
             {% empty %}
-            <p class="section-note">You cannot manage members in any workspace yet.</p>
+            <p class="section-note">Você ainda não pode gerenciar membros em nenhum espaço de trabalho.</p>
             {% endfor %}
         </div>
         </div>
         <div class="bb-modal-actions">
-            <button type="button" class="btn-pill-secondary" @click="close()">Cancel</button>
-            <button type="submit" class="btn-pill-primary">Send invitation</button>
+            <button type="button" class="btn-pill-secondary" @click="close()">Cancelar</button>
+            <button type="submit" class="btn-pill-primary">Enviar convite</button>
         </div>
     </form>
     {% endmodal %}
     {% endif %}
 
-    <h2 class="section-title mb-3">Members</h2>
+    <h2 class="section-title mb-3">Membros</h2>
     {% if rows %}
     <div class="card overflow-hidden mb-8">
         {% for row in rows %}
@@ -85,14 +84,14 @@ can demote the person reading it, is not a thing to leave lying in a list.
                 <div class="list-row-meta truncate">{{ row.membership.user.email }}</div>
             </div>
 
-            <a class="btn-pill-secondary btn-pill-sm flex-shrink-0" href="{% url 'members:manage_workspaces' membership_id=row.membership.id %}">Manage access</a>
+            <a class="btn-pill-secondary btn-pill-sm flex-shrink-0" href="{% url 'members:manage_workspaces' membership_id=row.membership.id %}">Gerenciar acesso</a>
 
             {% if is_admin and row.can_manage %}
-            <button type="button" class="btn-icon-round flex-shrink-0" @click="openMenu($event)" aria-haspopup="menu" :aria-expanded="menuOpen ? 'true' : 'false'" aria-label="More actions for {{ row.membership.user.display_name }}">
+            <button type="button" class="btn-icon-round flex-shrink-0" @click="openMenu($event)" aria-haspopup="menu" :aria-expanded="menuOpen ? 'true' : 'false'" aria-label="Mais ações para {{ row.membership.user.display_name }}">
                 <svg width="17" height="17" fill="currentColor" stroke="none" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
             </button>
             <div x-show="menuOpen" x-cloak @click.away="menuOpen = false" :style="`top:${menuTop}px; left:${menuLeft}px;`" class="row-menu-panel fixed z-50 w-[200px]" role="menu">
-                <button type="button" class="row-menu-item" role="menuitem" @click="changing = true; menuOpen = false">Change role…</button>
+                <button type="button" class="row-menu-item" role="menuitem" @click="changing = true; menuOpen = false">Alterar função…</button>
                 <div class="row-menu-sep"></div>
                 {% comment %}
                   Asked first (HANDOFF §2.4): they lose access at once, and only
@@ -100,20 +99,20 @@ can demote the person reading it, is not a thing to leave lying in a list.
                   the CSP blocks an inline onsubmit.
                 {% endcomment %}
                 <form method="post" action="{% url 'members:remove' membership_id=row.membership.id %}"
-                      @submit="if (!window.confirm('Remove {{ row.membership.user.display_name|escapejs }} from the organization? They lose access straight away.')) $event.preventDefault()">
+                      @submit="if (!window.confirm('Remover {{ row.membership.user.display_name|escapejs }} da organização? A pessoa perderá o acesso imediatamente.')) $event.preventDefault()">
                     {% csrf_token %}
-                    <button type="submit" class="row-menu-item row-menu-item-danger" role="menuitem">Remove from organization</button>
+                    <button type="submit" class="row-menu-item row-menu-item-danger" role="menuitem">Remover da organização</button>
                 </form>
             </div>
 
             <form x-show="changing" x-cloak class="w-full order-last flex flex-wrap items-center gap-2 pt-3" method="post" action="{% url 'members:update_role' membership_id=row.membership.id %}">
                 {% csrf_token %}
-                <label class="sr-only" for="role-{{ row.membership.id }}">Organization role</label>
+                <label class="sr-only" for="role-{{ row.membership.id }}">Função na organização</label>
                 <select class="form-input-styled bb-select" id="role-{{ row.membership.id }}" name="org_role" style="width: 14rem;">
                     {% for value, label in org_role_choices %}<option value="{{ value }}" {% if row.membership.org_role == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
                 </select>
-                <button type="submit" class="btn-pill-secondary btn-pill-sm">Update</button>
-                <button type="button" class="btn-pill-secondary btn-pill-sm" @click="changing = false">Cancel</button>
+                <button type="submit" class="btn-pill-secondary btn-pill-sm">Atualizar</button>
+                <button type="button" class="btn-pill-secondary btn-pill-sm" @click="changing = false">Cancelar</button>
             </form>
             {% endif %}
         </div>
@@ -121,12 +120,12 @@ can demote the person reading it, is not a thing to leave lying in a list.
     </div>
     {% else %}
     <div class="empty-state mb-8">
-        <p class="empty-state-title">Nobody here yet</p>
-        <p class="empty-state-body">Invite the people who answer messages with you.</p>
+        <p class="empty-state-title">Ainda não há ninguém aqui</p>
+        <p class="empty-state-body">Convide as pessoas que responderão às mensagens com você.</p>
     </div>
     {% endif %}
 
-    <h2 class="section-title mb-3">Pending invitations</h2>
+    <h2 class="section-title mb-3">Convites pendentes</h2>
     {% if invitations %}
     <div class="card overflow-hidden">
         {% for invite in invitations %}
@@ -137,16 +136,16 @@ can demote the person reading it, is not a thing to leave lying in a list.
                     <span class="list-row-title truncate">{{ invite.email }}</span>
                     <span class="status-pill">{{ invite.get_org_role_display }}</span>
                 </div>
-                <div class="list-row-meta">Expires {{ invite.expires_at }}</div>
+                <div class="list-row-meta">Expira em {{ invite.expires_at }}</div>
             </div>
             {% if is_admin %}
             <form method="post" action="{% url 'members:resend_invite' invitation_id=invite.id %}">
                 {% csrf_token %}
-                <button type="submit" class="btn-pill-secondary btn-pill-sm">Resend</button>
+                <button type="submit" class="btn-pill-secondary btn-pill-sm">Reenviar</button>
             </form>
             <form method="post" action="{% url 'members:revoke_invite' invitation_id=invite.id %}">
                 {% csrf_token %}
-                <button type="submit" class="btn-danger-link ml-1">Revoke</button>
+                <button type="submit" class="btn-danger-link ml-1">Revogar</button>
             </form>
             {% endif %}
         </div>
@@ -154,8 +153,8 @@ can demote the person reading it, is not a thing to leave lying in a list.
     </div>
     {% else %}
     <div class="empty-state">
-        <p class="empty-state-title">No pending invitations</p>
-        <p class="empty-state-body">Invitations you send appear here until they are accepted.</p>
+        <p class="empty-state-title">Nenhum convite pendente</p>
+        <p class="empty-state-body">Os convites enviados aparecem aqui até serem aceitos.</p>
     </div>
     {% endif %}
 </div>

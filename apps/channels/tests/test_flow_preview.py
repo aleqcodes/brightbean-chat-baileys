@@ -170,19 +170,6 @@ class TestItOffersTheChannelTheFlowIsBuiltFor:
         assert payload["deep_link"].startswith("https://m.me/123456?ref=preview-")
         assert payload["account"] == "Acme Inc"
 
-    def test_the_meta_platforms_say_a_tap_is_not_enough(
-        self, tenancy: Tenancy, client_for: Any, drafted_flow: Any
-    ) -> None:
-        """Telegram delivers /start on the tap; Meta opens a composer and the
-        referral rides in with the first message. Without saying so, a working
-        link gets reported as broken."""
-        connection = connection_for(tenancy, Platform.INSTAGRAM, display_name="@acme", external_id="ig-1")
-        bind(drafted_flow, connection)
-
-        payload = client_for(tenancy.user_for(WorkspaceRole.EDITOR)).post(url(tenancy, drafted_flow)).json()
-
-        assert "Send a message" in payload["instructions"]
-
     def test_telegram_needs_no_instructions(self, tenancy: Tenancy, client_for: Any, drafted_flow: Any) -> None:
         from apps.channels.providers.telegram import store_bot_token
 
@@ -212,7 +199,6 @@ class TestTheHonestEmptyStates:
         assert response.status_code == 200
         assert payload["ok"] is False
         assert payload["reason"] == "unsupported_platform"
-        assert "WhatsApp" in payload["message"]
         # Nothing to go and connect would change the answer.
         assert "settings_url" not in payload
 
@@ -258,8 +244,6 @@ class TestTheHonestEmptyStates:
 
         assert payload["ok"] is False
         assert payload["reason"] == "no_connection"
-        assert "Instagram" in payload["message"]
-        assert "Telegram" not in payload["message"]
 
     def test_a_flow_that_names_no_channel_still_uses_what_is_connected(
         self, tenancy: Tenancy, client_for: Any, drafted_flow: Any

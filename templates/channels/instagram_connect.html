@@ -13,7 +13,7 @@ Restyled only. Every sentence here is the one that was on the page before —
 the env var names and Meta's own UI labels are what somebody follows along
 with in another tab, so none of them is a detail to tidy away.
 {% endcomment %}
-{% block title %}Connect Instagram · BrightBean Chat{% endblock %}
+{% block title %}Conectar Instagram · BrightBean Chat{% endblock %}
 {% block content_wrap %}{% endblock %}
 
 {% block content %}
@@ -23,12 +23,12 @@ with in another tab, so none of them is a detail to tidy away.
     <div class="flex items-start gap-4 mb-7">
         <span class="pi-chip pi-chip-hero {{ platform_key|platform_class }}">{% include "partials/_platform_icon.html" with platform=platform_key size="lg" only %}</span>
         <div class="min-w-0">
-            <h1 class="page-title">Connect an Instagram account</h1>
+            <h1 class="page-title">Conectar uma conta do Instagram</h1>
             <p class="page-lede mt-1.5">
-                BrightBean Chat uses the <strong>Instagram API with Instagram Login</strong>, so the
-                account you connect must be a <strong>professional</strong> account, Business or
-                Creator. You will be sent to Instagram to authorise it, and we never see your
-                password.
+                O BrightBean Chat usa a <strong>API do Instagram com Login do Instagram</strong>;
+                portanto, a conta conectada deve ser <strong>profissional</strong>, comercial ou de
+                criador de conteúdo. Você será redirecionado ao Instagram para autorizar o acesso;
+                sua senha nunca será compartilhada conosco.
             </p>
         </div>
     </div>
@@ -36,46 +36,46 @@ with in another tab, so none of them is a detail to tidy away.
     {% if error %}<div class="alert-error">{{ error }}</div>{% endif %}
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-4">Before you start</h2>
+        <h2 class="section-title mb-4">Antes de começar</h2>
         <ol class="cn-steps" role="list">
-            <li class="cn-step">Create a Meta app with the <em>Instagram</em> product added.</li>
+            <li class="cn-step">Crie um app da Meta e adicione o produto <em>Instagram</em>.</li>
             <li class="cn-step">
-                Add this deployment's callback URL to the app's <em>Business login settings</em>,
-                exactly as written.
-                <div class="mt-2.5">{% include "partials/_copy_field.html" with label="Callback URL" value=callback_url only %}</div>
+                Adicione a URL de retorno desta instalação às <em>Configurações de login empresarial</em>
+                do app, exatamente como está escrita.
+                <div class="mt-2.5">{% include "partials/_copy_field.html" with label="URL de retorno" value=callback_url only %}</div>
             </li>
             <li class="cn-step">
-                Set the app's Instagram app ID and secret on this deployment as
-                <code>PLATFORM_INSTAGRAM_CLIENT_ID</code> and
+                Configure o ID e o segredo do app do Instagram nesta instalação como
+                <code>PLATFORM_INSTAGRAM_CLIENT_ID</code> e
                 <code>PLATFORM_INSTAGRAM_CLIENT_SECRET</code>.
             </li>
-            <li class="cn-step">In the account's Instagram settings, allow access to messages.</li>
+            <li class="cn-step">Nas configurações da conta do Instagram, permita o acesso às mensagens.</li>
         </ol>
     </section>
 
     <form class="card p-6 mb-5" method="post">
         {% csrf_token %}
-        <h2 class="section-title mb-1">Authorise the account</h2>
+        <h2 class="section-title mb-1">Autorizar a conta</h2>
         <p class="section-note mb-5">
-            You will be sent to Instagram to sign in and pick the account.
+            Você será redirecionado ao Instagram para entrar e escolher a conta.
         </p>
-        <button type="submit" class="btn-pill-primary">{% include "partials/_platform_icon.html" with platform=platform_key size="sm" only %} Continue to Instagram</button>
+        <button type="submit" class="btn-pill-primary">{% include "partials/_platform_icon.html" with platform=platform_key size="sm" only %} Continuar para o Instagram</button>
     </form>
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-3">What we ask Instagram for</h2>
+        <h2 class="section-title mb-3">Permissões solicitadas ao Instagram</h2>
         <ul class="flex flex-wrap gap-1.5">
             {% for scope in scopes %}<li><code>{{ scope }}</code></li>{% endfor %}
         </ul>
         <p class="field-hint">
-            Reading and answering comments needs the last one, so it is requested up front rather
-            than when a comment trigger is first used.
+            A leitura e a resposta a comentários exigem a última permissão; por isso ela é solicitada
+            desde o início, em vez de somente quando um gatilho de comentário é usado pela primeira vez.
         </p>
     </section>
 
     <a class="cn-back" href="{{ list_url }}">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-        Back to channels
+        Voltar aos canais
     </a>
 </div>
 {% endwith %}

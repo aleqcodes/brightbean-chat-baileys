@@ -5,7 +5,6 @@ import { SCHEMA, configSchema } from "./artifact";
 import {
   anyOfRequirements,
   branchAt,
-  branchLabels,
   constProperties,
   deref,
   isTaggedUnion,
@@ -86,21 +85,20 @@ describe("untagged unions", () => {
     // Eight branches over six sources: two sources contribute a presence form
     // and a comparison form, so `source` alone could not be a discriminator.
     expect(item?.oneOf).toHaveLength(8);
-    expect(branchLabels(item)).toContain("Tag");
-    expect(branchLabels(item)).toContain("Custom field comparison");
   });
 
   it("narrows the operators per source, so the bundle needs no operator table", () => {
     const item = deref(deref(deref(SCHEMA.$defs["condition_filter"])?.properties?.["rules"])?.items);
-    const tag = branchAt(item, branchLabels(item).indexOf("Tag"));
+    const tag = item?.oneOf?.findIndex((branch) => constProperties(deref(branch)).source === "tag") ?? -1;
+    const tagSchema = branchAt(item, tag);
 
-    expect(deref(tag?.properties?.["op"])?.enum).toEqual(["has", "has_not"]);
-    expect(constProperties(tag)).toEqual({ source: "tag" });
+    expect(tag).toBeGreaterThanOrEqual(0);
+    expect(deref(tagSchema?.properties?.["op"])?.enum).toEqual(["has", "has_not"]);
+    expect(constProperties(tagSchema)).toEqual({ source: "tag" });
   });
 
   it("matches a value to its branch on pinned literals, required keys and closedness", () => {
     const item = deref(deref(deref(SCHEMA.$defs["condition_filter"])?.properties?.["rules"])?.items);
-    const labels = branchLabels(item);
     const key = "00000000-0000-0000-0000-000000000000";
 
     // Presence and comparison differ only by `value`; every object is closed,
@@ -108,9 +106,10 @@ describe("untagged unions", () => {
     const presence = matchBranch(item, { source: "custom_field", key, op: "has_value" });
     const comparison = matchBranch(item, { source: "custom_field", key, op: "is", value: "x" });
 
-    expect(labels[presence]).toBe("Custom field");
-    expect(labels[comparison]).toBe("Custom field comparison");
-    expect(presence).not.toBe(comparison);
+    expect(constProperties(branchAt(item, presence))).toEqual({ source: "custom_field" });
+    expect(constProperties(branchAt(item, comparison))).toEqual({ source: "custom_field" });
+    expect(branchAt(item, presence)?.properties).not.toHaveProperty("value");
+    expect(branchAt(item, comparison)?.properties).toHaveProperty("value");
   });
 
   it("returns -1 for a value that belongs to no branch", () => {
@@ -146,8 +145,11 @@ describe("scalar branches of an untagged union", () => {
   /** A condition comparison's `value`: string | number | boolean | {relative}. */
   function valueSchema() {
     const item = deref(deref(deref(SCHEMA.$defs["condition_filter"])?.properties?.["rules"])?.items);
-    const comparison = branchAt(item, branchLabels(item).indexOf("Custom field comparison"));
-    return deref(comparison?.properties?.["value"]);
+    const comparison = item?.oneOf?.find((branch) => {
+      const resolved = deref(branch);
+      return constProperties(resolved).source === "custom_field" && Boolean(resolved?.properties?.value);
+    });
+    return deref(deref(comparison)?.properties?.value);
   }
 
   it("matches a plain string, number or boolean operand", () => {

@@ -80,7 +80,7 @@ class ActionNode(Node):
             handler = verb_handler(verb)
             if handler is None:
                 logger.warning(
-                    "Execution %s: action node %s names verb %r, which has no runtime in this deployment; skipping it.",
+                    "Execução %s: o nó de ação %s usa o verbo %r, que não está disponível neste ambiente; ignorando.",
                     ctx.execution.pk,
                     ctx.node_id,
                     verb,
@@ -93,7 +93,7 @@ class ActionNode(Node):
                 # deleted object, messaging not installed. The other verbs in
                 # the list still deserve to run.
                 logger.warning(
-                    "Execution %s: action node %s verb %r failed: %s",
+                    "Execução %s: o nó de ação %s falhou ao executar o verbo %r: %s",
                     ctx.execution.pk,
                     ctx.node_id,
                     verb,
@@ -117,10 +117,10 @@ def _add_tag(ctx: NodeContext, step: dict[str, Any]) -> None:
     """
     name = _text(step.get("tag"))
     if not name:
-        raise ValueError("add_tag needs a tag name.")
+        raise ValueError("add_tag precisa do nome de uma etiqueta.")
     tag, created = get_or_create_tag(ctx.workspace, name)
     if created:
-        logger.info("Execution %s created tag %r", ctx.execution.pk, tag.name)
+        logger.info("Execução %s criou a etiqueta %r", ctx.execution.pk, tag.name)
     add_tag(ctx.contact, tag)
 
 
@@ -128,10 +128,10 @@ def _remove_tag(ctx: NodeContext, step: dict[str, Any]) -> None:
     """Untag the contact. A tag the workspace does not have is already removed."""
     name = _text(step.get("tag"))
     if not name:
-        raise ValueError("remove_tag needs a tag name.")
+        raise ValueError("remove_tag precisa do nome de uma etiqueta.")
     tag = Tag.objects.for_workspace(ctx.workspace_id).filter(name__iexact=name).first()
     if tag is None:
-        logger.debug("Execution %s: no tag named %r to remove.", ctx.execution.pk, name)
+        logger.debug("Execução %s: não há etiqueta com o nome %r para remover.", ctx.execution.pk, name)
         return
     remove_tag(ctx.contact, tag)
 
@@ -186,7 +186,7 @@ def _notify_members(ctx: NodeContext, step: dict[str, Any]) -> None:
     raw_ids = step.get("member_ids")
     users = [user for user in (_member(ctx, value) for value in raw_ids or []) if user is not None]
     if not users:
-        logger.warning("Execution %s: notify_members named nobody in this workspace.", ctx.execution.pk)
+        logger.warning("Execução %s: notify_members não indicou ninguém deste espaço de trabalho.", ctx.execution.pk)
         return
     notify(
         ctx.workspace,
@@ -230,7 +230,7 @@ def _member(ctx: NodeContext, value: Any) -> Any | None:
     try:
         user_id = UUID(str(value))
     except (ValueError, AttributeError, TypeError):
-        logger.warning("Execution %s: %r is not a member id.", ctx.execution.pk, value)
+        logger.warning("Execução %s: %r não é um ID de membro.", ctx.execution.pk, value)
         return None
     membership = (
         WorkspaceMembership.objects.filter(workspace_id=ctx.workspace_id, user_id=user_id)
@@ -239,7 +239,7 @@ def _member(ctx: NodeContext, value: Any) -> Any | None:
     )
     if membership is None:
         logger.warning(
-            "Execution %s: member %s is not in this workspace; skipping.",
+            "Execução %s: o membro %s não pertence a este espaço de trabalho; ignorando.",
             ctx.execution.pk,
             user_id,
         )

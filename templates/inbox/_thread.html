@@ -66,7 +66,7 @@ unsaved work and a poll that swapped it would delete a half-typed reply.
   a narrow screen. It refreshes on
   its own event because a tag edit changes nothing in the thread.
 {% endcomment %}
-<aside id="inbox-sidebar" class="ib-side" :class="info ? 'is-open' : 'is-closed'" aria-label="Contact details"
+<aside id="inbox-sidebar" class="ib-side" :class="info ? 'is-open' : 'is-closed'" aria-label="Detalhes do contato"
        hx-get="{% url 'inbox:sidebar' workspace_id=request.workspace.id conversation_id=conversation.id %}"
        {% comment %}
          inboxThreadChanged as well as its own event: this panel's pause toggle

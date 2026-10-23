@@ -101,13 +101,13 @@ def _clean_text(value: Any, *, limit: int) -> str:
     if value is None:
         return ""
     if not isinstance(value, str):
-        raise ContactsError("Expected text.")
+        raise ContactsError("Era esperado um texto.")
     # Postgres text cannot hold a NUL, and `split()` does not treat one as
     # whitespace, so without this it survives into `objects.create()` and psycopg
     # raises at execute time — a 500 for a value an inbound platform or a CSV
     # import supplied. The custom-field and condition paths already refuse it.
     if "\x00" in value:
-        raise ContactsError("Text cannot contain a null byte.")
+        raise ContactsError("O texto não pode conter um byte nulo.")
     return " ".join(value.split())[:limit]
 
 
@@ -152,7 +152,7 @@ def create_contact(
     an equality probe rather than needing a functional one.
     """
     if source not in CONTACT_SOURCES:
-        raise ContactsError(f"Unknown contact source {source!r}.")
+        raise ContactsError(f"Origem de contato desconhecida: {source!r}.")
     with transaction.atomic():
         contact = Contact.objects.create(
             workspace=workspace,
@@ -194,16 +194,16 @@ def merge_contacts(*, primary: Contact, duplicate: Contact) -> Contact:
     still imports in a deployment without it.
     """
     if primary.workspace_id != duplicate.workspace_id:
-        raise WorkspaceMismatchError("Both contacts must belong to the same workspace.")
+        raise WorkspaceMismatchError("Os dois contatos devem pertencer ao mesmo espaço de trabalho.")
     if primary.pk == duplicate.pk:
-        raise ContactsError("A contact cannot be merged into itself.")
+        raise ContactsError("Um contato não pode ser mesclado a si mesmo.")
     if primary.status == ContactStatus.DELETED:
         # Merging *into* a tombstone would copy the duplicate's tags and values
         # onto a row no active-contact surface renders, then tombstone the
         # duplicate as well — losing both contacts in one call.
-        raise ContactsError("The surviving contact has been deleted.")
+        raise ContactsError("O contato que será mantido foi excluído.")
     if duplicate.status == ContactStatus.DELETED:
-        raise ContactsError("That contact has already been deleted.")
+        raise ContactsError("Esse contato já foi excluído.")
 
     with transaction.atomic():
         held = set(primary.contact_tags.values_list("tag_id", flat=True))
@@ -360,9 +360,9 @@ def merge_tags(source: Tag, target: Tag) -> int:
     tag deletion.
     """
     if source.workspace_id != target.workspace_id:
-        raise WorkspaceMismatchError("Both tags must belong to the same workspace.")
+        raise WorkspaceMismatchError("As duas etiquetas devem pertencer ao mesmo espaço de trabalho.")
     if source.pk == target.pk:
-        raise ContactsError("A tag cannot be merged into itself.")
+        raise ContactsError("Uma etiqueta não pode ser mesclada a si mesma.")
 
     links = ContactTag.objects.for_workspace(source.workspace_id)
     try:
@@ -395,7 +395,7 @@ def merge_tags(source: Tag, target: Tag) -> int:
         # collides with the (contact, tag) unique index. Rare, and a 500 for it
         # would be a 500 for a routine race — the same reasoning `_unique_name`
         # applies to two concurrent creates.
-        raise ContactsError("Another change to these tags landed first. Try the merge again.") from exc
+        raise ContactsError("Outra alteração dessas etiquetas foi aplicada primeiro. Tente mesclá-las novamente.") from exc
     return affected
 
 
@@ -418,7 +418,7 @@ def update_contact(contact: Contact, **fields: Any) -> list[str]:
     """
     unknown = sorted(set(fields) - set(_SCALAR_FIELDS))
     if unknown:
-        raise ContactsError(f"Not an editable contact field: {', '.join(unknown)}.")
+        raise ContactsError(f"Campo de contato não editável: {', '.join(unknown)}.")
 
     changed: list[str] = []
     for name, raw in fields.items():
@@ -441,7 +441,7 @@ def add_tag(contact: Contact, tag: Tag) -> bool:
     module docstring for why re-emitting would be a loop.
     """
     if tag.workspace_id != contact.workspace_id:
-        raise WorkspaceMismatchError("That tag belongs to a different workspace than the contact.")
+        raise WorkspaceMismatchError("Essa etiqueta não pertence ao mesmo espaço de trabalho do contato.")
     links = ContactTag.objects.for_workspace(contact.workspace_id)
     if links.filter(contact=contact, tag=tag).exists():
         return False
@@ -509,7 +509,7 @@ def remove_tag(contact: Contact, tag: Tag) -> bool:
 def create_custom_field(workspace: Any, *, name: str, field_type: str) -> CustomField:
     cleaned = _clean_name(name, limit=100, noun="field")
     if field_type not in CustomFieldType.values:
-        raise ContactsError("That is not a field type.")
+        raise ContactsError("Esse não é um tipo de campo válido.")
     _assert_name_is_free(CustomField, workspace, cleaned, noun="field")
     with _unique_name("field"):
         return CustomField.objects.create(workspace=workspace, name=cleaned, type=field_type)
@@ -573,37 +573,37 @@ def coerce_value(field: CustomField, value: Any) -> tuple[str, Any]:
 
     if field.type == CustomFieldType.BOOLEAN:
         if not isinstance(value, bool):
-            raise FieldTypeError(f"{field.name} holds true or false.")
+            raise FieldTypeError(f"{field.name} aceita apenas Sim ou Não.")
         return column, value
 
     if field.type == CustomFieldType.NUMBER:
         if isinstance(value, bool) or not isinstance(value, int | float | str | Decimal):
-            raise FieldTypeError(f"{field.name} holds a number.")
+            raise FieldTypeError(f"{field.name} aceita um número.")
         try:
             number = Decimal(str(value))
         except (InvalidOperation, ValueError) as exc:
-            raise FieldTypeError(f"{field.name} holds a number.") from exc
+            raise FieldTypeError(f"{field.name} aceita um número.") from exc
         if not number.is_finite():
-            raise FieldTypeError(f"{field.name} holds a number.")
+            raise FieldTypeError(f"{field.name} aceita um número.")
         # is_finite() above already excluded NaN and the infinities, whose
         # exponent is a letter rather than an int; the isinstance keeps the
         # type checker in step with that.
         exponent = number.as_tuple().exponent
         if (isinstance(exponent, int) and exponent < -6) or abs(number) >= Decimal(10) ** 14:
-            raise FieldTypeError(f"{field.name} holds a number with at most 14 digits and 6 decimal places.")
+            raise FieldTypeError(f"{field.name} aceita um número com no máximo 14 dígitos e 6 casas decimais.")
         return column, number
 
     if field.type == CustomFieldType.DATE:
         if isinstance(value, datetime):
-            raise FieldTypeError(f"{field.name} holds a date without a time.")
+            raise FieldTypeError(f"{field.name} aceita uma data sem horário.")
         if isinstance(value, date):
             return column, value
         if isinstance(value, str):
             try:
                 return column, date.fromisoformat(value)
             except ValueError as exc:
-                raise FieldTypeError(f"{field.name} holds a date like 2026-08-21.") from exc
-        raise FieldTypeError(f"{field.name} holds a date.")
+                raise FieldTypeError(f"{field.name} aceita uma data como 2026-08-21.") from exc
+        raise FieldTypeError(f"{field.name} aceita uma data.")
 
     if field.type == CustomFieldType.DATETIME:
         moment = value
@@ -611,19 +611,19 @@ def coerce_value(field: CustomField, value: Any) -> tuple[str, Any]:
             try:
                 moment = datetime.fromisoformat(moment)
             except ValueError as exc:
-                raise FieldTypeError(f"{field.name} holds a date and time with a UTC offset.") from exc
+                raise FieldTypeError(f"{field.name} aceita data e hora com fuso horário.") from exc
         if not isinstance(moment, datetime):
-            raise FieldTypeError(f"{field.name} holds a date and time.")
+            raise FieldTypeError(f"{field.name} aceita data e hora.")
         if timezone.is_naive(moment):
-            raise FieldTypeError(f"{field.name} holds a date and time with a UTC offset.")
+            raise FieldTypeError(f"{field.name} aceita data e hora com fuso horário.")
         return column, moment
 
     if not isinstance(value, str):
-        raise FieldTypeError(f"{field.name} holds text.")
+        raise FieldTypeError(f"{field.name} aceita texto.")
     if len(value) > MAX_TEXT_VALUE_CHARS:
-        raise FieldTypeError(f"{field.name} holds at most {MAX_TEXT_VALUE_CHARS} characters.")
+        raise FieldTypeError(f"{field.name} aceita no máximo {MAX_TEXT_VALUE_CHARS} caracteres.")
     if "\x00" in value:
-        raise FieldTypeError(f"{field.name} cannot hold a null byte.")
+        raise FieldTypeError(f"{field.name} não pode conter um byte nulo.")
     return column, value.strip()
 
 
@@ -638,7 +638,7 @@ def set_field_value(contact: Contact, field: CustomField, value: Any) -> CustomF
     Sends ``contact.field_changed`` only when the stored value actually changed.
     """
     if field.workspace_id != contact.workspace_id:
-        raise WorkspaceMismatchError("That field belongs to a different workspace than the contact.")
+        raise WorkspaceMismatchError("Esse campo não pertence ao mesmo espaço de trabalho do contato.")
     column, coerced = coerce_value(field, value)
     columns: dict[str, Any] = dict.fromkeys(VALUE_COLUMNS.values())
     columns[column] = coerced
@@ -711,7 +711,7 @@ def _as_filter_document(filter_json: Any) -> dict[str, Any]:
     Segments keep the parsed form.
     """
     if not isinstance(filter_json, dict):
-        raise ContactsError("A segment filter must be a JSON object.")
+        raise ContactsError("O filtro do segmento deve ser um objeto JSON.")
     return filter_json
 
 

@@ -149,7 +149,7 @@
           "type": "string"
         },
         "value": {
-          "description": "Can include {{placeholders}}, filled in when the message is sent.",
+          "description": "Pode incluir {{placeholders}}, que serão preenchidos quando a mensagem for enviada.",
           "maxLength": 4096,
           "type": "string"
         },
@@ -257,7 +257,7 @@
       "additionalProperties": false,
       "properties": {
         "image": {
-          "description": "Media library id or URL.",
+          "description": "ID da mídia na biblioteca ou URL.",
           "maxLength": 2000,
           "minLength": 1,
           "type": "string"
@@ -327,7 +327,7 @@
           "type": "string"
         },
         "media_id": {
-          "description": "Media library asset id (#16).",
+          "description": "ID do arquivo de mídia na biblioteca (#16).",
           "maxLength": 64,
           "minLength": 1,
           "type": "string"
@@ -411,7 +411,7 @@
                   "key",
                   "op"
                 ],
-                "title": "Tag",
+                "title": "Etiqueta",
                 "type": "object"
               },
               {
@@ -437,7 +437,7 @@
                   "key",
                   "op"
                 ],
-                "title": "Custom field",
+                "title": "Campo personalizado",
                 "type": "object"
               },
               {
@@ -520,7 +520,7 @@
                   "op",
                   "value"
                 ],
-                "title": "Custom field comparison",
+                "title": "Campo personalizado comparison",
                 "type": "object"
               },
               {
@@ -555,7 +555,7 @@
                   "key",
                   "op"
                 ],
-                "title": "Contact field",
+                "title": "Campo do contato",
                 "type": "object"
               },
               {
@@ -647,7 +647,7 @@
                   "op",
                   "value"
                 ],
-                "title": "Contact field comparison",
+                "title": "Campo do contato comparison",
                 "type": "object"
               },
               {
@@ -673,7 +673,7 @@
                   "key",
                   "op"
                 ],
-                "title": "Segment",
+                "title": "Segmento",
                 "type": "object"
               },
               {
@@ -699,7 +699,7 @@
                   "key",
                   "op"
                 ],
-                "title": "Sequence",
+                "title": "Sequência",
                 "type": "object"
               },
               {
@@ -733,7 +733,7 @@
                   "key",
                   "op"
                 ],
-                "title": "Messaging window",
+                "title": "Janela de atendimento",
                 "type": "object"
               }
             ]
@@ -794,22 +794,22 @@
           "=": "=",
           ">": ">",
           ">=": "≥",
-          "after": "after",
-          "before": "before",
-          "contains": "contains",
-          "has": "has tag",
-          "has_not": "does not have tag",
-          "has_value": "is set",
-          "in": "in segment",
-          "inside": "inside the messaging window",
-          "is": "is",
-          "is_not": "is not",
-          "no_value": "is not set",
-          "not": "not subscribed to",
-          "not_in": "not in segment",
-          "on": "on",
-          "outside": "outside the messaging window",
-          "subscribed": "subscribed to"
+          "after": "depois de",
+          "before": "antes de",
+          "contains": "contém",
+          "has": "tem a etiqueta",
+          "has_not": "não tem a etiqueta",
+          "has_value": "está preenchido",
+          "in": "está no segmento",
+          "inside": "dentro da janela de atendimento",
+          "is": "é",
+          "is_not": "não é",
+          "no_value": "está vazio",
+          "not": "não está inscrito na sequência",
+          "not_in": "não está no segmento",
+          "on": "em",
+          "outside": "fora da janela de atendimento",
+          "subscribed": "está inscrito na sequência"
         },
         "opsBySource": {
           "segment": [
@@ -864,35 +864,35 @@
         ],
         "systemFields": {
           "created_at": {
-            "label": "Created",
+            "label": "Data de criação",
             "type": "datetime"
           },
           "email": {
-            "label": "Email",
+            "label": "E-mail",
             "type": "text"
           },
           "first_name": {
-            "label": "First name",
+            "label": "Nome",
             "type": "text"
           },
           "last_interaction_at": {
-            "label": "Last interaction",
+            "label": "Última interação",
             "type": "datetime"
           },
           "last_name": {
-            "label": "Last name",
+            "label": "Sobrenome",
             "type": "text"
           },
           "locale": {
-            "label": "Locale",
+            "label": "Idioma",
             "type": "text"
           },
           "phone": {
-            "label": "Phone",
+            "label": "Telefone",
             "type": "text"
           },
           "timezone": {
-            "label": "Timezone",
+            "label": "Fuso horário",
             "type": "text"
           }
         },
@@ -937,12 +937,12 @@
           "type": "boolean"
         },
         "from": {
-          "description": "Local time, HH:MM.",
+          "description": "Horário local, HH:MM.",
           "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
           "type": "string"
         },
         "to": {
-          "description": "Local time, HH:MM.",
+          "description": "Horário local, HH:MM.",
           "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
           "type": "string"
         },
@@ -994,7 +994,7 @@
     },
     "followup": {
       "additionalProperties": false,
-      "description": "Where the flow goes if nobody answers in time.",
+      "description": "Para onde o fluxo segue se ninguém responder a tempo.",
       "properties": {
         "delay": {
           "maximum": 10000,
@@ -1022,7 +1022,7 @@
       "additionalProperties": false,
       "properties": {
         "image": {
-          "description": "Media library id or URL.",
+          "description": "ID da mídia na biblioteca ou URL.",
           "maxLength": 2000,
           "minLength": 1,
           "type": "string"
@@ -1119,7 +1119,7 @@
           "type": "string"
         },
         "id": {
-          "description": "The id in this button's btn:<id> handle.",
+          "description": "O ID no identificador btn:<id> deste botão.",
           "maxLength": 64,
           "minLength": 1,
           "type": "string"
@@ -1145,7 +1145,7 @@
           "type": "string"
         },
         "id": {
-          "description": "The id in this button's btn:<id> handle.",
+          "description": "O ID no identificador btn:<id> deste botão.",
           "maxLength": 64,
           "minLength": 1,
           "type": "string"
@@ -1225,7 +1225,7 @@
     },
     "node_action": {
       "additionalProperties": false,
-      "description": "Tags a contact, saves a detail, assigns the conversation. Several at once, in order.",
+      "description": "Adiciona etiquetas a um contato, salva informações e atribui a conversa. Executa várias ações em sequência.",
       "properties": {
         "config": {
           "additionalProperties": false,
@@ -1268,7 +1268,7 @@
     },
     "node_condition": {
       "additionalProperties": false,
-      "description": "Splits the flow in two, on what you know about the contact.",
+      "description": "Divide o fluxo em dois caminhos com base no que você sabe sobre o contato.",
       "properties": {
         "config": {
           "$ref": "#/$defs/condition_filter"
@@ -1297,7 +1297,7 @@
     },
     "node_data_collection": {
       "additionalProperties": false,
-      "description": "Asks a question and saves the answer on the contact. Checks emails and phone numbers look real.",
+      "description": "Faz uma pergunta e salva a resposta no contato. Verifica se endereços de e-mail e números de telefone parecem válidos.",
       "properties": {
         "config": {
           "additionalProperties": false,
@@ -1412,13 +1412,13 @@
     },
     "node_external_request": {
       "additionalProperties": false,
-      "description": "Calls another system and can save what it sends back.",
+      "description": "Faz uma chamada a outro sistema e pode salvar os dados recebidos.",
       "properties": {
         "config": {
           "additionalProperties": false,
           "properties": {
             "body": {
-              "description": "JSON body template; placeholders are substituted, never evaluated."
+              "description": "Modelo de corpo JSON; os placeholders são substituídos, nunca avaliados."
             },
             "fallback_handle_on_error": {
               "type": "boolean"
@@ -1488,7 +1488,7 @@
     },
     "node_note": {
       "additionalProperties": false,
-      "description": "A note to yourself on the canvas. It never runs and never connects to anything.",
+      "description": "Uma anotação para você no canvas. Ela não é executada nem se conecta a outros elementos.",
       "properties": {
         "config": {
           "additionalProperties": false,
@@ -1527,7 +1527,7 @@
     },
     "node_randomizer": {
       "additionalProperties": false,
-      "description": "Splits people down different paths, to compare two versions. Each person keeps the path they got.",
+      "description": "Divide os contatos em caminhos diferentes para comparar duas versões. Cada pessoa permanece no caminho que recebeu.",
       "properties": {
         "config": {
           "additionalProperties": false,
@@ -1541,7 +1541,7 @@
               "type": "array"
             },
             "sticky": {
-              "description": "On by default, so somebody who comes back takes the path they had before.",
+              "description": "Ativado por padrão: se alguém voltar, seguirá pelo mesmo caminho de antes.",
               "type": "boolean"
             }
           },
@@ -1574,7 +1574,7 @@
     },
     "node_send_email": {
       "additionalProperties": false,
-      "description": "Sends an email. Needs an email account connected and an address for the contact.",
+      "description": "Envia um e-mail. Requer uma conta de e-mail conectada e um endereço no contato.",
       "properties": {
         "config": {
           "additionalProperties": false,
@@ -1624,7 +1624,7 @@
     },
     "node_send_message": {
       "additionalProperties": false,
-      "description": "Sends a message. If it offers buttons or quick replies, the flow waits for an answer.",
+      "description": "Envia uma mensagem. Se ela tiver botões ou respostas rápidas, o fluxo aguarda uma resposta.",
       "properties": {
         "config": {
           "additionalProperties": false,
@@ -1690,7 +1690,7 @@
     },
     "node_send_sms": {
       "additionalProperties": false,
-      "description": "Sends a text message. Needs an SMS account connected and a phone number for the contact.",
+      "description": "Envia uma mensagem de texto. Requer uma conta de SMS conectada e um número de telefone no contato.",
       "properties": {
         "config": {
           "additionalProperties": false,
@@ -1735,7 +1735,7 @@
     },
     "node_smart_delay": {
       "additionalProperties": false,
-      "description": "Waits, then carries on. Picks up at the next hour you allow sending.",
+      "description": "Aguarda e depois continua. Retoma no próximo horário em que o envio estiver permitido.",
       "properties": {
         "config": {
           "discriminator": {
@@ -1779,7 +1779,7 @@
     },
     "node_start_flow": {
       "additionalProperties": false,
-      "description": "Hands over to another flow. This one stops here.",
+      "description": "Transfere a execução para outro fluxo. Este fluxo termina aqui.",
       "properties": {
         "config": {
           "additionalProperties": false,
@@ -1838,7 +1838,7 @@
       "additionalProperties": false,
       "properties": {
         "id": {
-          "description": "The id in this reply's qr:<id> handle.",
+          "description": "O ID no identificador qr:<id> desta resposta rápida.",
           "maxLength": 64,
           "minLength": 1,
           "type": "string"
@@ -1859,13 +1859,13 @@
       "additionalProperties": false,
       "properties": {
         "id": {
-          "description": "The id in this path's rand:<id> handle.",
+          "description": "O ID no identificador rand:<id> deste caminho.",
           "maxLength": 64,
           "minLength": 1,
           "type": "string"
         },
         "weight": {
-          "description": "Percent.",
+          "description": "Percentual.",
           "maximum": 100,
           "minimum": 0,
           "type": "integer"
@@ -1948,13 +1948,13 @@
           ],
           "properties": {
             "datetime": {
-              "description": "ISO-8601 instant.",
+              "description": "Data e hora no formato ISO-8601.",
               "maxLength": 64,
               "minLength": 1,
               "type": "string"
             },
             "field": {
-              "description": "A date/datetime field.",
+              "description": "Um campo de data/hora.",
               "maxLength": 200,
               "minLength": 1,
               "type": "string"
@@ -2037,7 +2037,7 @@
       "additionalProperties": false,
       "properties": {
         "reference": {
-          "description": "<name>/<language>, e.g. order_shipped/en_US.",
+          "description": "Referência no formato <name>/<language>, por exemplo order_shipped/en_US.",
           "maxLength": 600,
           "minLength": 3,
           "pattern": "^[a-z0-9_]{1,512}/[A-Za-z_]{2,10}$",
@@ -2065,7 +2065,7 @@
       "additionalProperties": false,
       "properties": {
         "slot": {
-          "description": "header.1, body.2, button.0.1 …",
+          "description": "Posição do parâmetro, por exemplo header.1, body.2 ou button.0.1.",
           "maxLength": 32,
           "minLength": 1,
           "pattern": "^(header|body|button\\.[0-9]{1,2})\\.[0-9]{1,3}$",
@@ -2118,19 +2118,19 @@
     "groups": [
       {
         "key": "content",
-        "label": "Content"
+        "label": "Conteúdo"
       },
       {
         "key": "logic",
-        "label": "Logic"
+        "label": "Lógica"
       },
       {
         "key": "actions",
-        "label": "Actions"
+        "label": "Ações"
       },
       {
         "key": "other",
-        "label": "Other"
+        "label": "Outros"
       }
     ],
     "limits": {
@@ -2143,7 +2143,7 @@
     "node_types": [
       {
         "annotation": false,
-        "description": "Sends a message. If it offers buttons or quick replies, the flow waits for an answer.",
+        "description": "Envia uma mensagem. Se ela tiver botões ou respostas rápidas, o fluxo aguarda uma resposta.",
         "dynamic_handles": [
           {
             "config_key": "buttons",
@@ -2159,60 +2159,60 @@
           "default",
           "timeout"
         ],
-        "label": "Send a message",
+        "label": "Enviar mensagem",
         "terminal": false,
         "type": "send_message"
       },
       {
         "annotation": false,
-        "description": "Tags a contact, saves a detail, assigns the conversation. Several at once, in order.",
+        "description": "Adiciona etiquetas a um contato, salva informações e atribui a conversa. Executa várias ações em sequência.",
         "dynamic_handles": [],
         "group": "actions",
         "handles": [
           "default"
         ],
-        "label": "Tag, save or assign",
+        "label": "Etiquetar, salvar ou atribuir",
         "terminal": false,
         "type": "action"
       },
       {
         "annotation": false,
-        "description": "Hands over to another flow. This one stops here.",
+        "description": "Transfere a execução para outro fluxo. Este fluxo termina aqui.",
         "dynamic_handles": [],
         "group": "logic",
         "handles": [],
-        "label": "Hand over to another flow",
+        "label": "Transferir para outro fluxo",
         "terminal": true,
         "type": "start_flow"
       },
       {
         "annotation": false,
-        "description": "Splits the flow in two, on what you know about the contact.",
+        "description": "Divide o fluxo em dois caminhos com base no que você sabe sobre o contato.",
         "dynamic_handles": [],
         "group": "logic",
         "handles": [
           "cond:true",
           "cond:false"
         ],
-        "label": "Branch on a condition",
+        "label": "Ramificar por condição",
         "terminal": false,
         "type": "condition"
       },
       {
         "annotation": false,
-        "description": "Waits, then carries on. Picks up at the next hour you allow sending.",
+        "description": "Aguarda e depois continua. Retoma no próximo horário em que o envio estiver permitido.",
         "dynamic_handles": [],
         "group": "logic",
         "handles": [
           "default"
         ],
-        "label": "Wait",
+        "label": "Aguardar",
         "terminal": false,
         "type": "smart_delay"
       },
       {
         "annotation": false,
-        "description": "Splits people down different paths, to compare two versions. Each person keeps the path they got.",
+        "description": "Divide os contatos em caminhos diferentes para comparar duas versões. Cada pessoa permanece no caminho que recebeu.",
         "dynamic_handles": [
           {
             "config_key": "paths",
@@ -2221,69 +2221,69 @@
         ],
         "group": "logic",
         "handles": [],
-        "label": "Split the traffic",
+        "label": "Dividir o tráfego",
         "terminal": false,
         "type": "randomizer"
       },
       {
         "annotation": false,
-        "description": "Calls another system and can save what it sends back.",
+        "description": "Faz uma chamada a outro sistema e pode salvar os dados recebidos.",
         "dynamic_handles": [],
         "group": "actions",
         "handles": [
           "default",
           "error"
         ],
-        "label": "Call another system",
+        "label": "Chamar outro sistema",
         "terminal": false,
         "type": "external_request"
       },
       {
         "annotation": false,
-        "description": "Asks a question and saves the answer on the contact. Checks emails and phone numbers look real.",
+        "description": "Faz uma pergunta e salva a resposta no contato. Verifica se endereços de e-mail e números de telefone parecem válidos.",
         "dynamic_handles": [],
         "group": "content",
         "handles": [
           "default",
           "timeout"
         ],
-        "label": "Ask a question",
+        "label": "Fazer uma pergunta",
         "terminal": false,
         "type": "data_collection"
       },
       {
         "annotation": false,
-        "description": "Sends a text message. Needs an SMS account connected and a phone number for the contact.",
+        "description": "Envia uma mensagem de texto. Requer uma conta de SMS conectada e um número de telefone no contato.",
         "dynamic_handles": [],
         "group": "actions",
         "handles": [
           "default",
           "error"
         ],
-        "label": "Send a text",
+        "label": "Enviar SMS",
         "terminal": false,
         "type": "send_sms"
       },
       {
         "annotation": false,
-        "description": "Sends an email. Needs an email account connected and an address for the contact.",
+        "description": "Envia um e-mail. Requer uma conta de e-mail conectada e um endereço no contato.",
         "dynamic_handles": [],
         "group": "actions",
         "handles": [
           "default",
           "error"
         ],
-        "label": "Send an email",
+        "label": "Enviar e-mail",
         "terminal": false,
         "type": "send_email"
       },
       {
         "annotation": true,
-        "description": "A note to yourself on the canvas. It never runs and never connects to anything.",
+        "description": "Uma anotação para você no canvas. Ela não é executada nem se conecta a outros elementos.",
         "dynamic_handles": [],
         "group": "content",
         "handles": [],
-        "label": "Note to yourself",
+        "label": "Anotação pessoal",
         "terminal": false,
         "type": "note"
       }

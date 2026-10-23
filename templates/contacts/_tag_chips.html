@@ -13,7 +13,7 @@ for.
          hx-get="{% url 'contacts:tags' workspace_id=request.workspace.id contact_id=contact.id %}"
          hx-trigger="contactTagsChanged from:body"
          hx-swap="outerHTML">
-  <h2>Tags</h2>
+  <h2>Etiquetas</h2>
 
   <div class="crm-chips">
     {% for tag in contact_tags %}
@@ -21,13 +21,13 @@ for.
         {{ tag.name }}
         {% if can_edit_contacts %}
           <button type="button" class="crm-chip-remove"
-                  aria-label="Remove {{ tag.name }}"
+                  aria-label="Remover {{ tag.name }}"
                   hx-post="{% url 'contacts:tag_remove' workspace_id=request.workspace.id contact_id=contact.id tag_id=tag.id %}"
                   hx-swap="none">&times;</button>
         {% endif %}
       </span>
     {% empty %}
-      <span class="muted text-xs">No tags yet.</span>
+      <span class="muted text-xs">Nenhuma tag ainda.</span>
     {% endfor %}
   </div>
 
@@ -39,8 +39,8 @@ for.
       "create" affordance for a `manage_crm` holder, so the two agree.
     {% endcomment %}
     <div class="crm-typeahead mt-2">
-      <label for="tag-search" class="sr-only">Find a tag</label>
-      <input type="search" id="tag-search" name="q" placeholder="Find or add a tag" maxlength="100"
+      <label for="tag-search" class="sr-only">Encontrar uma tag</label>
+      <input type="search" id="tag-search" name="q" placeholder="Encontrar ou adicionar uma tag" maxlength="100"
              hx-get="{% url 'contacts:tag_suggest' workspace_id=request.workspace.id contact_id=contact.id %}"
              hx-trigger="input changed delay:200ms, focus"
              hx-target="#tag-suggestions"

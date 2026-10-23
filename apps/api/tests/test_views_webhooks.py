@@ -197,7 +197,7 @@ class TestTestButton:
         response = client_for(tenancy.owner).post(f"{base(tenancy)}{webhook.pk}/test/", follow=True)
 
         assert len(internet.requests) == 1
-        assert "Test delivered" in response.content.decode()
+        assert any(message.level_tag == "success" for message in response.context["messages"])
         assert WebhookDelivery.objects.for_workspace(tenancy.workspace).get().event == "webhook.test"
 
     def test_it_uses_the_shorter_web_tier_deadline(self, client_for, tenancy, webhook, monkeypatch, settings):
@@ -231,7 +231,7 @@ class TestTestButton:
 
         response = client_for(tenancy.owner).post(f"{base(tenancy)}{webhook.pk}/test/", follow=True)
 
-        assert "Test failed" in response.content.decode()
+        assert any(message.level_tag == "error" for message in response.context["messages"])
 
 
 @pytest.mark.django_db

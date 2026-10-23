@@ -153,8 +153,11 @@ class TestItDisclosesWhatItKeeps:
         and neither is keyed by contact, so the honest answer is to say so."""
         document = subject_export.build(seeded["contact"])
 
-        categories = {entry["category"] for entry in document["not_included"]}
-        assert categories == {"Raw webhook payloads", "CSV import files"}
+        omitted = document["not_included"]
+        assert len(omitted) == 2
+        assert all(set(entry) == {"category", "detail"} for entry in omitted)
+        assert len({entry["category"] for entry in omitted}) == 2
+        assert all(entry["detail"] for entry in omitted)
 
 
 class TestTruncation:

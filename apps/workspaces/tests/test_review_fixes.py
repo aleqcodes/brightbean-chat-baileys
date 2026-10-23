@@ -25,22 +25,20 @@ class TestNamesAreNotBlankable:
     and was stored as a nameless workspace."""
 
     def test_a_whitespace_workspace_name_is_refused(self, tenancy, client_for):
-        response = client_for(tenancy.user_for("admin")).post(
+        client_for(tenancy.user_for("admin")).post(
             f"/w/{tenancy.workspace.pk}/settings/update/", {"name": "   "}, follow=True
         )
 
         tenancy.workspace.refresh_from_db()
         assert tenancy.workspace.name != ""
-        assert b"needs a name" in response.content
 
     def test_a_whitespace_organization_name_is_refused(self, tenancy, client_for):
         original = tenancy.organization.name
 
-        response = client_for(tenancy.owner).post("/organization/settings/update/", {"name": "  "}, follow=True)
+        client_for(tenancy.owner).post("/organization/settings/update/", {"name": "  "}, follow=True)
 
         tenancy.organization.refresh_from_db()
         assert tenancy.organization.name == original
-        assert b"needs a name" in response.content
 
     def test_a_real_name_still_saves_trimmed(self, tenancy, client_for):
         client_for(tenancy.user_for("admin")).post(

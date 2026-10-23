@@ -19,5 +19,5 @@ class Platform(models.TextChoices):
     MESSENGER = "messenger", "Facebook Messenger"
     WHATSAPP = "whatsapp", "WhatsApp"
     SMS = "sms", "SMS"
-    EMAIL = "email", "Email"
+    EMAIL = "email", "E-mail"
     WHATSAPP_BAILEYS = "whatsapp_baileys", "WhatsApp (Baileys)"

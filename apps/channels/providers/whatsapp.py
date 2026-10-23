@@ -170,13 +170,13 @@ MAX_REPLY_ID_CHARS = 256
 
 #: What the list's own opener button says. Meta requires one and gives it no
 #: default; this is the label a contact taps to see the rows.
-LIST_BUTTON_LABEL = "Choose"
+LIST_BUTTON_LABEL = "Escolher"
 
 #: What an interactive message says when the author gave it no text of its own.
 #: Meta requires a body on both interactive shapes, so the alternative to a word
 #: here is dropping the buttons — a media block plus buttons is exactly the case
 #: that reaches it.
-INTERACTIVE_BODY_FALLBACK = "Choose an option"
+INTERACTIVE_BODY_FALLBACK = "Escolha uma opção"
 
 #: Longest inbound text we carry out of a parse. Meta's own cap is 4096;
 #: ``apps.messaging.ingest`` bounds it again downstream, and this exists so a
@@ -286,7 +286,7 @@ def credentials_of(connection: ChannelConnection) -> dict[str, str]:
     try:
         raw: Any = connection.credentials or {}
     except ValueError:
-        logger.error("Connection %s: credentials could not be decrypted.", connection.pk)
+        logger.error("Conexão %s: não foi possível descriptografar as credenciais.", connection.pk)
         return {}
     if not isinstance(raw, dict):
         return {}
@@ -347,7 +347,7 @@ def call(
     for those.
     """
     if not token:
-        raise APIError("This WhatsApp connection has no access token stored.")
+        raise APIError("Esta conexão do WhatsApp não tem um token de acesso armazenado.")
     kwargs: dict[str, Any] = {"headers": {"Authorization": f"Bearer {token}"}}
     if payload is not None:
         kwargs["json"] = payload
@@ -378,7 +378,7 @@ def verify_phone_number(token: str, phone_number_id: str) -> dict[str, Any]:
         timeout=BACKGROUND_TIMEOUT,
     )
     if not isinstance(body.get("id"), str):
-        raise APIError("Meta returned an unexpected phone number result")
+        raise APIError("A Meta retornou um resultado inesperado de número de telefone")
     return body
 
 
@@ -556,8 +556,8 @@ def _interactive_action(message: OutboundMessage) -> dict[str, Any] | None:
             # because the alternative is a contact who cannot answer and a node
             # waiting on a handle nothing will ever fire.
             logger.warning(
-                "WhatsApp: %s control(s) on one message exceed the %s reply buttons it can show; "
-                "the message was not downgraded first and the extras cannot be delivered.",
+                "WhatsApp: %s controle(s) em uma mensagem excedem os %s botões de resposta disponíveis; "
+                "a mensagem não passou pelo processo de redução e os itens extras não podem ser entregues.",
                 len(rows),
                 _CAPABILITIES.max_buttons,
             )
@@ -579,7 +579,7 @@ def _pressable(message: OutboundMessage) -> list[Button]:
     extra = [Button(id=item.id, label=item.label) for item in message.quick_replies]
     if extra:
         logger.debug(
-            "WhatsApp: %s quick repl(ies) sent as reply buttons because the message also has buttons.",
+            "WhatsApp: %s resposta(s) rápida(s) foram enviadas como botões de resposta porque a mensagem também tem botões.",
             len(extra),
         )
     return [*message.buttons, *extra]
@@ -606,7 +606,7 @@ def _reply_button(button: Button) -> dict[str, Any] | None:
         return None
     if len(button.id) > MAX_REPLY_ID_CHARS:
         logger.warning(
-            "WhatsApp: button id is over %s characters and cannot be sent; it was left out of the set.",
+            "WhatsApp: o ID do botão excede %s caracteres e não pode ser enviado; ele foi omitido do conjunto.",
             MAX_REPLY_ID_CHARS,
         )
         return None
@@ -628,7 +628,7 @@ def _list_row(item: QuickReply) -> dict[str, Any] | None:
     if len(item.id) > MAX_REPLY_ID_CHARS:
         # Refused rather than trimmed, for the reason _reply_button gives.
         logger.warning(
-            "WhatsApp: list row id is over %s characters and cannot be sent; the row was left out.",
+            "WhatsApp: o ID da opção excede %s caracteres e não pode ser enviado; a opção foi omitida.",
             MAX_REPLY_ID_CHARS,
         )
         return None
@@ -1090,9 +1090,9 @@ class WhatsAppAdapter(Adapter):
             if isinstance(value, str) and value:
                 return value
         logger.warning(
-            "WhatsApp: no Meta app secret resolved for workspace %s, so no delivery can be verified. "
-            "The credential chain only uses a level that is complete, so PLATFORM_WHATSAPP_CLIENT_SECRET "
-            "needs PLATFORM_WHATSAPP_CLIENT_ID beside it (apps.credentials.models.REQUIRED_CREDENTIAL_KEYS).",
+            "WhatsApp: nenhum segredo de app da Meta foi resolvido para o espaço de trabalho %s, portanto não é possível verificar as entregas. "
+            "A cadeia de credenciais só usa um nível completo; PLATFORM_WHATSAPP_CLIENT_SECRET "
+            "precisa vir acompanhado de PLATFORM_WHATSAPP_CLIENT_ID (apps.credentials.models.REQUIRED_CREDENTIAL_KEYS).",
             connection.workspace_id,
         )
         return ""
@@ -1131,7 +1131,7 @@ class WhatsAppAdapter(Adapter):
             return verified
         owner = self._connection_for(phone_number_id)
         if owner is None:
-            logger.info("WhatsApp: a delivery named a phone number id this deployment has not connected.")
+            logger.info("WhatsApp: a entrega informou um ID de número de telefone que não está conectado nesta implantação.")
         return owner
 
     def _message_events(

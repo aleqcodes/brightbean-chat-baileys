@@ -196,15 +196,15 @@ def _format(template: str, mapping: _Blanks) -> str:
 register_event(
     NotificationEvent(
         key="flow_loop_cap_hit",
-        label="Flow hit the loop cap",
+        label="Fluxo excedeu o limite de repetição",
         icon="flows",
         tone="error",
         # SPEC §9.2: 30 blocks since the last pause fails the run and notifies
         # workspace admins. The loop-cap consumer is L3-B.
-        title='Flow "{flow_name}" hit the loop cap',
+        title='Fluxo "{flow_name}" excedeu o limite de repetição',
         body=(
-            "It ran 30 blocks without pausing for {contact_name} and was stopped. "
-            "Open the flow and look for a cycle with no wait in it."
+            "A execução passou por 30 etapas sem pausa para {contact_name} e foi interrompida. "
+            "Abra o fluxo e procure um ciclo sem nenhuma espera."
         ),
         required_context=("flow_name",),
     )
@@ -213,11 +213,11 @@ register_event(
 register_event(
     NotificationEvent(
         key="flow_execution_failed",
-        label="Flow run failed",
+        label="Execução do fluxo falhou",
         icon="flows",
         tone="error",
-        title='Flow "{flow_name}" failed',
-        body="The run for {contact_name} stopped at {node_label}: {error}",
+        title='A execução do fluxo "{flow_name}" falhou',
+        body="A execução de {contact_name} parou em {node_label}: {error}",
         required_context=("flow_name",),
         # In-app only. This fires once per *execution*, so one broken flow in a
         # busy workspace is a mail storm. The in-app rows still pile up — see
@@ -229,13 +229,13 @@ register_event(
 register_event(
     NotificationEvent(
         key="channel_needs_reauth",
-        label="Channel needs reconnecting",
+        label="Canal precisa ser reconectado",
         icon="channels",
         tone="warn",
-        title="{channel_name} needs reconnecting",
+        title="{channel_name} precisa ser reconectado",
         body=(
-            "{platform_label} stopped accepting the stored credentials. "
-            "Nothing will send or receive on this channel until it is reconnected."
+            "{platform_label} deixou de aceitar as credenciais armazenadas. "
+            "Este canal não poderá enviar nem receber mensagens até ser reconectado."
         ),
         required_context=("channel_name",),
     )
@@ -244,15 +244,15 @@ register_event(
 register_event(
     NotificationEvent(
         key="outbound_webhook_disabled",
-        label="Outbound webhook disabled",
+        label="Webhook de saída desativado",
         icon="channels",
         tone="error",
         # SPEC §17: auto-disable after 100 consecutive failures, with an admin
         # notification. The consumer is L5-F (#25).
-        title="Webhook disabled after repeated failures",
+        title="Webhook desativado após falhas repetidas",
         body=(
-            "{url} failed {failure_count} times in a row and has been switched off. "
-            "Re-enable it once the endpoint is healthy again."
+            "{url} falhou {failure_count} vezes seguidas e foi desativado. "
+            "Ative-o novamente quando o endpoint estiver funcionando."
         ),
         required_context=("url",),
     )
@@ -261,13 +261,13 @@ register_event(
 register_event(
     NotificationEvent(
         key="inbox_reminder",
-        label="Inbox reminder",
+        label="Lembrete da caixa de entrada",
         icon="inbox",
         tone="info",
         # SPEC §14: a scheduled_action that becomes an in-app notification.
         # In-app is the whole point of a reminder you set for yourself, so it
         # does not also earn an email.
-        title="Reminder: {contact_name}",
+        title="Lembrete: {contact_name}",
         body="{note}",
         emails_by_default=False,
     )
@@ -276,11 +276,11 @@ register_event(
 register_event(
     NotificationEvent(
         key="member_mentioned",
-        label="Mentioned by a teammate",
+        label="Menção de uma pessoa da equipe",
         icon="users",
         tone="info",
         # SPEC §11.2: the action node's notify_members.
-        title="{actor_name} mentioned you",
+        title="{actor_name} mencionou você",
         body="{message}",
         required_context=("actor_name",),
     )
@@ -289,11 +289,11 @@ register_event(
 register_event(
     NotificationEvent(
         key="broadcast_finished",
-        label="Broadcast finished",
+        label="Disparo concluído",
         icon="broadcasts",
         tone="success",
-        title='Broadcast "{broadcast_name}" finished',
-        body="{sent} sent, {failed} failed, {skipped} skipped.",
+        title='Disparo "{broadcast_name}" concluído',
+        body="{sent} enviados, {failed} com falha, {skipped} ignorados.",
         required_context=("broadcast_name",),
         emails_by_default=False,
     )
@@ -302,10 +302,10 @@ register_event(
 register_event(
     NotificationEvent(
         key="whatsapp_template_reviewed",
-        label="WhatsApp template reviewed",
+        label="Modelo do WhatsApp atualizado",
         icon="channels",
         tone="info",
-        title='WhatsApp template "{template_name}" was {status}',
+        title='O modelo do WhatsApp "{template_name}" foi revisado',
         body="{reason}",
         required_context=("template_name", "status"),
     )

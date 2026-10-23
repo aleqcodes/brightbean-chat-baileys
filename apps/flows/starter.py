@@ -36,7 +36,7 @@ __all__ = ["starter_graph"]
 #: screen.
 _POSITION = {"x": 520, "y": 160}
 
-_FIRST_MESSAGE = "Hi! Thanks for getting in touch. How can we help?"
+_FIRST_MESSAGE = "Olá! Obrigado por entrar em contato. Como podemos ajudar?"
 
 
 def starter_graph() -> dict[str, Any]:

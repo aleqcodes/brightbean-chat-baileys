@@ -65,11 +65,11 @@ class BroadcastStatus(models.TextChoices):
     never re-opened: the messages are gone.
     """
 
-    DRAFT = "draft", "Draft"
-    SCHEDULED = "scheduled", "Scheduled"
-    SENDING = "sending", "Sending"
-    SENT = "sent", "Sent"
-    CANCELLED = "cancelled", "Cancelled"
+    DRAFT = "draft", "Rascunho"
+    SCHEDULED = "scheduled", "Agendada"
+    SENDING = "sending", "Enviando"
+    SENT = "sent", "Enviada"
+    CANCELLED = "cancelled", "Cancelada"
 
 
 #: Statuses from which a broadcast still has work in the queue, and therefore the
@@ -87,11 +87,11 @@ class RecipientStatus(models.TextChoices):
     separately from a provider error.
     """
 
-    PENDING = "pending", "Pending"
-    SENT = "sent", "Sent"
-    FAILED = "failed", "Failed"
-    SKIPPED = "skipped", "Skipped"
-    CANCELLED = "cancelled", "Cancelled"
+    PENDING = "pending", "Pendente"
+    SENT = "sent", "Enviada"
+    FAILED = "failed", "Falhou"
+    SKIPPED = "skipped", "Ignorada"
+    CANCELLED = "cancelled", "Cancelada"
 
 
 #: Statuses a recipient never leaves. Everything else is still owed a send, which
@@ -122,7 +122,7 @@ class Broadcast(WorkspaceScopedModel):
         null=True,
         blank=True,
         related_name="broadcasts",
-        help_text="Where target_filter_json came from. Provenance only; the document is authoritative.",
+        help_text="Origem de target_filter_json. Apenas informação de procedência; o documento é a fonte oficial.",
     )
 
     # -- content: exactly one of these two, per SPEC §5 ----------------------
@@ -132,7 +132,7 @@ class Broadcast(WorkspaceScopedModel):
         null=True,
         blank=True,
         related_name="broadcasts",
-        help_text="The mini-flow holding this broadcast's single-node graph.",
+        help_text="O mini-fluxo que contém o grafo de nó único deste disparo.",
     )
     flow_version = models.ForeignKey(
         "flows.FlowVersion",
@@ -140,7 +140,7 @@ class Broadcast(WorkspaceScopedModel):
         null=True,
         blank=True,
         related_name="broadcasts",
-        help_text="Pinned when the broadcast is scheduled, so an edit mid-send changes nothing.",
+        help_text="Fixada quando o disparo é agendado; alterações durante o envio não terão efeito.",
     )
     whatsapp_template = models.ForeignKey(
         "channels.WhatsAppTemplate",
@@ -159,7 +159,7 @@ class Broadcast(WorkspaceScopedModel):
     #: again by the compliance engine on the way out.
     message_tag = models.CharField(max_length=64, blank=True, default="")
 
-    scheduled_at = models.DateTimeField(null=True, blank=True, help_text="Null means send as soon as it is started.")
+    scheduled_at = models.DateTimeField(null=True, blank=True, help_text="Nulo significa enviar assim que for iniciado.")
     #: Whether the composer's Schedule step has been answered. ``scheduled_at``
     #: cannot say so on its own: "send now" is stored as a null, the same value
     #: a draft holds before anyone has been asked, so without this a draft
@@ -257,7 +257,7 @@ class BroadcastRecipient(WorkspaceScopedModel):
         null=True,
         blank=True,
         related_name="+",
-        help_text="The row a delivery receipt advances; how delivered/read counters stay live.",
+        help_text="A linha atualizada pelo comprovante de entrega; mantém atualizados os contadores de entregues e lidas.",
     )
 
     class Meta:

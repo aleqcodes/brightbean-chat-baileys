@@ -71,9 +71,9 @@ class ApiScope(models.TextChoices):
     the issuance form from this enum intersected with ``SCOPE_PERMISSIONS``.
     """
 
-    READ = "read", "Read"
-    WRITE = "write", "Write"
-    ERASE = "erase", "Erase"
+    READ = "read", "Leitura"
+    WRITE = "write", "Gravação"
+    ERASE = "erase", "Exclusão"
 
 
 class DeliveryStatus(models.TextChoices):
@@ -84,9 +84,9 @@ class DeliveryStatus(models.TextChoices):
     retrying a private-range target just repeats the same refusal.
     """
 
-    SUCCEEDED = "succeeded", "Succeeded"
-    FAILED = "failed", "Failed"
-    BLOCKED = "blocked", "Blocked"
+    SUCCEEDED = "succeeded", "Concluída"
+    FAILED = "failed", "Falhou"
+    BLOCKED = "blocked", "Bloqueada"
 
 
 def generate_webhook_secret() -> str:

@@ -397,7 +397,7 @@ def connection_set_status(request: WorkspaceRequest, workspace_id: str, connecti
     connection = get_scoped_object_or_404(ChannelConnection, request.workspace, pk=connection_id)
     status = request.POST.get("status", "")
     if connection.platform == Platform.WHATSAPP_BAILEYS.value and status == ConnectionStatus.ACTIVE:
-        messages.error(request, "Baileys becomes active only after the gateway confirms a linked session.")
+        messages.error(request, "O Baileys só fica ativo depois que o gateway confirma uma sessão vinculada.")
         return redirect("channels:whatsapp_baileys_detail", workspace_id=workspace_id, connection_id=connection.pk)
     # Re-enabling a disabled connection has the same effect on the count as
     # connecting one, so it takes the same check. Without it an organization
@@ -406,7 +406,7 @@ def connection_set_status(request: WorkspaceRequest, workspace_id: str, connecti
     turning_on = status != ConnectionStatus.DISABLED and connection.status == ConnectionStatus.DISABLED
     disable_baileys = False
     if status not in SETTABLE_STATUSES:
-        messages.error(request, "That is not a status you can set by hand.")
+        messages.error(request, "Esse status não pode ser definido manualmente.")
     else:
         # The count and the status change are one critical section when the
         # change is a re-enable: two admins switching channels back on at the
@@ -422,7 +422,7 @@ def connection_set_status(request: WorkspaceRequest, workspace_id: str, connecti
                     BaileysSession.objects.filter(connection=connection).update(state="disabled", updated_at=timezone.now())
                     disable_baileys = True
                 messages.success(
-                    request, f"{connection.display_name} is now {connection.get_status_display().lower()}."
+                    request, f"{connection.display_name} agora está {connection.get_status_display().lower()}."
                 )
         if disable_baileys:
             try:
@@ -479,7 +479,7 @@ def connection_delete(request: WorkspaceRequest, workspace_id: str, connection_i
     name = connection.display_name
     _notify_disconnect(connection)
     connection.delete()
-    messages.success(request, f"Disconnected {name}.")
+    messages.success(request, f"{name} desconectado.")
     return redirect(reverse("channels:list", kwargs={"workspace_id": workspace_id}))
 
 

@@ -1,6 +1,6 @@
 {% extends "layouts/settings.html" %}
-{% block title %}API key issued · BrightBean Chat{% endblock %}
-{% block page_header %}<h1 class="page-title mb-4">API key issued</h1>{% endblock %}
+{% block title %}Chave de API emitida · BrightBean Chat{% endblock %}
+{% block page_header %}<h1 class="page-title mb-4">Chave de API emitida</h1>{% endblock %}
 
 {% block content %}
   {% comment %}
@@ -10,18 +10,17 @@
   redirect for the reason apps/api/views_keys.py documents — the messages
   framework stores in the session, which is a database table here.
   {% endcomment %}
-  <p><strong>Copy this key now. It is not shown again.</strong></p>
+  <p><strong>Copie esta chave agora. Ela não será exibida novamente.</strong></p>
   <p><code>{{ plaintext }}</code></p>
 
-  <h2>Using it</h2>
-  <p>Send it as a bearer token on every request:</p>
+  <h2>Como usar</h2>
+  <p>Envie-a como token do tipo bearer em todas as solicitações:</p>
   <p><code>Authorization: Bearer {{ plaintext }}</code></p>
   <p class="muted">
-    “{{ api_key.name }}” acts in <strong>{{ workspace.name }}</strong> and nowhere
-    else. Revoking it takes effect on the very next request. If you lose it,
-    revoke it and issue another. It cannot be recovered.
+    “{{ api_key.name }}” atua em <strong>{{ workspace.name }}</strong> e em nenhum outro espaço de trabalho. Revogá-la tem efeito já na próxima solicitação. Se você a perder,
+    revogue-a e emita outra. Não é possível recuperá-la.
   </p>
 
-  <p><a href="{% url 'api_docs' %}">Read the API reference</a></p>
-  <p><a href="{{ back_url }}">Done</a></p>
+  <p><a href="{% url 'api_docs' %}">Ler a referência da API</a></p>
+  <p><a href="{{ back_url }}">Concluído</a></p>
 {% endblock %}

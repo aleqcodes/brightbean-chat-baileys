@@ -101,10 +101,10 @@ class NodeSpec:
 #: the order and the labels are exported, so the frontend reads one file rather
 #: than one file plus a hard-coded table.
 GROUPS: tuple[tuple[str, str], ...] = (
-    ("content", "Content"),
-    ("logic", "Logic"),
-    ("actions", "Actions"),
-    ("other", "Other"),
+    ("content", "Conteúdo"),
+    ("logic", "Lógica"),
+    ("actions", "Ações"),
+    ("other", "Outros"),
 )
 
 NODE_TYPES: dict[str, NodeSpec] = {}
@@ -201,7 +201,7 @@ def handles_for_node(spec: NodeSpec, config: Any) -> set[str]:
 # gallery. Written once in Python and spread into both fragments, so the two can
 # never describe different cards.
 _CARD_PROPERTIES: dict[str, dict[str, Any]] = {
-    "image": f.string(min_length=1, max_length=2000, description="Media library id or URL."),
+    "image": f.string(min_length=1, max_length=2000, description="ID da mídia na biblioteca ou URL."),
     "title": f.string(min_length=1, max_length=200),
     "subtitle": f.string(max_length=400),
     "url_button": f.ref("url_button"),
@@ -221,7 +221,7 @@ register_defs(
         **f.obj(
             {
                 "type": f.enum("image", "audio", "video", "file"),
-                "media_id": f.string(min_length=1, max_length=64, description="Media library asset id (#16)."),
+                "media_id": f.string(min_length=1, max_length=64, description="ID do arquivo de mídia na biblioteca (#16)."),
                 "url": f.string(min_length=1, max_length=2000),
                 "caption": f.string(max_length=1024),
             },
@@ -250,7 +250,7 @@ register_defs(
     ),
     message_button_url=f.obj(
         {
-            "id": f.string(min_length=1, max_length=64, description="The id in this button's btn:<id> handle."),
+            "id": f.string(min_length=1, max_length=64, description="O ID no identificador btn:<id> deste botão."),
             "label": f.string(min_length=1, max_length=80),
             "action": f.const("url"),
             "url": f.string(min_length=1, max_length=2000),
@@ -259,7 +259,7 @@ register_defs(
     ),
     message_button_postback=f.obj(
         {
-            "id": f.string(min_length=1, max_length=64, description="The id in this button's btn:<id> handle."),
+            "id": f.string(min_length=1, max_length=64, description="O ID no identificador btn:<id> deste botão."),
             "label": f.string(min_length=1, max_length=80),
             "action": f.const("postback"),
         },
@@ -268,7 +268,7 @@ register_defs(
     message_button=f.tagged_union("action", {"url": "message_button_url", "postback": "message_button_postback"}),
     quick_reply=f.obj(
         {
-            "id": f.string(min_length=1, max_length=64, description="The id in this reply's qr:<id> handle."),
+            "id": f.string(min_length=1, max_length=64, description="O ID no identificador qr:<id> desta resposta rápida."),
             "label": f.string(min_length=1, max_length=80),
         },
         required=["id", "label"],
@@ -280,7 +280,7 @@ register_defs(
             "unit": f.enum("minutes", "hours", "days"),
         },
         required=["enabled"],
-        description="Where the flow goes if nobody answers in time.",
+        description="Para onde o fluxo segue se ninguém responder a tempo.",
     ),
     retry_unmatched=f.obj(
         {
@@ -299,7 +299,7 @@ register_defs(
     whatsapp_template_variable=f.obj(
         {
             "slot": {
-                **f.string(min_length=1, max_length=32, description="header.1, body.2, button.0.1 …"),
+                **f.string(min_length=1, max_length=32, description="Posição do parâmetro, por exemplo header.1, body.2 ou button.0.1."),
                 "pattern": r"^(header|body|button\.[0-9]{1,2})\.[0-9]{1,3}$",
             },
             "value": f.string(max_length=1024),
@@ -320,7 +320,7 @@ register_defs(
         {
             "template_id": f.string(min_length=1, max_length=64),
             "reference": {
-                **f.string(min_length=3, max_length=600, description="<name>/<language>, e.g. order_shipped/en_US."),
+                **f.string(min_length=3, max_length=600, description="Referência no formato <name>/<language>, por exemplo order_shipped/en_US."),
                 "pattern": r"^[a-z0-9_]{1,512}/[A-Za-z_]{2,10}$",
             },
             "variables": f.array(f.ref("whatsapp_template_variable"), max_items=20),
@@ -332,8 +332,8 @@ register_defs(
         {
             "enabled": f.boolean(),
             "days": f.array(f.enum("mon", "tue", "wed", "thu", "fri", "sat", "sun"), max_items=7),
-            "from": {**f.string(description="Local time, HH:MM."), "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"},
-            "to": {**f.string(description="Local time, HH:MM."), "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"},
+            "from": {**f.string(description="Horário local, HH:MM."), "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"},
+            "to": {**f.string(description="Horário local, HH:MM."), "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"},
             "use_contact_timezone": f.boolean(),
         },
         required=["enabled"],
@@ -355,8 +355,8 @@ register_defs(
             "date": {
                 **f.obj(
                     {
-                        "field": f.string(min_length=1, max_length=200, description="A date/datetime field."),
-                        "datetime": f.string(min_length=1, max_length=64, description="ISO-8601 instant."),
+                        "field": f.string(min_length=1, max_length=200, description="Um campo de data/hora."),
+                        "datetime": f.string(min_length=1, max_length=64, description="Data e hora no formato ISO-8601."),
                     },
                 ),
                 # SPEC §11.5: "date {field or fixed datetime}" — one of the two
@@ -369,8 +369,8 @@ register_defs(
     ),
     randomizer_path=f.obj(
         {
-            "id": f.string(min_length=1, max_length=64, description="The id in this path's rand:<id> handle."),
-            "weight": f.integer(minimum=0, maximum=100, description="Percent."),
+            "id": f.string(min_length=1, max_length=64, description="O ID no identificador rand:<id> deste caminho."),
+            "weight": f.integer(minimum=0, maximum=100, description="Percentual."),
         },
         required=["id", "weight"],
     ),
@@ -410,7 +410,7 @@ for _verb_name, _verb_schema in (
             {
                 "field": f.string(min_length=1, max_length=200),
                 "value": f.string(
-                    max_length=4096, description="Can include {{placeholders}}, filled in when the message is sent."
+                    max_length=4096, description="Pode incluir {{placeholders}}, que serão preenchidos quando a mensagem for enviada."
                 ),
             },
             ["field", "value"],
@@ -454,8 +454,8 @@ for _verb_name, _verb_schema in (
 register_node_type(
     NodeSpec(
         type="send_message",
-        label="Send a message",
-        description="Sends a message. If it offers buttons or quick replies, the flow waits for an answer.",
+        label="Enviar mensagem",
+        description="Envia uma mensagem. Se ela tiver botões ou respostas rápidas, o fluxo aguarda uma resposta.",
         group="content",
         config=f.obj(
             {
@@ -481,8 +481,8 @@ register_node_type(
 register_node_type(
     NodeSpec(
         type="action",
-        label="Tag, save or assign",
-        description="Tags a contact, saves a detail, assigns the conversation. Several at once, in order.",
+        label="Etiquetar, salvar ou atribuir",
+        description="Adiciona etiquetas a um contato, salva informações e atribui a conversa. Executa várias ações em sequência.",
         group="actions",
         # The verb union is built at export time from ACTION_VERBS, so a verb a
         # later issue registers appears without this line changing.
@@ -494,8 +494,8 @@ register_node_type(
 register_node_type(
     NodeSpec(
         type="start_flow",
-        label="Hand over to another flow",
-        description="Hands over to another flow. This one stops here.",
+        label="Transferir para outro fluxo",
+        description="Transfere a execução para outro fluxo. Este fluxo termina aqui.",
         group="logic",
         config=f.obj({"flow_id": f.string(min_length=1, max_length=64)}, required=["flow_id"]),
         handles=(),
@@ -506,8 +506,8 @@ register_node_type(
 register_node_type(
     NodeSpec(
         type="condition",
-        label="Branch on a condition",
-        description="Splits the flow in two, on what you know about the contact.",
+        label="Ramificar por condição",
+        description="Divide o fluxo em dois caminhos com base no que você sabe sobre o contato.",
         group="logic",
         config=f.ref("condition_filter"),
         handles=("cond:true", "cond:false"),
@@ -517,8 +517,8 @@ register_node_type(
 register_node_type(
     NodeSpec(
         type="smart_delay",
-        label="Wait",
-        description="Waits, then carries on. Picks up at the next hour you allow sending.",
+        label="Aguardar",
+        description="Aguarda e depois continua. Retoma no próximo horário em que o envio estiver permitido.",
         group="logic",
         # Discriminated on `mode` rather than a flat object with everything
         # optional. With only `mode` required, {"mode": "duration"} published
@@ -534,14 +534,14 @@ register_node_type(
 register_node_type(
     NodeSpec(
         type="randomizer",
-        label="Split the traffic",
-        description="Splits people down different paths, to compare two versions. Each person keeps the path they got.",
+        label="Dividir o tráfego",
+        description="Divide os contatos em caminhos diferentes para comparar duas versões. Cada pessoa permanece no caminho que recebeu.",
         group="logic",
         config=f.obj(
             {
                 "paths": f.array(f.ref("randomizer_path"), min_items=2, max_items=10),
                 "sticky": f.boolean(
-                    description="On by default, so somebody who comes back takes the path they had before."
+                    description="Ativado por padrão: se alguém voltar, seguirá pelo mesmo caminho de antes."
                 ),
             },
             required=["paths"],
@@ -554,15 +554,15 @@ register_node_type(
 register_node_type(
     NodeSpec(
         type="external_request",
-        label="Call another system",
-        description="Calls another system and can save what it sends back.",
+        label="Chamar outro sistema",
+        description="Faz uma chamada a outro sistema e pode salvar os dados recebidos.",
         group="actions",
         config=f.obj(
             {
                 "method": f.enum("GET", "POST", "PUT", "PATCH", "DELETE"),
                 "url": f.string(min_length=1, max_length=2000),
                 "headers": f.array(f.ref("http_header"), max_items=20),
-                "body": f.any_json(description="JSON body template; placeholders are substituted, never evaluated."),
+                "body": f.any_json(description="Modelo de corpo JSON; os placeholders são substituídos, nunca avaliados."),
                 # SPEC §11.7 caps the timeout at 10 seconds.
                 "timeout_s": f.integer(minimum=1, maximum=10),
                 "response_mappings": f.array(f.ref("response_mapping"), max_items=20),
@@ -577,8 +577,8 @@ register_node_type(
 register_node_type(
     NodeSpec(
         type="data_collection",
-        label="Ask a question",
-        description="Asks a question and saves the answer on the contact. Checks emails and phone numbers look real.",
+        label="Fazer uma pergunta",
+        description="Faz uma pergunta e salva a resposta no contato. Verifica se endereços de e-mail e números de telefone parecem válidos.",
         group="content",
         config=f.obj(
             {
@@ -613,8 +613,8 @@ register_node_type(
 register_node_type(
     NodeSpec(
         type="send_sms",
-        label="Send a text",
-        description="Sends a text message. Needs an SMS account connected and a phone number for the contact.",
+        label="Enviar SMS",
+        description="Envia uma mensagem de texto. Requer uma conta de SMS conectada e um número de telefone no contato.",
         group="actions",
         config=f.obj(
             {
@@ -630,8 +630,8 @@ register_node_type(
 register_node_type(
     NodeSpec(
         type="send_email",
-        label="Send an email",
-        description="Sends an email. Needs an email account connected and an address for the contact.",
+        label="Enviar e-mail",
+        description="Envia um e-mail. Requer uma conta de e-mail conectada e um endereço no contato.",
         group="actions",
         config=f.obj(
             {
@@ -650,8 +650,8 @@ register_node_type(
 register_node_type(
     NodeSpec(
         type="note",
-        label="Note to yourself",
-        description="A note to yourself on the canvas. It never runs and never connects to anything.",
+        label="Anotação pessoal",
+        description="Uma anotação para você no canvas. Ela não é executada nem se conecta a outros elementos.",
         group="content",
         config=f.obj({"text": f.string(max_length=5000)}, required=["text"]),
         handles=(),

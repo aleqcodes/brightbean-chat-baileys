@@ -21,6 +21,18 @@ from django.db import IntegrityError, transaction
 __all__ = ["assert_name_is_free", "clean_name", "unique_name"]
 
 
+_NOUN_LABELS = {
+    "sequence": "sequência",
+    "tag": "tag",
+    "field": "campo",
+    "segment": "segmento",
+    "flow": "fluxo",
+    "workspace": "espaço de trabalho",
+    "contact": "contato",
+    "organization": "organização",
+}
+
+
 def clean_name(value: Any, *, limit: int, noun: str, error: type[Exception]) -> str:
     """Collapse whitespace and **refuse** anything over the column width.
 
@@ -34,15 +46,16 @@ def clean_name(value: Any, *, limit: int, noun: str, error: type[Exception]) -> 
     into ``objects.create()`` and psycopg raises at execute time — a 500 for a
     value a stranger supplied.
     """
+    noun = _NOUN_LABELS.get(noun, noun)
     if not isinstance(value, str) and value is not None:
-        raise error(f"A {noun} name must be text.")
+        raise error(f"O nome de {noun} deve ser texto.")
     if value and "\x00" in value:
-        raise error(f"A {noun} name cannot contain a null byte.")
+        raise error(f"O nome de {noun} não pode conter um byte nulo.")
     cleaned = " ".join((value or "").split())
     if not cleaned:
-        raise error(f"A {noun} needs a name.")
+        raise error(f"{noun} precisa ter um nome.")
     if len(cleaned) > limit:
-        raise error(f"A {noun} name is at most {limit} characters.")
+        raise error(f"O nome de {noun} deve ter no máximo {limit} caracteres.")
     return cleaned
 
 
@@ -55,11 +68,12 @@ def assert_name_is_free(
     ``Lower(name)`` — checking with ``=`` here would let "vip" through and then
     let the database raise on it.
     """
+    noun = _NOUN_LABELS.get(noun, noun)
     rows = model.objects.for_workspace(workspace).filter(name__iexact=name)
     if excluding is not None:
         rows = rows.exclude(pk=excluding)
     if rows.exists():
-        raise error(f"A {noun} with that name already exists.")
+        raise error(f"Já existe {noun} com esse nome.")
 
 
 @contextmanager
@@ -76,8 +90,9 @@ def unique_name(noun: str, *, error: type[Exception]) -> Iterator[None]:
     expression over ``Lower(name)`` **and** ``workspace`` is skipped by a
     ``full_clean`` that excludes the derived ``workspace`` field.
     """
+    noun = _NOUN_LABELS.get(noun, noun)
     try:
         with transaction.atomic():
             yield
     except IntegrityError as exc:
-        raise error(f"A {noun} with that name already exists.") from exc
+        raise error(f"Já existe {noun} com esse nome.") from exc

@@ -125,11 +125,11 @@ def sequence_create(request: WorkspaceRequest, workspace_id: str) -> HttpRespons
     try:
         sequence = services.create_sequence(request.workspace, name=request.POST.get("name", ""))
     except CampaignsError as exc:
-        return _refused(exc, "Could not create the sequence")
+        return _refused(exc, "Não foi possível criar a sequência")
     return toast_response(
         tone="success",
-        title="Sequence created",
-        body=f"{sequence.name} is ready for its first step.",
+        title="Sequência criada",
+        body=f"{sequence.name} está pronta para a primeira etapa.",
         events={"sequencesChanged": True},
     )
 
@@ -142,8 +142,8 @@ def sequence_rename(request: WorkspaceRequest, workspace_id: str, sequence_id: s
     try:
         services.rename_sequence(sequence, name=request.POST.get("name", ""))
     except CampaignsError as exc:
-        return _refused(exc, "Could not rename the sequence")
-    return toast_response(tone="success", title="Sequence renamed", events={"sequencesChanged": True})
+        return _refused(exc, "Não foi possível renomear a sequência")
+    return toast_response(tone="success", title="Sequência renomeada", events={"sequencesChanged": True})
 
 
 @login_required
@@ -154,11 +154,11 @@ def sequence_status(request: WorkspaceRequest, workspace_id: str, sequence_id: s
     try:
         services.set_status(sequence, status=(request.POST.get("status") or "").strip())
     except CampaignsError as exc:
-        return _refused(exc, "Could not change the status")
+        return _refused(exc, "Não foi possível alterar o status")
     return toast_response(
         tone="success",
-        title=f"Sequence {sequence.get_status_display().lower()}",
-        body="Only active sequences accept new subscribers. People already on it are unaffected.",
+        title=f"Sequência {sequence.get_status_display().lower()}",
+        body="Somente sequências ativas aceitam novas inscrições. Quem já está inscrito não será afetado.",
         events={"sequencesChanged": True},
     )
 
@@ -172,8 +172,8 @@ def sequence_delete(request: WorkspaceRequest, workspace_id: str, sequence_id: s
     services.delete_sequence(sequence)
     return toast_response(
         tone="success",
-        title="Sequence deleted",
-        body=f"{name} and everyone's progress through it.",
+        title="Sequência excluída",
+        body=f"{name} e todo o progresso das pessoas inscritas foram removidos.",
         events={"sequencesChanged": True},
     )
 
@@ -273,8 +273,8 @@ def step_create(request: WorkspaceRequest, workspace_id: str, sequence_id: str) 
             send_window=_window_from(request),
         )
     except CampaignsError as exc:
-        return _refused(exc, "Could not add the step")
-    return toast_response(tone="success", title="Step added", events={"sequenceStepsChanged": True})
+        return _refused(exc, "Não foi possível adicionar a etapa")
+    return toast_response(tone="success", title="Etapa adicionada", events={"sequenceStepsChanged": True})
 
 
 @login_required
@@ -292,8 +292,8 @@ def step_update(request: WorkspaceRequest, workspace_id: str, sequence_id: str, 
             send_window=_window_from(request),
         )
     except CampaignsError as exc:
-        return _refused(exc, "Could not save the step")
-    return toast_response(tone="success", title="Step saved", events={"sequenceStepsChanged": True})
+        return _refused(exc, "Não foi possível salvar a etapa")
+    return toast_response(tone="success", title="Etapa salva", events={"sequenceStepsChanged": True})
 
 
 @login_required
@@ -305,8 +305,8 @@ def step_move(request: WorkspaceRequest, workspace_id: str, sequence_id: str, st
     try:
         services.move_step(step, direction=(request.POST.get("direction") or "").strip())
     except CampaignsError as exc:
-        return _refused(exc, "Could not move the step")
-    return toast_response(tone="success", title="Order updated", events={"sequenceStepsChanged": True})
+        return _refused(exc, "Não foi possível mover a etapa")
+    return toast_response(tone="success", title="Ordem atualizada", events={"sequenceStepsChanged": True})
 
 
 @login_required
@@ -317,8 +317,8 @@ def step_delete(request: WorkspaceRequest, workspace_id: str, sequence_id: str, 
     services.delete_step(_step(request, sequence, step_id))
     return toast_response(
         tone="success",
-        title="Step removed",
-        body="Anyone waiting on it moves to whatever took its place.",
+        title="Etapa removida",
+        body="Quem estava aguardando nela seguirá para a etapa que ocupar o lugar.",
         events={"sequenceStepsChanged": True},
     )
 
@@ -410,11 +410,11 @@ def subscriber_add(request: WorkspaceRequest, workspace_id: str, sequence_id: st
     try:
         services.subscribe(sequence, contact, source="manual")
     except CampaignsError as exc:
-        return _refused(exc, "Could not subscribe that contact")
+        return _refused(exc, "Não foi possível inscrever esse contato")
     return toast_response(
         tone="success",
-        title="Contact subscribed",
-        body=f"{contact.display_name} starts at step 1.",
+        title="Contato inscrito",
+        body=f"{contact.display_name} começará na etapa 1.",
         events={"sequenceSubscribersChanged": True, "sequenceStepsChanged": True},
     )
 
@@ -430,7 +430,7 @@ def subscriber_remove(
     services.unsubscribe(sequence, enrollment.contact)
     return toast_response(
         tone="success",
-        title="Contact unsubscribed",
-        body="Future steps are cancelled. Anything already running finishes.",
+        title="Contato removido da sequência",
+        body="As próximas etapas foram canceladas. As que já estão em andamento serão concluídas.",
         events={"sequenceSubscribersChanged": True, "sequenceStepsChanged": True},
     )

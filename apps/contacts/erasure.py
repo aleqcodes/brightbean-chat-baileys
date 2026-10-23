@@ -147,7 +147,7 @@ def begin(
         # ``erasure_one_live_per_contact``. The reclaim above is a
         # check-then-create, so two concurrent requests can both pass it; the
         # database arbitrates and the loser gets a sentence rather than a 500.
-        raise ErasureRefusedError("An erasure for this contact is already running.") from exc
+        raise ErasureRefusedError("Já existe uma exclusão em andamento para este contato.") from exc
 
     with transaction.atomic():
         # Both before the tombstone, and in this order. ``stand_down`` expires
@@ -218,9 +218,9 @@ def _reclaim_stale(contact: Contact) -> None:
                 status__in=(ActionStatus.PENDING, ActionStatus.RUNNING),
             )
             if armed.exists():
-                raise ErasureRefusedError("An erasure for this contact is already running.")
+                raise ErasureRefusedError("Já existe uma exclusão em andamento para este contato.")
             record.status = ErasureStatus.FAILED
-            record.error = record.error or "The run stopped without finishing; superseded by a later request."
+            record.error = record.error or "A execução foi interrompida antes de terminar; substituída por uma solicitação posterior."
             record.save(update_fields=["status", "error", "updated_at"])
             logger.warning("Superseded a stalled erasure %s for contact %s.", record.pk, record.contact_id)
 

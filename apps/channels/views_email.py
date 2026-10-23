@@ -84,13 +84,13 @@ AWS_REGION_RE = re.compile(r"^[a-z]{2}(-gov)?-[a-z]+-\d$")
 #: password" from "no such user" is an oracle.
 REJECTED_MESSAGES = {
     "smtp": (
-        "The mail server did not accept those details. Check the host, port, encryption and "
-        "sign-in details with your provider and try again."
+        "O servidor de e-mail não aceitou esses dados. Confira com seu provedor o host, a porta, a criptografia e "
+        "as credenciais de acesso e tente novamente."
     ),
-    "resend": "Resend did not accept that API key. Copy it again from the Resend dashboard and try again.",
+    "resend": "O Resend não aceitou essa chave de API. Copie-a novamente no painel do Resend e tente outra vez.",
     "ses": (
-        "AWS did not accept those credentials. Check the access key, secret and region, and that the "
-        "key is allowed to use SES."
+        "A AWS não aceitou essas credenciais. Confira a chave de acesso, o segredo, a região e se a chave "
+        "tem permissão para usar o SES."
     ),
 }
 
@@ -106,8 +106,8 @@ TEST_EMAIL_WINDOW_SECONDS = 60 * 10
 #: What a test send says. Fixed copy, because the point of the test is to prove
 #: the transport works, and anything configurable here would be one more thing
 #: that could be wrong when it fails.
-TEST_SUBJECT = "BrightBean Chat test email"
-TEST_BODY = "<p>This is a test from BrightBean Chat.</p><p>If you are reading it, this channel can send email.</p>"
+TEST_SUBJECT = "E-mail de teste do BrightBean Chat"
+TEST_BODY = "<p>Este é um teste do BrightBean Chat.</p><p>Se você está lendo isto, este canal pode enviar e-mails.</p>"
 
 
 @login_required
@@ -170,7 +170,7 @@ def _connect(request: WorkspaceRequest, provider: str) -> str:
     """Verify, then save. Returns ``""`` on success or the message to show."""
     from_address = normalize_email(request.POST.get("from_address") or "")
     if not from_address:
-        return "Enter the address this channel should send from."
+        return "Informe o endereço de e-mail que este canal deve usar para enviar mensagens."
     domain = from_address.partition("@")[2]
 
     credentials = _credentials(request, provider, from_address)
@@ -210,7 +210,7 @@ def _connect(request: WorkspaceRequest, provider: str) -> str:
     except IntegrityError:
         return DUPLICATE_ACCOUNT_ERROR
 
-    messages.success(request, f"Connected {domain}.")
+    messages.success(request, f"Conectado ao domínio {domain}.")
     return ""
 
 
@@ -224,7 +224,7 @@ def _credentials(request: WorkspaceRequest, provider: str, from_address: str) ->
     if provider == "resend":
         api_key = (request.POST.get("api_key") or "").strip()
         if not api_key:
-            return "Paste the API key from your Resend dashboard."
+            return "Cole a chave de API do painel do Resend."
         # Resend's own webhook signing secret. Optional at connect time: bounce
         # handling needs it, sending does not, and an operator who has not
         # created the endpoint yet should not be blocked from connecting.
@@ -234,9 +234,9 @@ def _credentials(request: WorkspaceRequest, provider: str, from_address: str) ->
         secret = (request.POST.get("secret_access_key") or "").strip()
         region = (request.POST.get("region") or "").strip().lower()
         if not key_id or not secret or not region:
-            return "Enter the access key, the secret and the AWS region."
+            return "Informe a chave de acesso, o segredo e a região da AWS."
         if not AWS_REGION_RE.match(region):
-            return "That is not an AWS region name. It looks like eu-west-1 or us-gov-east-1."
+            return "Esse não parece ser um nome de região da AWS. Exemplos: eu-west-1 ou us-gov-east-1."
         return {
             **common,
             "access_key_id": key_id,
@@ -251,13 +251,13 @@ def _credentials(request: WorkspaceRequest, provider: str, from_address: str) ->
 
     host = (request.POST.get("host") or "").strip()
     if not host:
-        return "Enter the SMTP host your provider gave you."
+        return "Informe o host SMTP fornecido pelo seu provedor."
     port = (request.POST.get("port") or "").strip() or "587"
     if not port.isdigit():
-        return "Enter a numeric SMTP port, usually 587 for STARTTLS or 465 for SSL."
+        return "Informe uma porta SMTP numérica, geralmente 587 para STARTTLS ou 465 para SSL."
     security = (request.POST.get("security") or "starttls").strip().lower()
     if security not in {"starttls", "ssl", "none"}:
-        return "Choose STARTTLS, SSL or none for the connection encryption."
+        return "Escolha STARTTLS, SSL ou nenhuma criptografia para a conexão."
     return {
         **common,
         "host": host,
@@ -309,9 +309,9 @@ def update_credentials(request: WorkspaceRequest, workspace_id: str, connection_
     if changed:
         connection.credentials = credentials  # type: ignore[assignment]
         connection.save(update_fields=["credentials", "updated_at"])
-        messages.success(request, "Updated this channel's webhook settings.")
+        messages.success(request, "As configurações de webhook deste canal foram atualizadas.")
     else:
-        messages.info(request, "Nothing to update.")
+        messages.info(request, "Não há nada para atualizar.")
     return redirect(reverse("channels:detail", kwargs={"workspace_id": workspace_id, "connection_id": connection.pk}))
 
 
@@ -339,7 +339,7 @@ def send_test_email(request: WorkspaceRequest, workspace_id: str, connection_id:
     )
     recipient = normalize_email(getattr(request.user, "email", "") or "")
     if not recipient:
-        return JsonResponse({"ok": False, "message": "Your account has no email address to send a test to."})
+        return JsonResponse({"ok": False, "message": "Sua conta não tem um endereço de e-mail para enviar um teste."})
 
     # Per connection rather than per user: the thing being protected is the
     # sending domain's reputation, and that belongs to the connection.
@@ -349,12 +349,12 @@ def send_test_email(request: WorkspaceRequest, workspace_id: str, connection_id:
         window_seconds=TEST_EMAIL_WINDOW_SECONDS,
     ):
         return JsonResponse(
-            {"ok": False, "message": "Too many test emails for this channel just now. Try again shortly."}
+            {"ok": False, "message": "Muitos testes de e-mail para este canal agora. Tente novamente em instantes."}
         )
 
     envelope = _test_envelope(connection, recipient)
     if not envelope.from_address:
-        return JsonResponse({"ok": False, "message": "This connection has no from-address stored."})
+        return JsonResponse({"ok": False, "message": "Este canal não tem um endereço de remetente salvo."})
 
     try:
         email_backends.deliver(connection, envelope)
@@ -366,7 +366,7 @@ def send_test_email(request: WorkspaceRequest, workspace_id: str, connection_id:
                 "message": REJECTED_MESSAGES.get(email_backends.provider_for(connection), REJECTED_MESSAGES["smtp"]),
             }
         )
-    return JsonResponse({"ok": True, "message": f"Sent a test email to {recipient}."})
+    return JsonResponse({"ok": True, "message": f"E-mail de teste enviado para {recipient}."})
 
 
 def _test_envelope(connection: ChannelConnection, recipient: str) -> email_backends.Envelope:

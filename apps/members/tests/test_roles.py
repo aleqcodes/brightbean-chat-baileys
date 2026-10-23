@@ -71,6 +71,7 @@ class TestThePermissionTable:
             "manage_channels",
             "manage_members",
             "manage_workspace_settings",
+            "manage_ai_agents",
             "manage_api_keys",
             # Issue #29: Editor keeps ``manage_crm``'s reversible delete and
             # does not get GDPR erasure, which has no undo.
@@ -90,6 +91,7 @@ class TestThePermissionTable:
             "manage_channels",
             "manage_members",
             "manage_workspace_settings",
+            "manage_ai_agents",
             "manage_api_keys",
             "erase_contacts",
         }

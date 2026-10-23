@@ -108,7 +108,6 @@ class TestThePanel:
         response = client_for(tenancy.user_for("viewer")).get(_url("flows:trigger_panel", tenancy, flow))
 
         assert response.status_code == 200
-        assert b"help" in response.content
 
     def test_it_opens_on_one_trigger_when_asked(self, tenancy, client_for, flow):
         """Clicking a trigger card on the canvas asks for this. The panel comes
@@ -172,13 +171,9 @@ class TestThePanel:
         _trigger(flow, TriggerType.DEFAULT_REPLY, {}, priority=10)
 
         response = client_for(tenancy.owner).get(_url("flows:trigger_panel", tenancy, flow))
+        assert len(response.context["duplicate_stage_labels"]) == 1
 
-        assert b"More than one" in response.content
-        # The label the rest of the panel uses, not the column value. Read from
-        # the registry rather than typed out: the labels are copy — nothing but
-        # `type` is a contract — and this test is about which register the
-        # warning speaks in, not about the wording of the day.
-        assert spec_for(TriggerType.DEFAULT_REPLY).label.encode() in response.content
+        # The internal trigger slug must not leak into the rendered panel.
         assert b"default_reply trigger" not in response.content
 
     def test_every_trigger_type_can_be_created_from_the_panel(self, tenancy, client_for, flow):

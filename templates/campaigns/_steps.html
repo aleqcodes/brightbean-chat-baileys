@@ -10,11 +10,11 @@ each step saves independently, so a validation refusal on one cannot discard
 edits to another.
 {% endcomment %}
 <section>
-    <h2 class="section-eyebrow mb-2.5">Steps</h2>
+    <h2 class="section-eyebrow mb-2.5">Etapas</h2>
 
     {% if not steps %}
     <div class="mb-4">
-    {% include "components/empty_state.html" with icon="sequences" title="No steps yet" body="A sequence with no steps completes the moment somebody subscribes to it." %}
+    {% include "components/empty_state.html" with icon="sequences" title="Ainda não há etapas" body="Uma sequência sem etapas é concluída assim que alguém se inscreve nela." %}
     </div>
     {% else %}
     <div class="card overflow-hidden mb-4">
@@ -25,25 +25,24 @@ edits to another.
                       style="width: 1.75rem; height: 1.75rem; background: var(--ink); color: var(--text-inverse);">{{ step.position }}</span>
                 <div class="flex-1 min-w-0">
                     <p class="list-row-title truncate">{{ step.flow.name }}</p>
-                    <p class="text-xs mt-0.5" style="color: var(--text-tertiary);">
-                        Wait {{ step.delay_label }}{% if step.window.enabled %},
-                        {{ step.window.from }}–{{ step.window.to }}{% if step.window.use_contact_timezone %} in the contact's timezone{% endif %}{% endif %}
-                        · {{ step.waiting_count }} waiting
+                    Aguarda {{ step.delay_value }} {% if step.delay_value == 1 %}{% if step.delay_unit == "minutes" %}minuto{% elif step.delay_unit == "hours" %}hora{% else %}dia{% endif %}{% else %}{% if step.delay_unit == "minutes" %}minutos{% elif step.delay_unit == "hours" %}horas{% else %}dias{% endif %}{% endif %}{% if step.window.enabled %},
+                    {{ step.window.from }}–{{ step.window.to }}{% if step.window.use_contact_timezone %} no fuso horário do contato{% endif %}{% endif %}
+                    · {{ step.waiting_count }} aguardando
                     </p>
                 </div>
                 {% if can_edit %}
                 <div class="flex items-center gap-2">
-                    <button type="button" class="btn-pill-secondary btn-pill-sm" @click="editing = !editing" :aria-expanded="editing ? 'true' : 'false'">Edit</button>
+                    <button type="button" class="btn-pill-secondary btn-pill-sm" @click="editing = !editing" :aria-expanded="editing ? 'true' : 'false'">Editar</button>
                     <button type="button" class="btn-icon-round"
                             hx-post="{% url 'campaigns:step_move' workspace_id=request.workspace.id sequence_id=sequence.id step_id=step.id %}"
-                            hx-vals='{"direction": "up"}' hx-swap="none" aria-label="Move step up">↑</button>
+                            hx-vals='{"direction": "up"}' hx-swap="none" aria-label="Mover etapa para cima">↑</button>
                     <button type="button" class="btn-icon-round"
                             hx-post="{% url 'campaigns:step_move' workspace_id=request.workspace.id sequence_id=sequence.id step_id=step.id %}"
-                            hx-vals='{"direction": "down"}' hx-swap="none" aria-label="Move step down">↓</button>
+                            hx-vals='{"direction": "down"}' hx-swap="none" aria-label="Mover etapa para baixo">↓</button>
                     <button type="button" class="btn-danger-link ml-1"
                             hx-post="{% url 'campaigns:step_delete' workspace_id=request.workspace.id sequence_id=sequence.id step_id=step.id %}"
                             hx-swap="none"
-                            hx-confirm="Remove step {{ step.position }}? Anyone waiting on it moves to whatever takes its place.">Remove</button>
+                            hx-confirm="Remover a etapa {{ step.position }}? Quem estiver aguardando nela será movido para a etapa que ocupar o lugar.">Remover</button>
                 </div>
                 {% endif %}
             </div>
@@ -56,8 +55,8 @@ edits to another.
                 {% csrf_token %}
                 {% include "campaigns/_step_fields.html" with step=step %}
                 <div class="flex items-center gap-2 mt-3">
-                    <button type="submit" class="btn-pill-secondary btn-pill-sm">Save step</button>
-                    <button type="button" class="btn-link" @click="editing = false">Cancel</button>
+                    <button type="submit" class="btn-pill-secondary btn-pill-sm">Salvar etapa</button>
+                    <button type="button" class="btn-link" @click="editing = false">Cancelar</button>
                 </div>
             </form>
             {% endif %}
@@ -69,7 +68,7 @@ edits to another.
     {% if can_edit %}
     <div class="card p-4" x-data="{ adding: false }">
         <button type="button" class="btn-pill-secondary btn-pill-sm" x-show="!adding" @click="adding = true">
-            {% include "partials/_nav_icon.html" with name="plus" icon_size=15 %} Add a step
+            {% include "partials/_nav_icon.html" with name="plus" icon_size=15 %} Adicionar etapa
         </button>
         <form x-show="adding" x-cloak
               hx-post="{% url 'campaigns:step_create' workspace_id=request.workspace.id sequence_id=sequence.id %}"
@@ -78,8 +77,8 @@ edits to another.
             {% csrf_token %}
             {% include "campaigns/_step_fields.html" %}
             <div class="flex items-center gap-2 mt-3">
-                <button type="submit" class="btn-pill-secondary btn-pill-sm">Add step</button>
-                <button type="button" class="btn-link" @click="adding = false">Cancel</button>
+                <button type="submit" class="btn-pill-secondary btn-pill-sm">Adicionar etapa</button>
+                <button type="button" class="btn-link" @click="adding = false">Cancelar</button>
             </div>
         </form>
     </div>

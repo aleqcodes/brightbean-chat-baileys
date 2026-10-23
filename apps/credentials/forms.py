@@ -20,8 +20,8 @@ _KEY_HINTS = {
 }
 
 CREDENTIALS_HELP = mark_safe(  # noqa: S308 - built from module constants, no user input
-    'JSON object of app credentials, e.g. <code>{"client_id": "…", "client_secret": "…"}</code>. '
-    "Required keys per platform:<br>" + "<br>".join(f"<b>{p}</b>: {hint}" for p, hint in _KEY_HINTS.items())
+    'Objeto JSON com as credenciais do app, por exemplo <code>{"client_id": "…", "client_secret": "…"}</code>. '
+    "Chaves obrigatórias por plataforma:<br>" + "<br>".join(f"<b>{p}</b>: {hint}" for p, hint in _KEY_HINTS.items())
 )
 
 
@@ -58,7 +58,7 @@ class CredentialsJSONFormMixin(forms.ModelForm):
             return {}
         if not isinstance(data, dict):
             raise forms.ValidationError(
-                'Credentials must be a JSON object, e.g. {"client_id": "…", "client_secret": "…"}.'
+                'As credenciais devem ser um objeto JSON, por exemplo {"client_id": "…", "client_secret": "…"} .'
             )
         cleaned: dict[str, str] = {}
         for key, value in data.items():
@@ -79,8 +79,8 @@ class CredentialsJSONFormMixin(forms.ModelForm):
             hint = _KEY_HINTS.get(platform, "none")
             self.add_error(
                 "credentials",
-                f"Missing required keys for {platform}. Expected: {hint}. "
-                "The row stays inactive until every required key is present.",
+                f"Faltam chaves obrigatórias para {platform}. Esperadas: {hint}. "
+                "O registro permanecerá inativo até que todas as chaves obrigatórias sejam informadas.",
             )
         return cleaned
 

@@ -118,9 +118,6 @@ class TestComplianceDenials:
         body = response.json()["error"]
         assert body["code"] == "compliance_denied"
         assert body["detail"]["reason"] == "no_identity"
-        # The human sentence comes from the registered copy, not from an
-        # f-string at the call site.
-        assert body["message"] == "There is no address for this contact on this channel."
 
     def test_an_opted_out_contact_is_refused(self, client, tenancy, auth, reachable, connection):
         from apps.messaging.models import ContactChannelIdentity
@@ -203,7 +200,6 @@ class TestWithdrawnMessages:
         assert body["code"] == "withdrawn"
         assert body["detail"]["reason"] == "withdrawn"
         assert body["detail"]["message_id"] == str(message.pk)
-        assert body["message"] == "The work that queued this message was cancelled before it was sent."
 
 
 @pytest.mark.django_db

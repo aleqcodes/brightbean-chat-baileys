@@ -69,7 +69,7 @@ class TestErrorTemplates:
         response = client.get("/no-such-page")
 
         assert response.status_code == 404
-        assert b"404 Not Found" in response.content
+        assert "404.html" in [template.name for template in response.templates]
 
     @pytest.mark.parametrize("name", ["403.html", "404.html", "500.html"])
     def test_error_templates_exist(self, name):

@@ -59,9 +59,9 @@ class SequenceStatus(models.TextChoices):
     a drip campaign they are editing.
     """
 
-    DRAFT = "draft", "Draft"
-    ACTIVE = "active", "Active"
-    ARCHIVED = "archived", "Archived"
+    DRAFT = "draft", "Rascunho"
+    ACTIVE = "active", "Ativa"
+    ARCHIVED = "archived", "Arquivada"
 
 
 class DelayUnit(models.TextChoices):
@@ -72,9 +72,9 @@ class DelayUnit(models.TextChoices):
     mean two conversions.
     """
 
-    MINUTES = "minutes", "Minutes"
-    HOURS = "hours", "Hours"
-    DAYS = "days", "Days"
+    MINUTES = "minutes", "Minutos"
+    HOURS = "hours", "Horas"
+    DAYS = "days", "Dias"
 
 
 #: A step's window, with sending allowed at any time. The shape is SPEC §11.5's
@@ -160,7 +160,7 @@ class SequenceStep(WorkspaceScopedModel):
         for name in ("sequence", "flow"):
             peer = getattr(self, f"{name}_id", None)
             if peer is not None and getattr(self, name).workspace_id != self.workspace_id:
-                raise ValidationError({name: f"That {name} belongs to a different workspace than the step."})
+                raise ValidationError({name: f"Esse {name} pertence a outro espaço de trabalho que não a etapa."})
 
     @property
     def window(self) -> dict:
@@ -172,9 +172,9 @@ class SequenceStep(WorkspaceScopedModel):
 class EnrollmentStatus(models.TextChoices):
     """SPEC §5's ``sequence_enrollment.status``."""
 
-    ACTIVE = "active", "Active"
-    COMPLETED = "completed", "Completed"
-    UNSUBSCRIBED = "unsubscribed", "Unsubscribed"
+    ACTIVE = "active", "Ativa"
+    COMPLETED = "completed", "Concluída"
+    UNSUBSCRIBED = "unsubscribed", "Inscrição cancelada"
 
 
 class SequenceEnrollment(ContactScopedModel):

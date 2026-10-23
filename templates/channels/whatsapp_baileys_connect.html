@@ -9,45 +9,45 @@
     <div class="flex items-start gap-4 mb-7">
         <span class="pi-chip pi-chip-hero {{ platform_key|platform_class }}">{% include "partials/_platform_icon.html" with platform=platform_key size="lg" only %}</span>
         <div class="min-w-0">
-            <h1 class="page-title">Connect WhatsApp (Baileys)</h1>
-            <p class="page-lede mt-1.5">Link one WhatsApp account to this workspace by scanning a QR code from the phone.</p>
+            <h1 class="page-title">Conectar WhatsApp (Baileys)</h1>
+            <p class="page-lede mt-1.5">Vincule uma conta do WhatsApp a este espaço de trabalho escaneando um código QR pelo celular.</p>
         </div>
     </div>
 
     <div class="rounded-[14px] p-4 mb-5" style="background: var(--warning-50);" role="note">
-        <p class="text-sm font-semibold" style="color: var(--warning-700);">Unofficial WhatsApp connection</p>
+        <p class="text-sm font-semibold" style="color: var(--warning-700);">Conexão não oficial do WhatsApp</p>
         <p class="text-sm mt-1" style="color: var(--warning-700);">{{ risk_notice }}</p>
     </div>
 
     <section class="card p-6 mb-5">
-        <h2 class="section-title mb-3">Before you connect</h2>
+        <h2 class="section-title mb-3">Antes de conectar</h2>
         <ol class="cn-steps" role="list">
-            <li class="cn-step">Use a phone number you control and can keep linked to this service.</li>
-            <li class="cn-step">After creating the channel, open WhatsApp on that phone and choose <strong>Linked devices → Link a device</strong>.</li>
-            <li class="cn-step">Scan only the current QR code displayed on the next page. It expires and refreshes automatically.</li>
+            <li class="cn-step">Use um número de telefone que você controla e pode manter vinculado a este serviço.</li>
+            <li class="cn-step">Depois de criar o canal, abra o WhatsApp nesse celular e selecione <strong>Dispositivos conectados → Conectar dispositivo</strong>.</li>
+            <li class="cn-step">Escaneie apenas o código QR atual exibido na próxima página. Ele expira e é atualizado automaticamente.</li>
         </ol>
     </section>
 
     <form class="card p-6 mb-5" method="post">
         {% csrf_token %}
-        <h2 class="section-title mb-4">Channel details</h2>
+        <h2 class="section-title mb-4">Detalhes do canal</h2>
         <div class="field">
-            <label class="field-label" for="display_name">Channel name</label>
+            <label class="field-label" for="display_name">Nome do canal</label>
             <input class="form-input-styled" id="display_name" name="display_name" maxlength="200" value="WhatsApp (Baileys)" autocomplete="off" required>
         </div>
         <label class="flex items-start gap-3 mt-5 text-sm" style="color: var(--text-secondary);">
             <input class="mt-1" type="checkbox" name="accept_risk" value="yes" required>
-            <span>I understand and accept the risks of using this unofficial channel.</span>
+            <span>Entendo e aceito os riscos de usar este canal não oficial.</span>
         </label>
         <div class="form-actions">
-            <button type="submit" class="btn-pill-primary">Create channel and continue</button>
-            <a class="btn-pill-secondary" href="{{ list_url }}">Cancel</a>
+            <button type="submit" class="btn-pill-primary">Criar canal e continuar</button>
+            <a class="btn-pill-secondary" href="{{ list_url }}">Cancelar</a>
         </div>
     </form>
 
     <a class="cn-back" href="{{ list_url }}">
         <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-        Back to channels
+        Voltar aos canais
     </a>
 </div>
 {% endwith %}

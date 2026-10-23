@@ -151,7 +151,7 @@ def deadline(config: Any, *, handle: str = "timeout", now: datetime | None = Non
         # Enabled with nothing to count: the builder allows it (only `enabled`
         # is required), and a wait that silently never times out is a better
         # answer than one that fires immediately.
-        logger.warning("A timeout block is enabled but carries no usable delay: %r", config)
+        logger.warning("Um bloco de timeout está habilitado, mas não tem um intervalo utilizável: %r", config)
         return None
     run_at = (now or timezone.now()) + timedelta(**{unit: delay})
     return {"handle": handle, "run_at": run_at.isoformat()}
@@ -187,8 +187,8 @@ def buttons_wait(
         # would route a button press down the quick reply's branch.
         if reply_id in handles:
             logger.warning(
-                "Node %s has a button and a quick reply both with id %r; an inbound event cannot "
-                "distinguish them, so %s stays mapped to %s.",
+                "O nó %s tem um botão e uma resposta rápida com o mesmo ID %r; um evento recebido não consegue "
+                "distinguir os dois, então %s continua mapeado para %s.",
                 node_id,
                 reply_id,
                 reply_id,
@@ -307,7 +307,7 @@ def _resume_buttons(execution: FlowExecution, event: Any, config: dict[str, Any]
 
     chosen = _match_choice(payload, handles, labels)
     if chosen is not None:
-        logger.debug("Execution %s: reply matched %s", execution.pk, chosen)
+        logger.debug("Execução %s: resposta correspondeu a %s", execution.pk, chosen)
         moved = advance(execution, Graph(execution.flow_version.graph_json), chosen)
         return Consumed(moved, reason="matched")
 
@@ -351,7 +351,7 @@ def _resume_data_collection(execution: FlowExecution, event: Any, config: dict[s
         # and the contact should be re-asked rather than the run crashing.
         _store_answer(execution, config.get("target"), value, reply_type)
     except InvalidAnswerError as exc:
-        logger.debug("Execution %s: answer rejected (%s)", execution.pk, exc)
+        logger.debug("Execução %s: resposta recusada (%s)", execution.pk, exc)
         return _retry_or_fall_through(execution, config, reason="invalid")
 
     moved = advance(execution, Graph(execution.flow_version.graph_json), "default")
@@ -380,7 +380,7 @@ def _retry_or_fall_through(execution: FlowExecution, config: dict[str, Any], *, 
     prompt = str(retry.get("text") or "")
     if prompt:
         _send_prompt(execution, prompt, attempt=retry["count"])
-    logger.debug("Execution %s: %s, retry %s of %s", execution.pk, reason, retry["count"], limit)
+    logger.debug("Execução %s: %s, nova tentativa %s de %s", execution.pk, reason, retry["count"], limit)
     return Consumed(execution, reason=f"{reason}, retried")
 
 
@@ -399,7 +399,7 @@ def _send_prompt(execution: FlowExecution, text: str, *, attempt: int) -> None:
     try:
         deliver(execution, text_message(rendered), node_id=node_id, attempt=attempt)
     except FacadeUnavailableError:
-        logger.warning("Execution %s could not send its retry prompt: messaging is not installed.", execution.pk)
+        logger.warning("Execução %s não pôde enviar a mensagem de nova tentativa: o sistema de mensagens não está instalado.", execution.pk)
 
 
 def _same_channel(execution: FlowExecution, event: Any) -> bool:
@@ -425,9 +425,9 @@ def normalise_answer(text: str, reply_type: str) -> Any:
     """
     answer = text.strip()
     if not answer:
-        raise InvalidAnswerError("an empty reply is not an answer")
+        raise InvalidAnswerError("uma resposta vazia não é uma resposta válida")
     if len(answer) > MAX_ANSWER_CHARS:
-        raise InvalidAnswerError("that reply is too long")
+        raise InvalidAnswerError("essa resposta é longa demais")
 
     if reply_type == "text":
         return answer
@@ -441,14 +441,14 @@ def normalise_answer(text: str, reply_type: str) -> Any:
         return _date(answer)
     if reply_type == "url":
         return _url(answer)
-    raise InvalidAnswerError(f"{reply_type!r} is not a reply type")
+    raise InvalidAnswerError(f"{reply_type!r} não é um tipo de resposta")
 
 
 def _email(answer: str) -> str:
     try:
         validate_email(answer)
     except ValidationError as exc:
-        raise InvalidAnswerError("that is not an email address") from exc
+        raise InvalidAnswerError("isso não é um endereço de e-mail") from exc
     return answer.lower()
 
 
@@ -467,7 +467,7 @@ def _phone(answer: str) -> str:
     """
     digits = "".join(character for character in answer if character in "0123456789")
     if not 7 <= len(digits) <= 15:
-        raise InvalidAnswerError("that is not a phone number")
+        raise InvalidAnswerError("isso não é um número de telefone")
     return f"+{digits}" if answer.strip().startswith("+") else digits
 
 
@@ -475,9 +475,9 @@ def _number(answer: str) -> Decimal:
     try:
         value = Decimal(answer.replace(",", ""))
     except (InvalidOperation, ValueError) as exc:
-        raise InvalidAnswerError("that is not a number") from exc
+        raise InvalidAnswerError("isso não é um número") from exc
     if not value.is_finite():
-        raise InvalidAnswerError("that is not a number")
+        raise InvalidAnswerError("isso não é um número")
     return value
 
 
@@ -490,9 +490,9 @@ def _date(answer: str):  # type: ignore[no-untyped-def]
         # answer to a contact.
         parsed = parse_date(answer)
     except ValueError as exc:
-        raise InvalidAnswerError("that is not a date") from exc
+        raise InvalidAnswerError("isso não é uma data") from exc
     if parsed is None:
-        raise InvalidAnswerError("that is not a date")
+        raise InvalidAnswerError("isso não é uma data")
     return parsed
 
 
@@ -503,7 +503,7 @@ def _url(answer: str) -> str:
     try:
         URLValidator(schemes=["http", "https"])(answer)
     except ValidationError as exc:
-        raise InvalidAnswerError("that is not a web address") from exc
+        raise InvalidAnswerError("isso não é um endereço da web") from exc
     return answer
 
 
@@ -575,7 +575,7 @@ def _system_target(execution: FlowExecution, target: Any) -> str | None:
     caller stays a straight line.
     """
     if not isinstance(target, dict):
-        logger.warning("Execution %s: data_collection has no target; the answer is discarded.", execution.pk)
+        logger.warning("Execução %s: data_collection não tem destino; a resposta será descartada.", execution.pk)
         return None
 
     kind = str(target.get("type") or "")
@@ -583,10 +583,10 @@ def _system_target(execution: FlowExecution, target: Any) -> str | None:
     if kind == "custom_field":
         return None
     if kind != "system_field":
-        logger.warning("Execution %s: %r is not a data_collection target type.", execution.pk, kind)
+        logger.warning("Execução %s: %r não é um tipo de destino de data_collection.", execution.pk, kind)
         return None
     if key not in WRITABLE_SYSTEM_FIELDS:
-        logger.warning("Execution %s: %r is not a writable contact field.", execution.pk, key)
+        logger.warning("Execução %s: %r não é um campo de contato gravável.", execution.pk, key)
         return None
     return key
 
@@ -605,7 +605,7 @@ def _assert_fits(contact: Any, key: str, text: str) -> None:
     """
     limit = contact._meta.get_field(key).max_length
     if limit is not None and len(text) > limit:
-        raise InvalidAnswerError(f"that answer is longer than {key} can hold")
+        raise InvalidAnswerError(f"essa resposta é maior do que o campo {key} comporta")
 
 
 def _store_custom_field(execution: FlowExecution, key: str, value: Any) -> None:
@@ -615,7 +615,7 @@ def _store_custom_field(execution: FlowExecution, key: str, value: Any) -> None:
 
     field = CustomField.objects.for_workspace(execution.workspace_id).filter(name__iexact=key).first()
     if field is None:
-        logger.warning("Execution %s: no custom field named %r; the answer is discarded.", execution.pk, key)
+        logger.warning("Execução %s: não há campo personalizado com o nome %r; a resposta será descartada.", execution.pk, key)
         return
     try:
         set_field_value(execution.contact, field, value)
@@ -624,7 +624,6 @@ def _store_custom_field(execution: FlowExecution, key: str, value: Any) -> None:
         # statement about what the contact typed, so it re-asks rather than
         # being logged and dropped. ``coerce_value`` raises before writing.
         raise InvalidAnswerError(str(exc)) from exc
-
 
 def _capture_identity(execution: FlowExecution, address: str, column: str, platform: str) -> None:
     """SPEC §11.8's "also": the contact column and the consent record.
@@ -655,7 +654,7 @@ def _record_consent(execution: FlowExecution, platform: str, address: str) -> No
         upsert_contact_identity(execution.contact, platform, address, source="data_collection", opt_in=True)
     except FacadeUnavailableError:
         logger.warning(
-            "Execution %s captured a %s but could not record consent: messaging is not installed.",
+            "Execução %s capturou um valor de %s, mas não pôde registrar o consentimento: o sistema de mensagens não está instalado.",
             execution.pk,
             platform,
         )
